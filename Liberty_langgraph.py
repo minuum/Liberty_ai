@@ -4,7 +4,7 @@
 import torch
 from transformers import BertTokenizer, BertForSequenceClassification
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from langchain import PromptTemplate, LLMChain
+from langchain import PromptTemplate
 from langchain.chains import SequentialChain
 from langchain.graphs import ChainGraph
 from langchain.llms import HuggingFacePipeline
@@ -12,14 +12,18 @@ from langchain.memory import ConversationBufferMemory
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 # # 1. 법률 관련 데이터를 파인 튜닝한 riberty-law-koBERT 모델 로드
 # bert_tokenizer = BertTokenizer.from_pretrained('riberty-law-koBERT')
 # bert_model = BertForSequenceClassification.from_pretrained('riberty-law-koBERT')
 
+bert_tokenizer = BertTokenizer.from_pretrained("monologg/kobert")
+bert_model = BertForSequenceClassification.from_pretrained("monologg/kobert")
+
 # 2. GPT-4o 모델 및 토크나이저 로드 (예시로 GPT-2 사용)
-gpt_tokenizer = AutoTokenizer.from_pretrained('gpt-4o')
-gpt_model = AutoModelForCausalLM.from_pretrained('gpt-4o')
+gpt_tokenizer = AutoTokenizer.from_pretrained('gpt-4o-mini-2024-07-18')
+gpt_model = AutoModelForCausalLM.from_pretrained('gpt-4o-mini-2024-07-18')
 
 # GPT-4o를 LangChain의 LLM으로 래핑
 from transformers import pipeline
@@ -27,9 +31,8 @@ gpt_pipeline = pipeline('text-generation', model=gpt_model, tokenizer=gpt_tokeni
 gpt_llm = HuggingFacePipeline(pipeline=gpt_pipeline)
 
 # 3. 임베딩 및 벡터스토어 설정 (RAG용)
-embeddings = HuggingFaceEmbeddings()
-text_splitter = CharacterTextSplitter(chunk_size=100, chunk_overlap=0)
-
+embeddings = HuggingFaceEmbeddings("nvidia/NV-Embed-v2")
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=20)
 # 예시 문서 데이터 (법률 관련 예시 데이터)
 documents = [
     "계약은 양 당사자 간의 합의에 의해 성립됩니다.",
@@ -37,7 +40,7 @@ documents = [
     "계약서에 명시된 조항은 법적 구속력을 가집니다."
 ]
 
-# 문서 분할 및 벡터스토어 생성
+# 문서 분할 및 벡터스토어 생성       n
 texts = []
 for doc in documents:
     texts.extend(text_splitter.split_text(doc))

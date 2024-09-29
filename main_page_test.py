@@ -1,32 +1,32 @@
+import os
+import time
 import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from sentence_transformers import SentenceTransformer
+import streamlit as st
+from transformers import AutoTokenizer, BertForSequenceClassification
+from langchain.storage import LocalFileStore
+from langchain.embeddings import CacheBackedEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, END
-from typing import TypedDict, Annotated, Sequence
-import operator
-
 from langchain_upstage import UpstageEmbeddings
 from langchain_openai import ChatOpenAI
-import os
-from dotenv import load_dotenv
-import sentencepiece as spm
 from langchain_core.prompts import PromptTemplate
-import time
+from typing import TypedDict, Annotated, Sequence
+import operator
+from dotenv import load_dotenv
 
-# .env 파일에서 환경 변수 로드
+# 환경 변수 로드
 load_dotenv()
 
 # BERT 모델 및 토크나이저 로드
-bert_tokenizer = AutoTokenizer.from_pretrained("monologg/kobert", trust_remote_code=True, clean_up_tokenization_spaces=False)
-bert_model = AutoModelForSequenceClassification.from_pretrained("monologg/kobert", trust_remote_code=True)
+bert_tokenizer = AutoTokenizer.from_pretrained("monologg/kobert", trust_remote_code=True)
+bert_model = BertForSequenceClassification.from_pretrained("monologg/kobert", trust_remote_code=True)
 
 # ChatOpenAI 모델 초기화
 gpt_llm = ChatOpenAI(
     model_name="gpt-4o-mini-2024-07-18",  # 또는 다른 OpenAI 모델
-    temperature=0.7,
+    temperature=0.2,
     openai_api_key=os.getenv("OPENAI_API_KEY")  # .env 파일에서 API 키 로드
 )
 
@@ -38,10 +38,39 @@ documents = [
     "계약의 위반 시 손해배상이 청구될 수 있습니다.",
     "계약서에 명시된 조항은 법적 구속력을 가집니다."
 ]
+
+fs = LocalFileStore("./cache/")
+cached_embeddings = CacheBackedEmbeddings.from_bytes_store(
+    passage_embeddings, fs, namespace=passage_embeddings.model
+)
+
 texts = []
 for doc in documents:
     texts.extend(text_splitter.split_text(doc))
-vectorstore = FAISS.from_texts(texts,passage_embeddings)
+
+FAISS_INDEX_PATH = "faiss_index"
+
+def create_vector_store():
+    if os.path.exists(FAISS_INDEX_PATH):
+        print("기존 FAISS 인덱스를 로드합니다.")
+        vector_store = FAISS.load_local(FAISS_INDEX_PATH, cached_embeddings, allow_dangerous_deserialization=True)
+    else:
+        print("FAISS 인덱스가 없습니다. 새로 생성합니다.")
+        vector_store = create_new_vector_store()
+    
+    return vector_store
+
+def create_new_vector_store():
+    print("새로운 벡터 저장소를 생성합니다.")
+    vector_store = FAISS.from_texts(texts, cached_embeddings)
+    
+    # 벡터 저장소를 로컬에 저장
+    vector_store.save_local(FAISS_INDEX_PATH)
+    
+    return vector_store
+
+vectorstore = create_vector_store()
+print("벡터스토어 설정 완료.")
 
 # 상태 정의
 class AgentState(TypedDict):
@@ -60,7 +89,7 @@ def evaluate_question(state):
     end_time = time.time()
     print(f"평가 단계 실행 시간: {end_time - start_time:.2f}초")
     return {"messages": [HumanMessage(content=f"평가 결과: {evaluation}")]}
-    
+
 def retrieve_info(state):
     start_time = time.time()
     messages = state['messages']
@@ -82,12 +111,12 @@ def generate_response(state):
         input_variables=["evaluation", "retrieved_info", "user_input"],
         template="""
         당신은 전문 법률 AI 어시스턴트입니다.
-
+        
         {evaluation}
         {retrieved_info}
-
+        
         사용자 질문: {user_input}
-
+        
         위의 평가 결과와 검색된 정보를 바탕으로 사용자에게 도움이 되는 법률 답변을 제공하세요.
         """
     )
@@ -117,19 +146,62 @@ def create_graph():
     
     return workflow.compile()
 
-# 실행 함수
-def run_pipeline(user_input):
-    start_time = time.time()
-    graph = create_graph()
-    inputs = {"messages": [HumanMessage(content=user_input)]}
-    for output in graph.stream(inputs):
-        for key, value in output.items():
-            if key == "생성":
-                print(value['messages'][-1].content)
-    end_time = time.time()
-    print(f"전체 실행 시간: {end_time - start_time:.2f}초")
+# Streamlit UI 설정
+def setup_page():
+    st.set_page_config(page_title="Perplexity-like AI Assistant", layout="wide")
+    st.title("AI Assistant")
 
-# 실행 예시
+def create_sidebar():
+    with st.sidebar:
+        st.header("Settings")
+        model = st.selectbox("Select Model", ["gpt-4o-mini-2024-07-18","gpt-4o"])
+        temperature = st.slider("Temperature", 0.0, 1.0, 0.7)
+    return model, temperature
+
+def display_chat_history(chat_history):
+    for i, message in enumerate(chat_history):
+        if message["role"] == "user":
+            st.text_area(f"You_{i}", value=message["content"], height=100, disabled=True)
+        else:
+            st.text_area(f"AI_{i}", value=message["content"], height=200, disabled=True)
+
+def user_input_section():
+    user_input = st.text_area("Your message", height=100)
+    send_button = st.button("Send")
+    return user_input, send_button
+
+def display_sources(sources):
+    with st.expander("Sources"):
+        for i, source in enumerate(sources, 1):
+            st.write(f"{i}. {source}")
+
+def main():
+    setup_page()
+    model, temperature = create_sidebar()
+    
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+    
+    display_chat_history(st.session_state.chat_history)
+    
+    user_input, send_button = user_input_section()
+    
+    if send_button and user_input:
+        st.session_state.chat_history.append({"role": "user", "content": user_input})
+        
+        # 그래프 실행
+        graph = create_graph()
+        inputs = {"messages": [HumanMessage(content=user_input)]}
+        for output in graph.stream(inputs):
+            for key, value in output.items():
+                if key == "생성":
+                    st.session_state.chat_history.append({"role": "assistant", "content": value['messages'][-1].content})
+        
+        # 소스 표시 (실제 구현 시 AI 응답과 함께 생성되어야 함)
+        sources = ["Source 1", "Source 2", "Source 3"]
+        display_sources(sources)
+        
+        st.rerun()
+
 if __name__ == "__main__":
-    user_input = input("사용자 질문: ")
-    run_pipeline(user_input)
+    main()

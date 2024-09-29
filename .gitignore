@@ -1,1 +1,4 @@
 .env
+cache
+.DS_Store
+faiss_index

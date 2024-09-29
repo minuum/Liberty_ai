@@ -1,29 +1,37 @@
 import torch
-from transformers import BertTokenizer, BertForSequenceClassification, AutoTokenizer, AutoModelForCausalLM
-from langchain import PromptTemplate
-from langchain.llms import HuggingFacePipeline
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from sentence_transformers import SentenceTransformer
+from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, END
 from typing import TypedDict, Annotated, Sequence
 import operator
 
-# 모델 및 토크나이저 로드
-bert_tokenizer = BertTokenizer.from_pretrained("monologg/kobert")
-bert_model = BertForSequenceClassification.from_pretrained("monologg/kobert")
+from langchain_upstage import UpstageEmbeddings
+from langchain_openai import ChatOpenAI
+import os
+from dotenv import load_dotenv
+import sentencepiece as spm
+from langchain_core.prompts import PromptTemplate
+import time
 
-gpt_tokenizer = AutoTokenizer.from_pretrained('gpt-4o-mini-2024-07-18')
-gpt_model = AutoModelForCausalLM.from_pretrained('gpt-4o-mini-2024-07-18')
+# .env 파일에서 환경 변수 로드
+load_dotenv()
 
-# GPT-4o를 LangChain의 LLM으로 래핑
-from transformers import pipeline
-gpt_pipeline = pipeline('text-generation', model=gpt_model, tokenizer=gpt_tokenizer)
-gpt_llm = HuggingFacePipeline(pipeline=gpt_pipeline)
+# BERT 모델 및 토크나이저 로드
+bert_tokenizer = AutoTokenizer.from_pretrained("monologg/kobert", trust_remote_code=True)
+bert_model = AutoModelForSequenceClassification.from_pretrained("monologg/kobert", trust_remote_code=True)
+
+# ChatOpenAI 모델 초기화
+gpt_llm = ChatOpenAI(
+    model_name="gpt-4o-mini-2024-07-18",  # 또는 다른 OpenAI 모델
+    temperature=0.7,
+    openai_api_key=os.getenv("OPENAI_API_KEY")  # .env 파일에서 API 키 로드
+)
 
 # 임베딩 및 벡터스토어 설정
-embeddings = HuggingFaceEmbeddings("nvidia/NV-Embed-v2")
+passage_embeddings = UpstageEmbeddings(model="solar-embedding-1-large-passage")
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=20)
 documents = [
     "계약은 양 당사자 간의 합의에 의해 성립됩니다.",
@@ -33,7 +41,7 @@ documents = [
 texts = []
 for doc in documents:
     texts.extend(text_splitter.split_text(doc))
-vectorstore = FAISS.from_texts(texts, embeddings)
+vectorstore = FAISS.from_texts(texts,passage_embeddings)
 
 # 상태 정의
 class AgentState(TypedDict):
@@ -41,6 +49,7 @@ class AgentState(TypedDict):
 
 # 노드 함수들
 def evaluate_question(state):
+    start_time = time.time()
     messages = state['messages']
     question = messages[-1].content
     inputs = bert_tokenizer(question, return_tensors='pt')
@@ -48,16 +57,22 @@ def evaluate_question(state):
     classification = torch.argmax(outputs.logits, dim=1).item()
     classification_map = {0: "일반 법률 질문", 1: "복잡한 법률 질문"}
     evaluation = classification_map.get(classification, "알 수 없음")
+    end_time = time.time()
+    print(f"평가 단계 실행 시간: {end_time - start_time:.2f}초")
     return {"messages": [HumanMessage(content=f"평가 결과: {evaluation}")]}
-
+    
 def retrieve_info(state):
+    start_time = time.time()
     messages = state['messages']
     query = messages[-1].content + " " + messages[0].content
     docs = vectorstore.similarity_search(query, k=3)
     retrieved_info = "\n".join([doc.page_content for doc in docs])
+    end_time = time.time()
+    print(f"검색 단계 실행 시간: {end_time - start_time:.2f}초")
     return {"messages": [HumanMessage(content=f"검색된 정보: {retrieved_info}")]}
 
 def generate_response(state):
+    start_time = time.time()
     messages = state['messages']
     evaluation = messages[1].content
     retrieved_info = messages[2].content
@@ -82,8 +97,10 @@ def generate_response(state):
         retrieved_info=retrieved_info,
         user_input=user_input
     )
-    response = gpt_llm(prompt)
-    return {"messages": [HumanMessage(content=f"AI 응답: {response}")]}
+    response = gpt_llm.invoke(prompt)
+    end_time = time.time()
+    print(f"생성 단계 실행 시간: {end_time - start_time:.2f}초")
+    return {"messages": [HumanMessage(content=f"AI 응답: {response.content}")]}
 
 # 그래프 생성
 def create_graph():
@@ -102,12 +119,15 @@ def create_graph():
 
 # 실행 함수
 def run_pipeline(user_input):
+    start_time = time.time()
     graph = create_graph()
     inputs = {"messages": [HumanMessage(content=user_input)]}
     for output in graph.stream(inputs):
         for key, value in output.items():
             if key == "생성":
                 print(value['messages'][-1].content)
+    end_time = time.time()
+    print(f"전체 실행 시간: {end_time - start_time:.2f}초")
 
 # 실행 예시
 if __name__ == "__main__":

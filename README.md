@@ -43,19 +43,33 @@
 
 
 mermaid
+
 graph TD
+
 A[사용자 질문] --> B[Agent Node]
+
 B --> C{Should Retrieve}
+
 C -->|Yes| D[Tool Node: 검색 도구]
+
 C -->|No| E[End]
+
 D --> F[Check Relevance]
+
 F -->|Yes| G[Generate Node: GPT-4]
+
 F -->|No| H[Rewrite Node]
+
 G --> I[답변 평가 Agent]
+
 I -->|평가 통과| J[최종 답변]
+
 I -->|재검토 필요| H
+
 H --> B
+
 subgraph Langgraph AI Agent
+
 B
 C
 D

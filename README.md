@@ -40,3 +40,76 @@
 ## 6. 시스템 구조(Architecture)
 - **구성요소**: Agent Node, KoBERT LLM 판단 모델, 검색 도구, GPT-4 생성 모델, 답변 평가 Agent, Rewrite Node, 데이터베이스, 웹 서버, 프론트엔드.
 - **구현 방법**: Python, Langgraph, PyTorch, Elasticsearch, OpenAI API, PostgreSQL, Django/FastAPI, React.js, Tailwind CSS.
+- 
+mermaid
+graph TD
+A[사용자 질문] --> B[Agent Node]
+B --> C{Should Retrieve}
+C -->|Yes| D[Tool Node: 검색 도구]
+C -->|No| E[End]
+D --> F[Check Relevance]
+F -->|Yes| G[Generate Node: GPT-4]
+F -->|No| H[Rewrite Node]
+G --> I[답변 평가 Agent]
+I -->|평가 통과| J[최종 답변]
+I -->|재검토 필요| H
+H --> B
+subgraph Langgraph AI Agent
+B
+C
+D
+F
+G
+I
+H
+end
+D --> K
+D --> L
+D --> M
+subgraph KoBERT LLM 판단 모델
+N[질문 의도 분석]
+O[법률 분야 분류]
+P[필요 정보 식별]
+end
+B --> N
+N --> O
+O --> P
+P --> C
+
+## 7. 개발 방법론
+- **구현환경**: UI는 Streamlit을 이용하여 Python 환경에서 구현.
+- **사용 예정 데이터**: AI HUB의 "의료, 법률 서적 말뭉치" 사용.
+- **학습 방법**: 비 가공 데이터를 가공한 후, 파인-튜닝을 이용하여 학습.
+
+## 8. 팀원 역할분담(R&R)
+| 팀원 | 역할 및 할 일 |
+| --- | --- |
+| 이민우 | 팀장, AI Agent 담당 |
+| 이동현 | 팀원, fine-tuning 담당 |
+
+## 9. 일정(소요예산, 요청사항)
+### Sprint 1 - 계획서 발표
+- 1주차: 팀 조직
+- 2주차: 주제 선정 및 기획서 초안 작성
+- 3주차: 기획서 확정 및 개발환경 구성
+
+### Sprint 2 - 8주차 중간평가(1st 프로토타입 제작)
+- 4주차: 개발 환경 구성
+- 5주차: 데이터 수집 및 정제
+- 6주차: 법률 데이터 수집 및 전처리
+- 7주차: 모델 선택 및 기초 학습
+- 8주차: 모델 성능 평가 및 1차 수정
+
+### Sprint 3 - 12주 중간점검(2nd 프로토타입 제작)
+- 9주차: 법률 상담용 UI/UX 디자인 및 개발
+- 10주차: 모델 피드백 반영 및 재학습
+- 11주차: 법률 답변 시나리오 확립
+- 12주차: 2nd 프로토타입 기능 테스트 및 개선
+
+### Sprint 4 (최종 배포 준비)
+- 13주차: 시스템 통합 테스트
+- 14주차: 법률 규정 및 데이터 윤리 검토
+- 15주차: 최종 프로토타입 배포 및 발표 준비
+
+## 10. 기대 효과 및 활용 분야
+법률 답변 챗봇 서비스는 법률 상담의 특수성과 비용 문제를 해결하여 법률에 관한 진입 장벽을 낮추고, 잘못된 법률 상식을 바로잡는 데 기여할 수 있습니다. 이를 통해 많은 사람들이 법률 상담을 쉽게 받을 수 있게 되어 생활에 깊게 파고들 수 있는 서비스가 될 것입니다.

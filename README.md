@@ -42,54 +42,7 @@
 - **구현 방법**: Python, Langgraph, PyTorch, Elasticsearch, OpenAI API, PostgreSQL, Django/FastAPI, React.js, Tailwind CSS.
 
 
-mermaid
-
-graph TD
-
-A[사용자 질문] --> B[Agent Node]
-
-B --> C{Should Retrieve}
-
-C -->|Yes| D[Tool Node: 검색 도구]
-
-C -->|No| E[End]
-
-D --> F[Check Relevance]
-
-F -->|Yes| G[Generate Node: GPT-4]
-
-F -->|No| H[Rewrite Node]
-
-G --> I[답변 평가 Agent]
-
-I -->|평가 통과| J[최종 답변]
-
-I -->|재검토 필요| H
-
-H --> B
-
-subgraph Langgraph AI Agent
-
-B
-C
-D
-F
-G
-I
-H
-end
-D --> K
-D --> L
-D --> M
-subgraph KoBERT LLM 판단 모델
-N[질문 의도 분석]
-O[법률 분야 분류]
-P[필요 정보 식별]
-end
-B --> N
-N --> O
-O --> P
-P --> C
+https://www.figma.com/board/0LivhrgVnLyiOM9qjRxVR9/Liberty_Constructure?node-id=0-1&node-type=canvas&t=ixMVKGxF9RGzXS04-0
 
 
 ## 7. 개발 방법론

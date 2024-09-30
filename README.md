@@ -40,8 +40,8 @@
 ## 6. 시스템 구조(Architecture)
 - **구성요소**: Agent Node, KoBERT LLM 판단 모델, 검색 도구, GPT-4 생성 모델, 답변 평가 Agent, Rewrite Node, 데이터베이스, 웹 서버, 프론트엔드.
 - **구현 방법**: Python, Langgraph, PyTorch, Elasticsearch, OpenAI API, PostgreSQL, Django/FastAPI, React.js, Tailwind CSS.
-- 
-mermaid
+
+
 graph TD
 A[사용자 질문] --> B[Agent Node]
 B --> C{Should Retrieve}

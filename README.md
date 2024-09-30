@@ -42,6 +42,7 @@
 - **구현 방법**: Python, Langgraph, PyTorch, Elasticsearch, OpenAI API, PostgreSQL, Django/FastAPI, React.js, Tailwind CSS.
 
 
+mermaid
 graph TD
 A[사용자 질문] --> B[Agent Node]
 B --> C{Should Retrieve}
@@ -75,6 +76,7 @@ B --> N
 N --> O
 O --> P
 P --> C
+
 
 ## 7. 개발 방법론
 - **구현환경**: UI는 Streamlit을 이용하여 Python 환경에서 구현.

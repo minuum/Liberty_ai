@@ -1,4 +1,4 @@
-# Liberty(Agent 기반 사용자 맞춤 법률 답변 서비스)
+![image](https://github.com/user-attachments/assets/68c68072-c0be-4cbd-b729-867fcf688760)# Liberty(Agent 기반 사용자 맞춤 법률 답변 서비스)
 ### 팀 정보
 | 팀명 | 학번 | 이름 |
 | --- | --- | --- |
@@ -79,6 +79,7 @@ https://www.figma.com/board/0LivhrgVnLyiOM9qjRxVR9/Liberty_Constructure?node-id=
 - 13주차: 시스템 통합 테스트
 - 14주차: 법률 규정 및 데이터 윤리 검토
 - 15주차: 최종 프로토타입 배포 및 발표 준비
+![image](https://github.com/user-attachments/assets/d9cdf0b0-3f75-45ce-bff8-bccaf1d756e4)
 
 ## 10. 기대 효과 및 활용 분야
 법률 답변 챗봇 서비스는 법률 상담의 특수성과 비용 문제를 해결하여 법률에 관한 진입 장벽을 낮추고, 잘못된 법률 상식을 바로잡는 데 기여할 수 있습니다. 이를 통해 많은 사람들이 법률 상담을 쉽게 받을 수 있게 되어 생활에 깊게 파고들 수 있는 서비스가 될 것입니다.

@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/68c68072-c0be-4cbd-b729-867fcf688760)# Liberty(Agent 기반 사용자 맞춤 법률 답변 서비스)
+# Liberty(Agent 기반 사용자 맞춤 법률 답변 서비스)
 ### 팀 정보
 | 팀명 | 학번 | 이름 |
 | --- | --- | --- |

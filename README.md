@@ -7,8 +7,7 @@
 | PM, AI Agent, UI/UX Design | 202204249 | 이민우 |
 | DL, Fine-tuning | 202204248 | 이동현 |
 
-https://github.com/user-attachments/assets/61ed2001-3cde-471a-a00f-dfe7f9283bd9
-
+![image.png](https://github.com/user-attachments/assets/61ed2001-3cde-471a-a00f-dfe7f9283bd9)
 ## Abstract
 
 본 프로젝트에서는 **AI** **법률 답변** **챗봇 서비스**를 **Langgraph**를 이용한 **AI Agent**로 구현하려고 합니다. 판례 답변에 대한 데이터는 2022년 구축된 aihub **의료, 법률 전문 서적 말뭉치**를 이용하였으며 법률에 대한 데이터는 **국회법률정보시스템의 민,형법 자료(PDF)**를 자료 기반으로 삼아 검색 증강 생성(RAG) 기술을 적용시켰습니다. **Langgraph**를 이용해 검색 엔진, DB 검색기, 답변 평가 등의 과정을 거치며 기존 RAG에 비해 정확한 답변을 가능케 하는 AI Agent를 구현하였습니다. 이를 통해 법률 상담, 답변에 대한 준수한 답변 성능을 제공하는 AI 서비스를 만들고자 합니다.
@@ -97,8 +96,8 @@ https://github.com/kyopark2014/langgraph-agent
 - 13주차: 시스템 통합 테스트
 - 14주차: 법률 규정 및 데이터 윤리 검토
 - 15주차: 최종 프로토타입 배포 및 발표 준비
+![image.png](https://github.com/user-attachments/assets/d9cdf0b0-3f75-45ce-bff8-bccaf1d756e4)
 
-https://github.com/user-attachments/assets/d9cdf0b0-3f75-45ce-bff8-bccaf1d756e4
 
 ## 10. 기대 효과 및 활용 분야
 

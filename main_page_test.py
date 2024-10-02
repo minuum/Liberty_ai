@@ -110,7 +110,7 @@ def generate_response(state):
     prompt_template = PromptTemplate(
         input_variables=["evaluation", "retrieved_info", "user_input"],
         template="""
-        당신은 전문 법률 AI 어시스턴트입니다.
+        당신은 전문 법률 AI 어시스턴트 Liberty입니다.
         
         {evaluation}
         {retrieved_info}
@@ -148,26 +148,26 @@ def create_graph():
 
 # Streamlit UI 설정
 def setup_page():
-    st.set_page_config(page_title="Perplexity-like AI Assistant", layout="wide")
-    st.title("AI Assistant")
+    st.set_page_config(page_title="Liberty_ai", layout="wide")
+    st.title("Liberty")
 
 def create_sidebar():
     with st.sidebar:
         st.header("Settings")
-        model = st.selectbox("Select Model", ["gpt-4o-mini-2024-07-18","gpt-4o"])
+        model = st.selectbox("모델 선택", ["gpt-4o-mini-2024-07-18","gpt-4o"])
         temperature = st.slider("Temperature", 0.0, 1.0, 0.7)
     return model, temperature
 
 def display_chat_history(chat_history):
     for i, message in enumerate(chat_history):
         if message["role"] == "user":
-            st.text_area(f"You_{i}", value=message["content"], height=100, disabled=True)
+            st.chat_message("user", message["content"])
         else:
-            st.text_area(f"AI_{i}", value=message["content"], height=200, disabled=True)
+            st.chat_message("assistant", message["content"])
 
 def user_input_section():
-    user_input = st.text_area("Your message", height=100)
-    send_button = st.button("Send")
+    user_input = st.text_area("원하는 법률 답변을 입력하세요!", height=100)
+    send_button = st.button("➡")
     return user_input, send_button
 
 def display_sources(sources):

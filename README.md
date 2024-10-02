@@ -7,7 +7,8 @@
 | PM, AI Agent, UI/UX Design | 202204249 | 이민우 |
 | DL, Fine-tuning | 202204248 | 이동현 |
 
-<img width="800" alt="SCR-20241002-jlge" src="https://github.com/user-attachments/assets/30c2b4a1-ca47-4989-8f13-10d933e52639">
+<img width="800" alt="SCR-20241002-jarm" src="https://github.com/user-attachments/assets/17172682-f88a-4417-9057-a3aa3e4379652639">
+
 <img width="400" alt="SCR-20241002-jlge" src="https://github.com/user-attachments/assets/61ed2001-3cde-471a-a00f-dfe7f9283bd">
 
 ## Abstract
@@ -67,6 +68,7 @@ https://github.com/kyopark2014/langgraph-agent
 
 - **구현환경**: UI는 Streamlit을 이용하여 Python 환경에서 구현.
 - **사용 예정 데이터** https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&dataSetSn=71487
+  <img width="800" alt="SCR-20241002-jlge" src="https://github.com/user-attachments/assets/30c2b4a1-ca47-4989-8f13-10d933e52639">
 - **학습 방법**: 비 가공 데이터를 가공한 후, 파인-튜닝을 이용하여 학습.
 
 ## 8. 팀원 역할분담(R&R)

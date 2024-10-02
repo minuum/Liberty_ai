@@ -27,18 +27,19 @@
 
 - **lawandsearch**: 생성형 AI 기술을 활용한 법률 챗봇 서비스로, 변호사 전문단 구축,
 법률지식 특화, 높은 한국어 이해도, 환각현상 방지 등의 특징을 가짐.
+
 https://lawandsearch.ai/
+
 - **차별점**: Langgraph를 통해 데이터를 검색하고 평가하는 과정에서 정확도를 상승시키는 것.
+
 https://github.com/kyopark2014/langgraph-agent
 
 ## 4. 예상 결과물 UI
 
 - **UI 특징**: 간결하고 직관적인 디자인, 채팅 형식의 인터페이스, 추천 질문 기능, 법률 자료 버튼 제공.
-- **UI 구현 도구**: Streamlit, [creatie.ai](http://creatie.ai/)
+- **UI 구현 도구**: [Streamlit](https://streamlit.io/), [creatie.ai](http://creatie.ai/)
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/89c02629-13d1-4b8a-ac0b-333da0e9d5c6/3e5d9fc6-0ddb-4ad3-827f-32e2c9c0ea11/image.png)
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/89c02629-13d1-4b8a-ac0b-333da0e9d5c6/8c67e652-d5f0-45ed-899c-d94f3b3d2d88/image.png)
 
 ## 5. 주요 기능
 
@@ -58,7 +59,7 @@ https://github.com/kyopark2014/langgraph-agent
 - **구성요소**: Agent Node, KoBERT LLM 판단 모델, 검색 도구, GPT-4 생성 모델, 답변 평가 Agent, Rewrite Node, 데이터베이스, 웹 서버, 프론트엔드.
 - **구현 방법**: Python, Langgraph, PyTorch, Elasticsearch, OpenAI API, PostgreSQL, Django/FastAPI, React.js, Tailwind CSS.
 
-[figma](https://www.figma.com/board/0LivhrgVnLyiOM9qjRxVR9/Liberty_Constructure?node-id=0-1&node-type=canvas&t=ixMVKGxF9RGzXS04-0)링크 
+#### [시스템 구조(figma)](https://www.figma.com/board/0LivhrgVnLyiOM9qjRxVR9/Liberty_Constructure?node-id=0-1&node-type=canvas&t=ixMVKGxF9RGzXS04-0)
 
 ## 7. 개발 방법론
 

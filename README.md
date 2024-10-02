@@ -7,7 +7,7 @@
 | PM, AI Agent, UI/UX Design | 202204249 | 이민우 |
 | DL, Fine-tuning | 202204248 | 이동현 |
 
-<div style="display: flex; align-items: center;">
+<div style="display: flex; align-items: right;">
   <img src="https://github.com/user-attachments/assets/17172682-f88a-4417-9057-a3aa3e4379652639" width="100" />
   <p>Liberty의 캐릭터 이미지입니다.</p>
 </div>

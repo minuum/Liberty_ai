@@ -7,9 +7,9 @@
 | PM, AI Agent, UI/UX Design | 202204249 | 이민우 |
 | DL, Fine-tuning | 202204248 | 이동현 |
 
-<img width="800" alt="SCR-20241002-jarm" src="https://github.com/user-attachments/assets/17172682-f88a-4417-9057-a3aa3e4379652639">
+<img width="100" alt="SCR-20241002-jarm" src="https://github.com/user-attachments/assets/17172682-f88a-4417-9057-a3aa3e4379652639">
 
-<img width="400" alt="SCR-20241002-jlge" src="https://github.com/user-attachments/assets/61ed2001-3cde-471a-a00f-dfe7f9283bd">
+
 
 ## Abstract
 

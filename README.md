@@ -1,7 +1,6 @@
 # Liberty(Agent 기반 사용자 맞춤 법률 답변 서비스)
 
 ### Team
-<div>
 | 역할 | 학번 | 이름 |
 | --- | --- | --- |
 | PM, AI Agent, UI/UX Design | 202204249 | 이민우 |
@@ -12,7 +11,6 @@
   <p>Liberty의 캐릭터 이미지입니다.</p>
 </div>
 
-</div>
 
 ## Abstract
 

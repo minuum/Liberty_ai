@@ -11,6 +11,8 @@
   <p>Liberty의 캐릭터 이미지입니다.</p>
 </div>
 
+![supermeme_22h4_51](https://github.com/user-attachments/assets/a1ccb5c0-0e59-4db1-bb70-025fefef9ce0)
+
 
 ## Abstract
 

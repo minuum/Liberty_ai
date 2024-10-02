@@ -41,7 +41,7 @@
 - **구성요소**: Agent Node, KoBERT LLM 판단 모델, 검색 도구, GPT-4 생성 모델, 답변 평가 Agent, Rewrite Node, 데이터베이스, 웹 서버, 프론트엔드.
 - **구현 방법**: Python, Langgraph, PyTorch, Elasticsearch, OpenAI API, PostgreSQL, Django/FastAPI, React.js, Tailwind CSS.
 
-:::danger
+::: danger
 
 *figma*. 이렇게 [[링크로 가기](https://www.figma.com/board/0LivhrgVnLyiOM9qjRxVR9/Liberty_Constructure?node-id=0-1&node-type=canvas&t=ixMVKGxF9RGzXS04-0) `click`](#) 도 할 수 있어요.
 

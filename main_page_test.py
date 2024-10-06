@@ -180,28 +180,50 @@ def main():
     model, temperature = create_sidebar()
     
     if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
+        st.session_state.chat_history = [{"role": "assistant", "content": "안녕하세요. 법률 관련 질문에 답변해 드리겠습니다. 어떤 도움이 필요하신가요?"}]
     
-    display_chat_history(st.session_state.chat_history)
+    for message in st.session_state.chat_history:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
     
-    user_input, send_button = user_input_section()
-    
-    if send_button and user_input:
-        st.session_state.chat_history.append({"role": "user", "content": user_input})
+    if prompt := st.chat_input("법률 관련 질문을 입력해주세요:"):
+        st.session_state.chat_history.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
         
-        # 그래프 실행
-        graph = create_graph()
-        inputs = {"messages": [HumanMessage(content=user_input)]}
-        for output in graph.stream(inputs):
-            for key, value in output.items():
-                if key == "생성":
-                    st.session_state.chat_history.append({"role": "assistant", "content": value['messages'][-1].content})
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            
+            # 그래프 실행
+            graph = create_graph()
+            inputs = {"messages": [HumanMessage(content=prompt)]}
+            for output in graph.stream(inputs):
+                for key, value in output.items():
+                    if key == "생성":
+                        assistant_response = value['messages'][-1].content
+                        for chunk in assistant_response.split():
+                            full_response += chunk + " "
+                            time.sleep(0.05)
+                            message_placeholder.markdown(full_response + "▌")
+                        message_placeholder.markdown(full_response)
+            
+            st.session_state.chat_history.append({"role": "assistant", "content": full_response})
         
         # 소스 표시 (실제 구현 시 AI 응답과 함께 생성되어야 함)
         sources = ["Source 1", "Source 2", "Source 3"]
         display_sources(sources)
-        
-        st.rerun()
+
+    # 피드백 수집 (사이드바로 이동)
+    with st.sidebar:
+        st.subheader("피드백")
+        feedback = st.text_area("답변에 대한 피드백을 남겨주세요:")
+        if st.button("피드백 제출"):
+            if feedback:
+                st.success("피드백이 제출되었습니다. 감사합니다!")
+                # 여기에 피드백 처리 로직을 추가할 수 있습니다.
+            else:
+                st.warning("피드백을 입력해주세요.")
 
 if __name__ == "__main__":
     main()

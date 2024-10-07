@@ -47,7 +47,7 @@ class RetrievalChain(ABC):
         return ChatOpenAI(model_name="gpt-4-turbo", temperature=0)
 
     def create_prompt(self):
-        return hub.pull("teddynote/rag-korean-with-source")
+        return hub.pull("minuum/liberty-rag")
 
     @staticmethod
     def format_docs(docs):
@@ -63,6 +63,22 @@ class RetrievalChain(ABC):
         prompt = self.create_prompt()
         self.chain = (
             {"question": itemgetter("question"), "context": itemgetter("context")}
+            | prompt
+            | model
+            | StrOutputParser()
+        )
+        return self
+    
+    def create_chain(self, rewrite_weight, original_weight):
+        docs = self.load_documents(self.source_uri)
+        text_splitter = self.create_text_splitter()
+        split_docs = self.split_documents(docs, text_splitter)
+        self.vectorstore = self.create_vectorstore(split_docs)
+        self.retriever = self.create_retriever(self.vectorstore)
+        model = self.create_model()
+        prompt = self.create_prompt()
+        self.chain = (
+            {"question": itemgetter("question"), "context": itemgetter("context"), "rewrite_weight": rewrite_weight, "original_weight": original_weight}
             | prompt
             | model
             | StrOutputParser()

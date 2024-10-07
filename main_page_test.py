@@ -2,10 +2,11 @@ import os
 import time
 import torch
 import streamlit as st
+from langchain_community.document_loaders import PDFPlumberLoader 
 from transformers import AutoTokenizer, BertForSequenceClassification
 from langchain.storage import LocalFileStore
 from langchain.embeddings import CacheBackedEmbeddings
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS, Pinecone
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, END
@@ -16,8 +17,30 @@ from typing import TypedDict, Annotated, Sequence
 import operator
 from dotenv import load_dotenv
 
+# 한글 불용어 사전 불러오기 (불용어 사전 출처: https://www.ranks.nl/stopwords/korean)
+
+# pinecone 사용
+
+
+from pinecone import Pinecone, ServerlessSpec
+from langchain_teddynote.community.pinecone import create_index
+from langchain_teddynote.community.pinecone import (create_sparse_encoder,fit_sparse_encoder, load_sparse_encoder)
+from langchain_teddynote.korean import stopwords
+import glob
+from langchain_teddynote.community.pinecone import preprocess_documents
+from langchain_teddynote.community.pinecone import upsert_documents_parallel
 # 환경 변수 로드
 load_dotenv()
+
+# 벡터 저장소 타입 설정 (기본값: pinecone)
+VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "pinecone")
+
+# Pinecone 설정
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT", "gcp-starter")
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "liberty-ai-index")
+# FAISS 설정
+FAISS_INDEX_PATH = os.getenv("FAISS_INDEX_PATH", "faiss_index")
 
 # BERT 모델 및 토크나이저 로드
 bert_tokenizer = AutoTokenizer.from_pretrained("monologg/kobert", trust_remote_code=True)
@@ -30,47 +53,130 @@ gpt_llm = ChatOpenAI(
     openai_api_key=os.getenv("OPENAI_API_KEY")  # .env 파일에서 API 키 로드
 )
 
-# 임베딩 및 벡터스토어 설정
-passage_embeddings = UpstageEmbeddings(model="solar-embedding-1-large-passage")
+# 임베딩 및 텍스트 스플리터 설정
+passage_embeddings = UpstageEmbeddings(model="solar-embedding-1-large-query")
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=20)
-documents = [
-    "계약은 양 당사자 간의 합의에 의해 성립됩니다.",
-    "계약의 위반 시 손해배상이 청구될 수 있습니다.",
-    "계약서에 명시된 조항은 법적 구속력을 가집니다."
-]
-
+stopword = stopwords()
+# 캐시된 임베딩 설정
 fs = LocalFileStore("./cache/")
 cached_embeddings = CacheBackedEmbeddings.from_bytes_store(
     passage_embeddings, fs, namespace=passage_embeddings.model
 )
 
-texts = []
-for doc in documents:
-    texts.extend(text_splitter.split_text(doc))
+def load_documents(data_dir="./data"):
+    documents = []
+    files = sorted(glob.glob("data/*.pdf"))
+    for filename in files:
+        loader = PDFPlumberLoader(filename)
+        documents.extend(loader.load_and_split(text_splitter))
+    return documents
 
-FAISS_INDEX_PATH = "faiss_index"
 
-def create_vector_store():
-    if os.path.exists(FAISS_INDEX_PATH):
-        print("기존 FAISS 인덱스를 로드합니다.")
-        vector_store = FAISS.load_local(FAISS_INDEX_PATH, cached_embeddings, allow_dangerous_deserialization=True)
+def preprocess_contents():
+    split_docs = load_documents()
+    print(split_docs)
+    contents, metadatas = preprocess_documents(
+        split_docs=split_docs,
+        metadata_keys=["source", "page", "author"],
+        min_length=5,
+        use_basename=True,
+    )
+    return contents, metadatas
+def Sparse_encoder(contents):
+    sparse_encoder_path = "./sparse_encoder.pkl"
+    
+    if os.path.exists(sparse_encoder_path):
+        # 이미 학습된 sparse encoder가 존재하는 경우 불러옵니다.
+        sparse_encoder = load_sparse_encoder(sparse_encoder_path)
     else:
-        print("FAISS 인덱스가 없습니다. 새로 생성합니다.")
-        vector_store = create_new_vector_store()
+        # 학습된 sparse encoder가 없는 경우 새로 생성하고 학습합니다.
+        sparse_encoder = create_sparse_encoder(stopwords(), mode="kiwi")
+        saved_path = fit_sparse_encoder(
+            sparse_encoder=sparse_encoder, 
+            contents=contents, 
+            save_path=sparse_encoder_path
+        )
+    
+    return sparse_encoder
+
+def Pinecone_upsert():
+    contents, metadatas = preprocess_contents()
+    upsert_documents_parallel(
+    index=PINECONE_INDEX_NAME,  # Pinecone 인덱스
+    namespace="Liberty_namespace01",  # Pinecone namespace
+    contents=contents,  # 이전에 전처리한 문서 내용
+    metadatas=metadatas,  # 이전에 전처리한 문서 메타데이터
+    sparse_encoder=Sparse_encoder(contents),  # Sparse encoder
+    embedder=passage_embeddings,
+    batch_size=64,
+        max_workers=30,
+    )
+from langchain_teddynote.community.pinecone import init_pinecone_index
+def Pinecone_init():
+    pinecone_params=init_pinecone_index(
+        index_name=PINECONE_INDEX_NAME,  # Pinecone 인덱스 이름
+    namespace="Liberty_namespace01",  # Pinecone Namespace
+    api_key=os.environ["PINECONE_API_KEY"],  # Pinecone API Key
+    sparse_encoder_path="./sparse_encoder.pkl",  # Sparse Encoder 저장경로(save_path)
+    stopwords=stopwords(),  # 불용어 사전
+    tokenizer="kiwi",
+    embeddings=passage_embeddings,
+   # Dense Embedder
+    top_k=5,  # Top-K 문서 반환 개수
+    alpha=0.5, 
+
+    )
+    return pinecone_params
+from langchain_teddynote.community.pinecone import PineconeKiwiHybridRetriever
+
+# 검색기 생성
+pinecone_retriever = PineconeKiwiHybridRetriever(**(Pinecone_init()))
+
+def create_vector_store(documents, store_type=VECTOR_STORE_TYPE):
+    if store_type == "pinecone":
+        if not PINECONE_API_KEY:
+            print("Pinecone API 키가 설정되지 않았습니다. FAISS를 사용합니다.")
+            return create_vector_store(documents, "faiss")
+        
+        try:
+            pc_index = create_index(        
+                api_key=os.environ["PINECONE_API_KEY"],
+                index_name="teddynote-db-index",  # 인덱스 이름을 지정합니다.
+                dimension=4096,  # Embedding 차원과 맞춥니다. (OpenAIEmbeddings: 1536, UpstageEmbeddings: 4096)
+                metric="dotproduct",  # 유사도 측정 방법을 지정합니다. (dotproduct, euclidean, cosine)
+            )
+
+        except Exception as e:
+            print(f"Pinecone 초기화 중 오류 발생: {e}")
+            print("FAISS를 대체 옵션으로 사용합니다.")
+            return create_vector_store(documents, "faiss")
+    
+    elif store_type == "faiss":
+        if os.path.exists(FAISS_INDEX_PATH):
+            print("기존 FAISS 인덱스를 로드합니다.")
+            return FAISS.load_local(FAISS_INDEX_PATH, cached_embeddings, allow_dangerous_deserialization=True)
+        else:
+            print("새로운 FAISS 벡터 저장소를 생성합니다.")
+            vector_store = FAISS.from_texts(documents, cached_embeddings)
+            vector_store.save_local(FAISS_INDEX_PATH)
+            return vector_store
+    
+    raise ValueError("지원되지 않는 벡터 저장소 타입입니다.")
+
+def setup_vector_store():
+    start_time = time.time()
+    
+    print("문서 로딩 중...")
+    documents = load_documents()
+    print(f"{len(documents)}개의 텍스트 청크가 생성되었습니다.")
+    
+    print(f"{VECTOR_STORE_TYPE} 벡터 저장소 생성 중...")
+    vector_store = create_vector_store(documents)
+    
+    end_time = time.time()
+    print(f"벡터 저장소 설정 완료. 총 소요 시간: {end_time - start_time:.2f}초")
     
     return vector_store
-
-def create_new_vector_store():
-    print("새로운 벡터 저장소를 생성합니다.")
-    vector_store = FAISS.from_texts(texts, cached_embeddings)
-    
-    # 벡터 저장소를 로컬에 저장
-    vector_store.save_local(FAISS_INDEX_PATH)
-    
-    return vector_store
-
-vectorstore = create_vector_store()
-print("벡터스토어 설정 완료.")
 
 # 상태 정의
 class AgentState(TypedDict):
@@ -226,4 +332,5 @@ def main():
                 st.warning("피드백을 입력해주세요.")
 
 if __name__ == "__main__":
+    vectorstore = setup_vector_store()
     main()

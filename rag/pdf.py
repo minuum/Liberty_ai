@@ -19,3 +19,22 @@ class PDFRetrievalChain(RetrievalChain):
 
     def create_text_splitter(self):
         return RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    
+class PDFRetrievalChain(RetrievalChain):
+    def __init__(self, source_uri, rewrite_weight=0.1, original_weight=0.9):
+        self.source_uri = source_uri
+        self.k = 5
+        self.rewrite_weight = rewrite_weight
+        self.original_weight = original_weight
+        
+
+    def load_documents(self, source_uris: List[str]):
+        docs = []
+        for source_uri in source_uris:
+            loader = PDFPlumberLoader(source_uri)
+            docs.extend(loader.load())
+
+        return docs
+
+    def create_text_splitter(self):
+        return RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)

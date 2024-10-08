@@ -64,6 +64,7 @@ https://github.com/kyopark2014/langgraph-agent
 - **구현 방법**: Python, Langgraph, PyTorch, Elasticsearch, OpenAI API, PostgreSQL, Django/FastAPI, React.js, Tailwind CSS.
 
 #### [시스템 구조(figma)](https://www.figma.com/board/0LivhrgVnLyiOM9qjRxVR9/Liberty_Constructure?node-id=0-1&node-type=canvas&t=ixMVKGxF9RGzXS04-0)
+<img width="909" alt="image" src="https://github.com/user-attachments/assets/6feed1e9-13c8-44e3-a3f3-07e6ba4dfa98">
 
 ## 7. 개발 방법론
 

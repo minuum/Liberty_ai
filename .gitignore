@@ -1,2 +1,4 @@
 .env
 data
+cache
+faiss_index

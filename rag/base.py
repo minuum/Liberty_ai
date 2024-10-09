@@ -9,12 +9,16 @@ from langchain_core.output_parsers import StrOutputParser
 from abc import ABC, abstractmethod
 from operator import itemgetter
 import os
+from dotenv import load_dotenv
+
+FAISS_INDEX_PATH = os.getenv("FAISS_INDEX_PATH", "faiss_index")
 
 class RetrievalChain(ABC):
     def __init__(self):
+        load_dotenv()
         self.source_uri = None
         self.k = 5
-        self.FAISS_INDEX_PATH = os.getenv("FAISS_INDEX_PATH", "faiss_index")
+        self.FAISS_INDEX_PATH = FAISS_INDEX_PATH
         self.cached_embeddings = None
     @abstractmethod
     def load_documents(self, source_uris):
@@ -42,14 +46,13 @@ class RetrievalChain(ABC):
     
     
     def create_vectorstore(self, split_docs):
-
-        if os.path.exists(self.FAISS_INDEX_PATH):
+        if os.path.exists(FAISS_INDEX_PATH):
             print("기존 FAISS 인덱스를 로드합니다.")
-            return FAISS.load_local(self.FAISS_INDEX_PATH, self.cached_embeddings, allow_dangerous_deserialization=True)
+            return FAISS.load_local(FAISS_INDEX_PATH, self.cached_embeddings, allow_dangerous_deserialization=True)
         else:
             print("새로운 FAISS 벡터 저장소를 생성합니다.")
             vector_store = FAISS.from_documents(split_docs, self.cached_embeddings)
-            vector_store.save_local(self.FAISS_INDEX_PATH)
+            vector_store.save_local(FAISS_INDEX_PATH)
             return vector_store
  
 
@@ -61,10 +64,14 @@ class RetrievalChain(ABC):
         return dense_retriever
 
     def create_model(self):
-        return ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+        return ChatOpenAI(model_name="gpt-4o-mini", temperature=0,max_tokens=500)
+    
 
     def create_prompt(self):
-        return hub.pull("minuum/liberty-rag")
+        base_prompt = hub.pull("minuum/liberty-rag")
+        # 출력 길이 제한에 대한 지시사항 추가
+        length_instruction = "답변은 최대 400자 이내로 간결하게 작성해주세요."
+        return base_prompt + "\n\n" + length_instruction
 
     @staticmethod
     def format_docs(docs):

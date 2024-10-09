@@ -1,2 +1,5 @@
 .env
 data
+cache
+faiss_index
+rag/__pycache__

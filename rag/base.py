@@ -64,7 +64,7 @@ class RetrievalChain(ABC):
         return dense_retriever
 
     def create_model(self):
-        return ChatOpenAI(model_name="gpt-4o-mini", temperature=0,max_tokens=500)
+        return ChatOpenAI(model_name="gpt-4o", temperature=0,max_tokens=150)
     
 
     def create_prompt(self):

@@ -62,25 +62,10 @@ class RetrievalChain(ABC):
         model = self.create_model()
         prompt = self.create_prompt()
         self.chain = (
-            {"question": itemgetter("question"), "context": itemgetter("context")}
+            {"question": itemgetter("question"), "context": itemgetter("context"),"rewrite_weight":itemgetter("rewrite_weight"),"original_weight":itemgetter("original_weight")}
             | prompt
             | model
             | StrOutputParser()
         )
         return self
     
-    def create_chain(self, rewrite_weight, original_weight):
-        docs = self.load_documents(self.source_uri)
-        text_splitter = self.create_text_splitter()
-        split_docs = self.split_documents(docs, text_splitter)
-        self.vectorstore = self.create_vectorstore(split_docs)
-        self.retriever = self.create_retriever(self.vectorstore)
-        model = self.create_model()
-        prompt = self.create_prompt()
-        self.chain = (
-            {"question": itemgetter("question"), "context": itemgetter("context"), "rewrite_weight": rewrite_weight, "original_weight": original_weight}
-            | prompt
-            | model
-            | StrOutputParser()
-        )
-        return self

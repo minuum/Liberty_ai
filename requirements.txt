@@ -1,0 +1,9 @@
+streamlit
+python-dotenv
+langchain-teddynote
+transformers
+torch
+langchain-upstage
+langchain-openai
+langchain-community
+langgraph

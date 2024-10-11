@@ -20,7 +20,7 @@ import time
 load_dotenv()
 
 # BERT 모델 및 토크나이저 로드
-bert_tokenizer = AutoTokenizer.from_pretrained("monologg/kobert", trust_remote_code=True)
+bert_tokenizer = AutoTokenizer.from_pretrained("monologg/kobert", trust_remote_code=True, clean_up_tokenization_spaces=False)
 bert_model = AutoModelForSequenceClassification.from_pretrained("monologg/kobert", trust_remote_code=True)
 
 # ChatOpenAI 모델 초기화

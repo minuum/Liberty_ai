@@ -2,3 +2,7 @@
 data
 cache
 faiss_index
+
+__pycache__/
+*.pyc
+.venv/

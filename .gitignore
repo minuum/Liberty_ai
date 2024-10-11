@@ -1,4 +1,8 @@
 .env
+data
 cache
-.DS_Store
 faiss_index
+
+__pycache__/
+*.pyc
+.venv/

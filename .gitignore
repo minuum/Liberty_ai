@@ -2,7 +2,7 @@
 data
 cache
 faiss_index
-
+.streamlit
 __pycache__/
 *.pyc
 .venv/

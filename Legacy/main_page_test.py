@@ -38,7 +38,7 @@ VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "pinecone")
 # Pinecone 설정
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT", "gcp-starter")
-PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "liberty-ai-index")
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "liberty-index")
 # FAISS 설정
 FAISS_INDEX_PATH = os.getenv("FAISS_INDEX_PATH", "faiss_index")
 
@@ -103,7 +103,7 @@ def Pinecone_upsert():
     contents, metadatas = preprocess_contents()
     upsert_documents_parallel(
     index=PINECONE_INDEX_NAME,  # Pinecone 인덱스
-    namespace="Liberty_namespace01",  # Pinecone namespace
+    namespace="liberty_namespace-01",  # Pinecone namespace
     contents=contents,  # 이전에 전처리한 문서 내용
     metadatas=metadatas,  # 이전에 전처리한 문서 메타데이터
     sparse_encoder=Sparse_encoder(contents),  # Sparse encoder
@@ -115,7 +115,7 @@ from langchain_teddynote.community.pinecone import init_pinecone_index
 def Pinecone_init():
     pinecone_params=init_pinecone_index(
         index_name=PINECONE_INDEX_NAME,  # Pinecone 인덱스 이름
-    namespace="Liberty_namespace01",  # Pinecone Namespace
+    namespace="liberty_namespace-01",  # Pinecone Namespace
     api_key=os.environ["PINECONE_API_KEY"],  # Pinecone API Key
     sparse_encoder_path="./sparse_encoder.pkl",  # Sparse Encoder 저장경로(save_path)
     stopwords=stopwords(),  # 불용어 사전

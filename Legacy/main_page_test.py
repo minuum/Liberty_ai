@@ -34,7 +34,6 @@ load_dotenv()
 
 # 벡터 저장소 타입 설정 (기본값: pinecone)
 VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "pinecone")
-
 # Pinecone 설정
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT", "gcp-starter")
@@ -72,8 +71,8 @@ def load_documents(data_dir="./data"):
     return documents
 
 
-def preprocess_contents():
-    split_docs = load_documents()
+def preprocess_contents(documents):
+    split_docs = documents
     print(split_docs)
     contents, metadatas = preprocess_documents(
         split_docs=split_docs,
@@ -96,14 +95,14 @@ def Sparse_encoder(contents):
             contents=contents, 
             save_path=sparse_encoder_path
         )
-    
+        return saved_path
     return sparse_encoder
 
-def Pinecone_upsert():
-    contents, metadatas = preprocess_contents()
+def Pinecone_upsert(documents):
+    contents, metadatas = preprocess_contents(documents)
     upsert_documents_parallel(
     index=PINECONE_INDEX_NAME,  # Pinecone 인덱스
-    namespace="Liberty_namespace01",  # Pinecone namespace
+    namespace="liberty-namespace-01",  # Pinecone namespace
     contents=contents,  # 이전에 전처리한 문서 내용
     metadatas=metadatas,  # 이전에 전처리한 문서 메타데이터
     sparse_encoder=Sparse_encoder(contents),  # Sparse encoder
@@ -111,11 +110,15 @@ def Pinecone_upsert():
     batch_size=64,
         max_workers=30,
     )
+
+
+
 from langchain_teddynote.community.pinecone import init_pinecone_index
 def Pinecone_init():
+    print(PINECONE_INDEX_NAME)
     pinecone_params=init_pinecone_index(
         index_name=PINECONE_INDEX_NAME,  # Pinecone 인덱스 이름
-    namespace="Liberty_namespace01",  # Pinecone Namespace
+    namespace="liberty-namespace-01",  # Pinecone Namespace
     api_key=os.environ["PINECONE_API_KEY"],  # Pinecone API Key
     sparse_encoder_path="./sparse_encoder.pkl",  # Sparse Encoder 저장경로(save_path)
     stopwords=stopwords(),  # 불용어 사전
@@ -133,18 +136,17 @@ from langchain_teddynote.community.pinecone import PineconeKiwiHybridRetriever
 pinecone_retriever = PineconeKiwiHybridRetriever(**(Pinecone_init()))
 
 def create_vector_store(documents, store_type=VECTOR_STORE_TYPE):
+    print(PINECONE_INDEX_NAME)
+    print("벡터스토어 생성을 시작합니다========================")
     if store_type == "pinecone":
         if not PINECONE_API_KEY:
             print("Pinecone API 키가 설정되지 않았습니다. FAISS를 사용합니다.")
             return create_vector_store(documents, "faiss")
         
         try:
-            pc_index = create_index(        
-                api_key=os.environ["PINECONE_API_KEY"],
-                index_name="teddynote-db-index",  # 인덱스 이름을 지정합니다.
-                dimension=4096,  # Embedding 차원과 맞춥니다. (OpenAIEmbeddings: 1536, UpstageEmbeddings: 4096)
-                metric="dotproduct",  # 유사도 측정 방법을 지정합니다. (dotproduct, euclidean, cosine)
-            )
+            pinecone_params=Pinecone_init()
+            Pinecone_upsert()
+            return pinecone_params
 
         except Exception as e:
             print(f"Pinecone 초기화 중 오류 발생: {e}")
@@ -171,7 +173,7 @@ def setup_vector_store():
     print(f"{len(documents)}개의 텍스트 청크가 생성되었습니다.")
     
     print(f"{VECTOR_STORE_TYPE} 벡터 저장소 생성 중...")
-    vector_store = create_vector_store(documents)
+    vector_store = create_vector_store(documents, store_type=VECTOR_STORE_TYPE)
     
     end_time = time.time()
     print(f"벡터 저장소 설정 완료. 총 소요 시간: {end_time - start_time:.2f}초")

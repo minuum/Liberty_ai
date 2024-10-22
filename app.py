@@ -17,6 +17,10 @@ from langgraph.prebuilt import ToolInvocation
 import pprint
 from langgraph.errors import GraphRecursionError
 from langchain_core.runnables import RunnableConfig
+import streamlit as st
+from menu import menu
+
+
 
 # 환경 변수 로드
 load_dotenv()
@@ -43,6 +47,7 @@ class GraphState(TypedDict):
     original_weight: float
     relevance: str
     rewrite_count: int
+    combined_score: float
 
 # KoBERT 모델 및 토크나이저 로드
 @st.cache_resource
@@ -174,7 +179,7 @@ def kobert_relevance_check(context, answer):
     # 코사인 유사도 계산
     similarity = torch.nn.functional.cosine_similarity(context_embedding, answer_embedding)
     
-    # 유사도 값을 0과 1 사이로 변환
+    # Convert the similarity value to a range between 0 and 1
     relevance_score = (similarity.item() + 1) / 2
     
     return relevance_score
@@ -223,7 +228,7 @@ def relevance_check(state: GraphState) -> GraphState:
         print("final_relevance (upstage only) : ", final_relevance)
     
     return GraphState(
-        relevance=final_relevance, question=state["question"], answer=state["answer"]
+        relevance=final_relevance, question=state["question"], answer=state["answer"], combined_score=combined_score
     )
 
 
@@ -237,6 +242,30 @@ def final_output(state: GraphState) -> str:
 
 # Streamlit 앱 시작
 st.title("Liberty LangGraph QA 챗봇")
+# 세션 상태 초기화
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+def login():
+    st.session_state.logged_in = True
+    st.rerun()
+
+def logout():
+    st.session_state.logged_in = False
+    st.rerun()
+
+# 로그인 버튼
+if not st.session_state.logged_in:
+    st.title("로그인")
+    if st.button("로그인"):
+        login()
+else:
+    st.title("환영합니다!")
+    if st.button("로그아웃"):
+        logout()
+
+# 메뉴 호출
+menu()
 
 # 세션 상태 초기화
 if "messages" not in st.session_state:
@@ -311,14 +340,14 @@ if prompt := st.chat_input("질문을 입력하세요:"):
             final_output = outputs[-1]
             final_answer = final_output.get('relevance_check', {}).get('answer', "답변을 찾을 수 없습니다.")
             rewrite_count = final_output.get('relevance_check', {}).get('rewrite_count', 0)
+            combined_score = final_output.get('relevance_check', {}).get('combined_score', 0)  # combined_score 확인
             
-            full_response = f"{final_answer}\n\n총 질문 재작성 횟수: {rewrite_count}"
+            full_response = f"{final_answer}\n\n총 질문 재작성 횟수: {rewrite_count}\n결합 점수: {combined_score}"
             message_placeholder.markdown(full_response)
 
         except GraphRecursionError as e:
-            error_message = f"Recursion limit reached: {e}\n최종 답변: {outputs[-1] if outputs else '답변을 생성하지 못했습니다.'}"
-            message_placeholder.error(error_message)
-            full_response = error_message
+            full_response = f"재귀 한도에 도달했습니다: {e}\n최종 답변: {outputs[-1] if outputs else '답변을 생성하지 못했습니다.'}"
+            message_placeholder.markdown(full_response)
 
         st.session_state.messages.append({"role": "assistant", "content": full_response})
 

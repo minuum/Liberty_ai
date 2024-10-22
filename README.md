@@ -22,6 +22,8 @@ AI Agent Liberty의 시스템 구조를 자세히 보려면 아래 Figma 링크�
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/f16b12c4-a786-40f2-86ff-8267cebd0027" alt="Python" width="200">
+</p>
+<p align="center">
   <img src="https://github.com/user-attachments/assets/fca98822-0741-4356-b5da-bb392cbefcfb" alt="Streamlit" width="200">
 </p>
 <p align="center">

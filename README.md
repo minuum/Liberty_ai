@@ -1,7 +1,8 @@
 # AI Agent Liberty - 랭그래프 기반 질의응답 시스템
 
 <p align="center">
-  <img src="https://your-image-host.com/ai-agent-liberty-logo.png" alt="AI Agent Liberty 로고" width="200">
+  <img src="![image](https://github.com/user-attachments/assets/4c13647e-0358-4b91-9abd-36ad93201795)
+" width="200">
 </p>
 
 ## 프로젝트 소개

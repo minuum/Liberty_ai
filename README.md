@@ -1,9 +1,5 @@
 # AI Agent Liberty - 랭그래프 기반 질의응답 시스템
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/4c13647e-0358-4b91-9abd-36ad93201795" width="200">
-</p>
-
 ## 프로젝트 소개
 
 AI Agent Liberty는 랭그래프(LangGraph) 기법을 활용한 민간 법률 고급 질의응답 시스템입니다. 이 프로젝트는 사용자의 질문에 대해 정확하고 관련성 높은 법률 답변을 제공하기 위해 설계되었습니다.
@@ -97,7 +93,10 @@ AI Agent Liberty는 랭그래프 기법을 사용하여 다음과 같은 프로�
 3. 변경 사항을 커밋합니다 (`git commit -m 'Add some AmazingFeature'`).
 4. 브랜치에 푸시합니다 (`git push origin feature/AmazingFeature`).
 5. Pull Request를 생성합니다.
-
+6. 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/4c13647e-0358-4b91-9abd-36ad93201795" width="200">
+</p>
 ## 라이선스
 
 이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.

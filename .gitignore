@@ -9,3 +9,4 @@ __pycache__/
 rag/__pycache__
 .streamlit/secrets.toml
 .streamlit/config.toml
+*.dockerfile

@@ -1,8 +1,7 @@
 # AI Agent Liberty - 랭그래프 기반 질의응답 시스템
 
 <p align="center">
-  <img src="![image](https://github.com/user-attachments/assets/4c13647e-0358-4b91-9abd-36ad93201795)
-" width="200">
+  <img src="(https://github.com/user-attachments/assets/4c13647e-0358-4b91-9abd-36ad93201795)" width="200">
 </p>
 
 ## 프로젝트 소개
@@ -26,10 +25,10 @@ AI Agent Liberty의 시스템 구조를 자세히 보려면 아래 Figma 링크�
 ## 기술 스택
 
 <p align="center">
-  <img src="https://your-image-host.com/python-logo.png" alt="Python" width="50">
-  <img src="https://your-image-host.com/streamlit-logo.png" alt="Streamlit" width="50">
-  <img src="https://your-image-host.com/langchain-logo.png" alt="LangChain" width="50">
-  <img src="https://your-image-host.com/langgraph-logo.png" alt="LangGraph" width="50">
+  <img src="(https://github.com/user-attachments/assets/5f55fcb8-4c91-4c6a-abe5-8b81e009f32a)" alt="Python" width="50">
+  <img src="(https://github.com/user-attachments/assets/fca98822-0741-4356-b5da-bb392cbefcfb)" alt="Streamlit" width="50">
+  <img src="(https://github.com/user-attachments/assets/0de82bd5-8bd2-4c5d-9111-06bddcc99479)" alt="LangChain" width="50">
+  <img src="https://github.com/user-attachments/assets/5190d84a-c348-47c5-bb18-3ce47915e3cb" alt="LangGraph" width="50">
 </p>
 
 - Python

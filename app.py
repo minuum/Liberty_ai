@@ -36,6 +36,19 @@ def setup_pdf_chain():
     pdf = pdf_chain.create_chain()
     return pdf.retriever, pdf.chain
 
+#중간고사 이후 임베딩할 부분
+import json
+from langchain_community.document_loaders import JSONLoader
+@st.cache_resource
+def json_load():
+    file_path = "data/154.의료, 법률 전문 서적 말뭉치/01-1.정식개방데이터/Validation/02.라벨링데이터/Validation_legal.json"
+    loader = JSONLoader(
+        file_path=file_path,
+        jq_schema='.[]',
+    )
+    data = loader.load()
+    return data
+
 pdf_retriever, pdf_chain = setup_pdf_chain()
 
 # GraphState 정의

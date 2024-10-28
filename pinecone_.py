@@ -68,13 +68,45 @@ class PineconeRetrievalChain:
         index = self.create_index(api_key=PINECONE_API_KEY, host=host, index_name=index_name)
         return {"index": index, "namespace": index_name + "-namespace-01"}
     
-    def load_documents(self, data_dir="./data"):
+    def load_documents(self, data_dir="./data", mode="pdf"):
         split_docs = []
-        files = sorted(glob.glob(os.path.join(data_dir, "*.pdf")))
-        print(files)
-        for filename in files:
-            loader = PDFPlumberLoader(filename)
-            split_docs.extend(loader.load_and_split(self.text_splitter))
+        if mode == "pdf":
+            files = sorted(glob.glob(os.path.join(data_dir, "*.pdf")))
+            print(files)
+            for filename in files:
+                loader = PDFPlumberLoader(filename)
+                split_docs.extend(loader.load_and_split(self.text_splitter))
+        if mode == "json":
+            import json
+            with open(data_dir, 'r', encoding='utf-8') as f:
+                try:
+                    json_data = json.load(f)
+                    
+                    # data 배열에서 문서 추출
+                    if isinstance(json_data, dict) and 'data' in json_data:
+                        for item in json_data['data']:
+                            if isinstance(item, dict):
+                                # Document 객체 생성
+                                from langchain.schema import Document
+                                doc = Document(
+                                    page_content=item.get('text', ''),
+                                    metadata={
+                                        'book_id': item.get('book_id'),
+                                        'category': item.get('category'),
+                                        'popularity': item.get('popularity'),
+                                        'keyword': item.get('keyword', []),
+                                        'word_segment': item.get('word_segment', []),
+                                        'publication_ymd': item.get('publication_ymd')
+                                    }
+                                )
+                                split_docs.append(doc)
+                    else:
+                        print("JSON 데이터가 예상된 형식이 아닙니다.")
+                        print("데이터 구조:", json_data.keys() if isinstance(json_data, dict) else type(json_data))
+                        
+                except json.JSONDecodeError as e:
+                    print(f"JSON 파일 파싱 중 오류가 발생했습니다: {e}")
+                    
         return split_docs
     
     def preprocess_documents(self,
@@ -219,3 +251,5 @@ class PineconeRetrievalChain:
             print(f"새로운 인덱스 '{index_name}' 생성 완료")
         
         return index
+
+

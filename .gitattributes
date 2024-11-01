@@ -1,1 +1,5 @@
 *.ipynb filter=lfs diff=lfs merge=lfs -text
+<<<<<<< HEAD
+*.ipynb !text !filter !merge !diff
+=======
+>>>>>>> e750685f819534bc284978bee07b405d92b7c178

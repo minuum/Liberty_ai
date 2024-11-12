@@ -18,7 +18,7 @@ import pprint
 from langgraph.errors import GraphRecursionError
 from langchain_core.runnables import RunnableConfig
 import streamlit as st
-from menu import menu
+from streamlit_ui.menu import menu
 
 
 

@@ -16,11 +16,11 @@ from langchain import hub
 
 # 로깅 설정
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.ERROR,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-
+ 
 # 환경 변수 로드
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -51,7 +51,11 @@ class AgentState(TypedDict):
     question: str
     context: List[str]
     answer: str
+    previous_answer: str
     rewrite_count: int
+    rewrite_weight: float
+    previous_weight: float
+    original_weight: float
     combined_score: float
 
 class LegalAgent:
@@ -162,7 +166,22 @@ class LegalAgent:
     def _retrieve_document(self, state: AgentState) -> AgentState:
         """문서 검색"""
         try:
+            logger.info(f"""
+            === RETRIEVE NODE 디버깅 ===
+            검색 쿼리: {state["question"]}
+            하이브리드 검색기 상태: {self.search_engine.hybrid_retriever is not None}
+            네임스페이스: {self.search_engine.namespace}
+            """)
+            
             context = self.search_engine.hybrid_search(state["question"])
+            
+            logger.info(f"""
+            검색 결과:
+            - 문서 수: {len(context)}
+            - 첫 번째 문서 길이: {len(context[0].page_content) if context else 0}
+            - 메타데이터: {context[0].metadata if context else None}
+            """)
+            
             return AgentState(
                 question=state["question"],
                 context=context,
@@ -175,23 +194,102 @@ class LegalAgent:
     def _llm_answer(self, state: AgentState) -> AgentState:
         """LLM 답변 생성"""
         try:
-            # 컨텍스트 문자열로 변환
+            logger.info(f"""
+            === LLM_ANSWER NODE 진입 ===
+            질문: {state["question"]}
+            재작성 횟수: {state.get("rewrite_count", 0)}
+            이전 답변 존재: {"있음" if state.get("previous_answer") else "없음"}
+            재작성 가중치: {state.get("rewrite_weight", 0.0)}
+            """)
+            
+            # 중요한 에러 로그만 남김
+            if state.get("rewrite_weight") is None:
+                logger.error(f"rewrite_weight is None in state")
+            
+            # ERROR 레벨로 변경하여 반드시 보이도록 함
+            logger.error(f"State received in _llm_answer: {state}")
+            logger.error(f"rewrite_weight value: {state.get('rewrite_weight')}")
             context = "\n\n".join([
-                f"문서 {i+1}:\n{doc['page_content']}" 
+                f"문서 {i+1}:\n{doc.page_content}" 
                 for i, doc in enumerate(state["context"])
             ]) if state["context"] else ""
             
+            # 디버깅을 위한 상태 로깅 추가
+            logger.error(f"Current state values:")
+            logger.error(f"rewrite_weight: {state.get('rewrite_weight')}")
+            logger.error(f"previous_weight: {state.get('previous_weight')}")
+            logger.error(f"rewrite_count: {state.get('rewrite_count')}")
+            
+            # None 체크 추가
+            rewrite_weight = state.get("rewrite_weight")
+            if rewrite_weight is None:
+                logger.error(f"rewrite_weight is None in state: {state}")
+                rewrite_weight = 0.0  # 기본값 설정
+            
+            try:
+                exploration_type = "More exploratory and critical" if rewrite_weight > 0.3 else "Slightly refined"
+            except TypeError as e:
+                logger.error(f"TypeError in exploration_type comparison: {e}")
+                logger.error(f"rewrite_weight type: {type(rewrite_weight)}")
+                raise
+            
+            # 새로운 프롬프트 템플릿
+            answer_prompt = ChatPromptTemplate.from_messages([
+                (
+                    "system",
+                    """You are analyzing this question for the {rewrite_count}th time.
+                    
+                    Previous weight: {previous_weight:.2f}
+                    Current weight: {rewrite_weight:.2f}
+                    
+                    This weight progression indicates:
+                    - Initial response (weight 0.0): Direct answer from context
+                    - Current response (weight {rewrite_weight:.2f}): {exploration_type}
+                    
+                    Your task is to {revision_type} the previous interpretation.
+                    
+                    Context:
+                    {context}
+                    
+                    Previous answer:
+                    {previous_answer}
+                    
+                    Remember to maintain legal accuracy and provide Korean responses."""
+                ),
+                ("human", "{question}")
+            ])
+            
             # 체인 실행
-            chain = self.answer_prompt | self.llm | StrOutputParser()
+            chain = answer_prompt | self.llm | StrOutputParser()
+            
+            # 기본값 설정
+            rewrite_weight = state.get("rewrite_weight", 0.0)
+            exploration_type = "More exploratory and critical" if rewrite_weight > 0.3 else "Slightly refined"
+            revision_type = "significantly revise" if rewrite_weight > 0.3 else "slightly adjust"
+            
             response = chain.invoke({
                 "question": state["question"],
-                "context": context
+                "context": context,
+                "previous_answer": state.get("previous_answer", ""),
+                "rewrite_count": state.get("rewrite_count", 0),
+                "previous_weight": state.get("previous_weight", 0.0),  # 기본값 추가
+                "rewrite_weight": rewrite_weight,  # 이미 기본값이 설정된 변수 사용
+                "exploration_type": exploration_type,
+                "revision_type": revision_type
             })
             
-            return AgentState(
-                **state,
-                answer=response
-            )
+            # 수정된 부분: state 업데이트 방식 변경
+            updated_state = state.copy()
+            updated_state["previous_answer"] = state.get("answer", "")
+            updated_state["answer"] = response
+            
+            logger.info(f"""
+            === LLM_ANSWER NODE 종료 ===
+            답변 길이: {len(response)}
+            다음 노드: relevance_check
+            """)
+            
+            return AgentState(**updated_state)
             
         except Exception as e:
             logger.error(f"답변 생성 중 오류: {str(e)}")
@@ -200,29 +298,86 @@ class LegalAgent:
     def _rewrite(self, state: AgentState) -> AgentState:
         """질문 재작성"""
         try:
+            logger.info(f"""
+            === REWRITE NODE 진입 ===
+            원래 질문: {state["question"]}
+            현재 재작성 횟수: {state.get("rewrite_count", 0)}
+            이전 가중치: {state.get("rewrite_weight", 0.0)}
+            """)
+            
+            previous_weight = state.get("rewrite_weight", 0)
             rewrite_count = state.get("rewrite_count", 0) + 1
             rewrite_weight = min(rewrite_count * 0.1, 0.5)
             
-            # 컨텍스트 문자열로 변환
             context = "\n\n".join([
-                f"문서 {i+1}:\n{doc['page_content']}" 
+                f"문서 {i+1}:\n{doc.page_content}" 
                 for i, doc in enumerate(state["context"])
             ]) if state["context"] else ""
             
-            # 체인 실행
-            chain = self.rewrite_prompt | self.llm | StrOutputParser()
+            # 새로운 재작성 프롬프트
+            rewrite_prompt = ChatPromptTemplate.from_messages([
+                (
+                    "system",
+                    """Rewrite iteration: {rewrite_count}
+                    Weight change: {previous_weight:.2f} → {rewrite_weight:.2f}
+                    
+                    As the weight increases:
+                    1. Question complexity should increase
+                    2. Scope should broaden
+                    3. Alternative viewpoints should be explored
+                    
+                    Current stage requires: {revision_requirement}
+                    
+                    Generate an improved question in Korean."""
+                ),
+                (
+                    "human",
+                    "Initial question:\n------- \n{question}\n------- \n"
+                    "Context:\n------- \n{context}\n------- \n"
+                    "Previous answer:\n------- \n{answer}\n------- \n"
+                )
+            ])
+            
+            chain = rewrite_prompt | self.llm | StrOutputParser()
+            
+            revision_requirement = "major reframing" if rewrite_weight > 0.3 else "minor refinement"
+            
             new_question = chain.invoke({
                 "question": state["question"],
                 "context": context,
                 "answer": state["answer"],
-                "rewrite_weight": rewrite_weight
+                "rewrite_count": rewrite_count,
+                "previous_weight": previous_weight,
+                "rewrite_weight": rewrite_weight,
+                "revision_requirement": revision_requirement
             })
+            
+            # 상태 로깅 추가
+            logger.info(f"""
+            Weight Progress:
+            - Iteration: {rewrite_count}
+            - Previous Weight: {previous_weight:.2f}
+            - Current Weight: {rewrite_weight:.2f}
+            - Expected Changes: {'Significant' if rewrite_weight > 0.3 else 'Minor'}
+            """)
+            
+            logger.info(f"""
+            === REWRITE NODE 종료 ===
+            새로운 질문: {new_question}
+            새로운 가중치: {rewrite_weight}
+            다음 노드: retrieve
+            """)
             
             return AgentState(
                 question=new_question,
+                context=[],
+                answer="",
+                previous_answer=state["answer"],
                 rewrite_count=rewrite_count,
                 rewrite_weight=rewrite_weight,
-                original_weight=1-rewrite_weight
+                previous_weight=previous_weight,
+                original_weight=state.get("original_weight", 1.0),
+                combined_score=0.0
             )
             
         except Exception as e:
@@ -232,15 +387,27 @@ class LegalAgent:
     def _relevance_check(self, state: AgentState) -> AgentState:
         """답변 관련성 검사"""
         try:
+            logger.info(f"""
+            === RELEVANCE_CHECK NODE 진입 ===
+            재작성 횟수: {state.get("rewrite_count", 0)}
+            답변 길이: {len(state["answer"])}
+            """)
+            
+            # context를 문자열로 변환
+            context_str = "\n\n".join([
+                f"문서 {i+1}:\n{doc.page_content}" 
+                for i, doc in enumerate(state["context"])
+            ]) if state["context"] else ""
+            
             # Upstage 검사
             upstage_response = self.search_engine.upstage_checker.run({
-                "context": state["context"],
+                "context": context_str,
                 "answer": state["answer"]
             })
             
             # KoBERT 검사
             kobert_score = self.search_engine.validate_answer(
-                context=state["context"],
+                context=context_str,
                 answer=state["answer"]
             )
             
@@ -250,11 +417,20 @@ class LegalAgent:
                 kobert_score
             )
             
-            return AgentState(
-                **state,
-                relevance=self._get_relevance_status(combined_score),
-                combined_score=combined_score
-            )
+            # state 복사 후 업데이트
+            updated_state = state.copy()
+            updated_state["relevance"] = self._get_relevance_status(combined_score)
+            updated_state["combined_score"] = combined_score
+            
+            logger.info(f"""
+            === RELEVANCE_CHECK NODE 종료 ===
+            결합 점수: {combined_score:.2f}
+            관련성 상태: {updated_state["relevance"]}
+            다음 노드: {updated_state["relevance"]}
+            """)
+            
+            return AgentState(**updated_state)
+            
         except Exception as e:
             logger.error(f"관련성 검사 중 오류: {str(e)}")
             raise
@@ -272,11 +448,19 @@ class LegalAgent:
         upstage_weight = 0.6
         kobert_weight = 0.4
         
+        # upstage_response가 딕셔너리인 경우를 처리
+        if isinstance(upstage_response, dict):
+            # upstage_response에서 실제 응답 값을 추출
+            upstage_result = upstage_response.get('result', 'notSure')
+        else:
+            upstage_result = upstage_response
+        
+        # 점수 매핑
         upstage_score = {
             "grounded": 1.0,
             "notGrounded": 0.0,
             "notSure": 0.33
-        }.get(upstage_response, 0.0)
+        }.get(upstage_result, 0.0)
         
         return (upstage_weight * upstage_score) + (kobert_weight * kobert_score)
 
@@ -295,9 +479,18 @@ class LegalAgent:
                 question=question,
                 context=[],
                 answer="",
+                previous_answer="",
                 rewrite_count=0,
+                rewrite_weight=0.0,
+                previous_weight=0.0,
+                original_weight=1.0,
                 combined_score=0.0
             )
+            
+            # 초기 상태 로깅
+            logger.info(f"Initial state created with values:")
+            logger.info(f"rewrite_weight: {initial_state.get('rewrite_weight')}")
+            logger.info(f"previous_weight: {initial_state.get('previous_weight')}")
             
             config = RunnableConfig(
                 recursion_limit=5,
@@ -305,19 +498,15 @@ class LegalAgent:
             )
             
             result = self.workflow.invoke(initial_state, config=config)
-            
             return {
                 "answer": result["answer"],
                 "confidence": result["combined_score"],
                 "rewrites": result["rewrite_count"]
             }
-            
         except Exception as e:
-            logger.error(f"질문 처리 중 오류 발생: {str(e)}")
-            return {
-                "error": str(e),
-                "answer": "죄송합니다. 답변을 생성하는 중에 오류가 발생했습니다."
-            }
+            logger.error(f"Error in process_query: {str(e)}")
+            logger.error(f"State at error: {initial_state}")
+            raise
             
 # Streamlit UI용 함수
 def create_ui():
@@ -379,7 +568,7 @@ def create_ui():
                         {response['answer']}
                         
                         신뢰도: {response['confidence']:.2f}
-                        질문 재작성 횟수: {response['rewrites']}
+                        질문 재작성 횟수: {response['rewrites']}    
                         """
                         
                     message_placeholder.markdown(full_response)

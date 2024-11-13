@@ -58,7 +58,8 @@ class GraphState(TypedDict):
     answer: str
     rewrite_weight: float
     original_weight: float
-    relevance: str
+    previous_weight: float  # Add this
+    previous_answer: str    # Add this
     rewrite_count: int
     combined_score: float
 
@@ -113,18 +114,45 @@ def retrieve_document(state: GraphState) -> GraphState:
 def llm_answer(state: GraphState) -> GraphState:
     question = state["question"]
     context = state["context"]
-    #재작성 횟수
     rewrite_count = state.get("rewrite_count", 0)
-    # 재작성 횟수에 따른 가중치 조정
-    rewrite_weight = state["rewrite_weight"]  # 최대 0.5까지 증가
-    original_weight =state["original_weight"]
+    rewrite_weight = state["rewrite_weight"]
+    original_weight = state["original_weight"]
+    previous_weight = state["rewrite_weight"]
 
-    response = pdf_chain.invoke({"question": question, "context": context, "rewrite_weight": rewrite_weight, "original_weight": original_weight})
+    prompt = ChatPromptTemplate.from_messages([
+        (
+            "system",
+            """You are analyzing this question for the {{rewrite_count}}th time.
+            
+            Previous weight: {{previous_weight:.2f}}
+            Current weight: {{rewrite_weight:.2f}}
+            
+            This increase in weight means:
+            - Initial response (weight 0.0): Direct answer from context
+            - Current response (weight {{rewrite_weight:.2f}}): {{"More exploratory and critical" if rewrite_weight > 0.3 else "Slightly refined"}} approach
+            
+            Your task is to {{"significantly revise" if rewrite_weight > 0.3 else "slightly adjust"}} the previous interpretation."""
+        ),
+        ("human", "{question}"),
+        ("context", "{context}"),
+        ("previous_answer", "{previous_answer}")  # Add previous answer for comparison
+    ])
+
+    # Create chain with the new prompt
+    chain = prompt | ChatOpenAI(temperature=0) | StrOutputParser()
+    
+    response = chain.invoke({
+        "question": question, 
+        "context": context,
+        "rewrite_weight": rewrite_weight,
+        "original_weight": original_weight,
+        "previous_answer": state["answer"]
+    })
 
     return GraphState(answer=response, rewrite_count=rewrite_count)
 
 def rewrite(state):
-    
+    previous_weight = state["rewrite_weight"]
     state["rewrite_count"] = (state.get("rewrite_count", 0) + 1)  # 카운터 증가
     print("rewrite_count : ", state["rewrite_count"])
 
@@ -138,29 +166,29 @@ def rewrite(state):
     context = state["context"]
     rewrite_weight = state["rewrite_weight"]
     
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            (
+    prompt = ChatPromptTemplate.from_messages([
+        (
             "system",
-            "You are a professional prompt rewriter. Your task is to generate questions to obtain additional information not shown in the given context. "
-            "Your generated questions will be used for web searches to find relevant information. "
-            "Consider the rewrite weight ({{rewrite_weight:.2f}}) to adjust the credibility of the previous answer. "
-            "The higher the weight, the more you should doubt the previous answer and focus on finding new information."
-            "The weight is calculated based on the number of times the question has been rewritten. "
-            "The higher the weight, the more you should doubt the previous answer and focus on finding new information."
+            """Rewrite iteration: {{rewrite_count}}
+            Weight change: {{previous_weight:.2f}} → {{rewrite_weight:.2f}}
+            
+            As the weight increases:
+            1. Question complexity should increase
+            2. Scope should broaden
+            3. Alternative viewpoints should be explored
+            
+            Current stage requires: {{"major reframing" if rewrite_weight > 0.3 else "minor refinement"}}"""
         ),
         (
             "human",
-            "Rewrite the question to obtain additional information for the answer. "
-            "\n\nInitial question:\n ------- \n{question}\n ------- \n"
-            "\n\nInitial context:\n ------- \n{context}\n ------- \n"
-            "\n\nInitial answer to the question:\n ------- \n{answer}\n ------- \n"
-            "\n\nRewrite weight: {{rewrite_weight:.2f}} (The higher this value, the more you should doubt the previous answer)"
-            "\n\nFormulate an improved question in Korean:"
-        ),
-    ]
-)
-
+            "Rewrite the question to obtain additional information.\n\n"
+            "Initial question:\n------- \n{question}\n------- \n"
+            "Initial context:\n------- \n{context}\n------- \n"
+            "Initial answer:\n------- \n{answer}\n------- \n"
+            "\nGenerate an improved question in Korean that reflects the current rewrite weight ({{rewrite_weight:.2f}}):"
+        )
+    ])
+    
     # Question rewriting model
     model = ChatOpenAI(temperature=0, model="gpt-4o-2024-08-06")
 
@@ -198,6 +226,13 @@ def kobert_relevance_check(context, answer):
     return relevance_score
 
 def relevance_check(state: GraphState) -> GraphState:
+    print(f"""
+    Weight Progress:
+    - Iteration: {state['rewrite_count']}
+    - Previous Weight: {state.get('previous_weight', 0):.2f}
+    - Current Weight: {state['rewrite_weight']:.2f}
+    - Answer Evolution: {'Significant' if state['rewrite_weight'] > 0.3 else 'Minor'} changes expected
+    """)
     #print("relevance_check", state)
     print("relevance_check")
     # 기존 upstage_ground_checker 실행

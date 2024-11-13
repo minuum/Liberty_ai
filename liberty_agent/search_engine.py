@@ -208,27 +208,33 @@ class LegalSearchEngine:
             raise
             
     def hybrid_search(self, query: str, top_k: int = 5) -> List[Dict]:
-        """
-        하이브리드 검색 수행
-        
-        Args:
-            query: 검색 쿼리
-            top_k: 반환할 결과 수
-            
-        Returns:
-            List[Dict]: 검색 결과 리스트
-        """
-        if not self.hybrid_retriever:
-            raise ValueError("하이브리드 검색기가 초기화되지 않았습니다. setup_hybrid_retriever()를 먼저 호출하세요.")
-            
+        """하이브리드 검색 수행"""
         try:
-            logger.info(f"검색 수행 중: {query}")
+            logger.info(f"""
+            === 하이브리드 검색 시작 ===
+            쿼리: {query}
+            요청 문서 수: {top_k}
+            검색기 설정:
+            - 네임스페이스: {self.namespace}
+            - Dense 임베딩 모델: {self.dense_embedder.__class__.__name__}
+            """)
+            
             results = self.hybrid_retriever.invoke(
                 query,
                 search_kwargs={"top_k": top_k}
             )
-            logger.info(f"검색 완료: {len(results)}개 결과 찾음")
+            
+            logger.info(f"""
+            === 검색 결과 ===
+            찾은 문서 수: {len(results)}
+            문서 내용 샘플:
+            {[doc.page_content[:200] + "..." for doc in results[:2]]}
+            메타데이터 샘플:
+            {[doc.metadata for doc in results[:2]]}
+            """)
+            
             return results
+            
         except Exception as e:
             logger.error(f"검색 중 오류 발생: {str(e)}")
             raise
@@ -239,25 +245,26 @@ class LegalSearchEngine:
         answer: str,
         upstage_weight: float = 0.6,
         kobert_weight: float = 0.4
-    ) -> Dict[str, float]:
+    ) -> float:
         """
         답변의 신뢰도 검증
-        
-        Args:
-            context: 컨텍스트 텍스트
-            answer: 검증할 답변
-            upstage_weight: Upstage 검증 가중치
-            kobert_weight: KoBERT 검증 가중치
         """
-        # Upstage 검증
-        upstage_response = self.upstage_checker.run(
-            {"context": context,
-             "answer": answer}
-        )   
+        logger.info(f"""
+        === 답변 신뢰도 검증 시작 ===
+        컨텍스트 길이: {len(context)}
+        답변 길이: {len(answer)}
+        """)
         
-        if self.use_combined_check:
+        try:
+            # Upstage 검증
+            upstage_response = self.upstage_checker.run(
+                {"context": context, "answer": answer}
+            )   
+            logger.info(f"Upstage 검증 결과: {upstage_response}")
+            
             # KoBERT 검증
             kobert_score = self._kobert_check(context, answer)
+            logger.info(f"KoBERT 유사도 점수: {kobert_score:.3f}")
             
             # Upstage 점수 변환
             upstage_score = {
@@ -265,71 +272,83 @@ class LegalSearchEngine:
                 "notGrounded": 0.0,
                 "notSure": 0.33
             }.get(upstage_response, 0.33)
+            logger.info(f"Upstage 변환 점수: {upstage_score:.3f}")
             
             # 결합 점수 계산
-            combined_score = (
-                upstage_weight * upstage_score + 
-                kobert_weight * kobert_score
-            )
+            final_score = (upstage_weight * upstage_score) + (kobert_weight * kobert_score)
             
-            # 최종 판정
-            if combined_score >= 0.7:
-                final_relevance = "grounded"
-            elif combined_score <= 0.3:
-                final_relevance = "notGrounded"
-            else:
-                final_relevance = "notSure"
-                
-            return {
-                "final_relevance": final_relevance,
-                "combined_score": combined_score,
-                "upstage_score": upstage_score,
-                "kobert_score": kobert_score
-            }
+            logger.info(f"""
+            === 최종 신뢰도 점수 ===
+            Upstage 가중치: {upstage_weight} × 점수: {upstage_score:.3f} = {upstage_weight * upstage_score:.3f}
+            KoBERT 가중치: {kobert_weight} × 점수: {kobert_score:.3f} = {kobert_weight * kobert_score:.3f}
+            최종 결합 점수: {final_score:.3f}
+            """)
             
-        return {
-            "final_relevance": upstage_response,
-            "combined_score": 1.0 if upstage_response == "grounded" else 0.0
-        }
+            return final_score
+            
+        except Exception as e:
+            logger.error(f"신뢰도 검증 중 오류 발생: {str(e)}")
+            raise
         
     def _kobert_check(self, context: str, answer: str) -> float:
         """KoBERT를 사용한 관련성 점수 계산"""
-        # 토크나이즈
-        context_inputs = self.kobert_tokenizer(
-            context,
-            return_tensors="pt",
-            truncation=True,
-            padding=True
-        )
-        answer_inputs = self.kobert_tokenizer(
-            answer,
-            return_tensors="pt",
-            truncation=True,
-            padding=True
-        )
+        logger.info("=== KoBERT 관련성 검사 시작 ===")
         
-        # 디바이스 이동
-        context_inputs = {
-            k: v.to(self.device) for k, v in context_inputs.items()
-        }
-        answer_inputs = {
-            k: v.to(self.device) for k, v in answer_inputs.items()
-        }
-        
-        # 임베딩 생성
-        with torch.no_grad():
-            context_outputs = self.kobert_model(**context_inputs)
-            answer_outputs = self.kobert_model(**answer_inputs)
-        
-        # 평균 풀링
-        context_embedding = context_outputs.last_hidden_state.mean(dim=1)
-        answer_embedding = answer_outputs.last_hidden_state.mean(dim=1)
-        
-        # 코사인 유사도 계산
-        similarity = torch.nn.functional.cosine_similarity(
-            context_embedding,
-            answer_embedding
-        )
-        
-        # 점수 변환 (0~1 범위)
-        return (similarity.item() + 1) / 2
+        try:
+            # 토크나이즈
+            context_inputs = self.kobert_tokenizer(
+                context,
+                return_tensors="pt",
+                truncation=True,
+                padding=True
+            )
+            answer_inputs = self.kobert_tokenizer(
+                answer,
+                return_tensors="pt",
+                truncation=True,
+                padding=True
+            )
+            
+            logger.info(f"""
+            토큰화 결과:
+            컨텍스트 토큰 수: {context_inputs['input_ids'].shape[1]}
+            답변 토큰 수: {answer_inputs['input_ids'].shape[1]}
+            """)
+            
+            # 디바이스 이동
+            context_inputs = {
+                k: v.to(self.device) for k, v in context_inputs.items()
+            }
+            answer_inputs = {
+                k: v.to(self.device) for k, v in answer_inputs.items()
+            }
+            
+            # 임베딩 생성
+            with torch.no_grad():
+                context_outputs = self.kobert_model(**context_inputs)
+                answer_outputs = self.kobert_model(**answer_inputs)
+            
+            # 평균 풀링
+            context_embedding = context_outputs.last_hidden_state.mean(dim=1)
+            answer_embedding = answer_outputs.last_hidden_state.mean(dim=1)
+            
+            # 코사인 유사도 계산
+            similarity = torch.nn.functional.cosine_similarity(
+                context_embedding,
+                answer_embedding
+            )
+            
+            # 점수 변환 (0~1 범위)
+            final_score = (similarity.item() + 1) / 2
+            
+            logger.info(f"""
+            === KoBERT 점수 계산 완료 ===
+            원본 코사인 유사도: {similarity.item():.3f}
+            정규화된 최종 점수: {final_score:.3f}
+            """)
+            
+            return final_score
+            
+        except Exception as e:
+            logger.error(f"KoBERT 검사 중 오류 발생: {str(e)}")
+            raise

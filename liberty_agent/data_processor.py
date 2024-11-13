@@ -53,7 +53,7 @@ class LegalDataProcessor:
         
         # Sparse Encoder 초기화
         logger.info("Sparse Encoder 초기화 중...")
-        self.sparse_encoder = None
+        self.sparse_encoder = self._initialize_sparse_encoder(load_encoder)
         
     def _initialize_sparse_encoder(self, load_encoder: bool, contents: List[str] = []):
         """Sparse Encoder 초기화"""

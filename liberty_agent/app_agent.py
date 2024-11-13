@@ -10,6 +10,9 @@ import os
 import logging
 from data_processor import LegalDataProcessor
 from search_engine import LegalSearchEngine
+from pinecone import Pinecone
+import streamlit as st
+from langchain import hub 
 
 # 로깅 설정
 logging.basicConfig(
@@ -54,21 +57,78 @@ class AgentState(TypedDict):
 class LegalAgent:
     def __init__(self):
         """법률 에이전트 초기화"""
-        # 검색 엔진 초기화
-        self.search_engine = LegalSearchEngine(
-            pinecone_index=PINECONE_INDEX_NAME,
-            namespace="legal-agent"
-        )
-        
-        # LLM 초기화
-        self.llm = ChatOpenAI(
-            model="gpt-4-turbo-preview",
-            temperature=0.1,
-            api_key=OPENAI_API_KEY
-        )
-        
-        # 워크플로우 그래프 초기화
-        self.workflow = self._create_workflow()
+        try:
+            # Pinecone 초기화
+            pc = Pinecone(api_key=PINECONE_API_KEY)
+            self.pinecone_index = pc.Index(PINECONE_INDEX_NAME)
+            logger.info("Pinecone 인덱스 초기화 완료")
+            
+            # 데이터 프로세서 초기화
+            self.data_processor = LegalDataProcessor(
+                pinecone_api_key=PINECONE_API_KEY,
+                index_name=PINECONE_INDEX_NAME,
+                load_encoder=True,
+                encoder_path="sparse_encoder.pkl"
+            )
+            logger.info("데이터 프로세서 초기화 완료")
+            
+            # sparse encoder 가져오기
+            sparse_encoder = self.data_processor.get_encoder()
+            if sparse_encoder is None:
+                raise ValueError("Sparse encoder를 로드하지 못했습니다.")
+            logger.info("Sparse encoder 로드 완료")
+            
+            # 검색 엔진 초기화
+            self.search_engine = LegalSearchEngine(
+                pinecone_index=self.pinecone_index,
+                namespace="liberty-rag-json-namespace-02",
+                use_combined_check=True
+            )
+            logger.info("검색 엔진 초기화 완료")
+            
+            # 하이브리드 검색기 설정
+            self.search_engine.setup_hybrid_retriever(sparse_encoder)
+            logger.info("하이브리드 검색기 설정 완료")
+            
+            # LLM 초기화
+            self.llm = ChatOpenAI(
+                model="gpt-4o-2024-08-06",
+                temperature=0.1,
+                api_key=OPENAI_API_KEY
+            )
+            logger.info("LLM 초기화 완료")
+            
+            # 워크플로우 초기화
+            self.workflow = self._create_workflow()
+            logger.info("워크플로우 초기화 완료")
+            
+            # 프롬프트 로드
+            self.answer_prompt = hub.pull("minuum/liberty-rag")
+            self.rewrite_prompt = ChatPromptTemplate.from_messages([
+                (
+                    "system",
+                    "You are a professional prompt rewriter. Your task is to generate questions to obtain additional information not shown in the given context. "
+                    "Your generated questions will be used for web searches to find relevant information. "
+                    "Consider the rewrite weight ({rewrite_weight:.2f}) to adjust the credibility of the previous answer. "
+                    "The higher the weight, the more you should doubt the previous answer and focus on finding new information."
+                    "The weight is calculated based on the number of times the question has been rewritten. "
+                    "The higher the weight, the more you should doubt the previous answer and focus on finding new information."
+                ),
+                (
+                    "human",
+                    "Rewrite the question to obtain additional information for the answer. "
+                    "\n\nInitial question:\n ------- \n{question}\n ------- \n"
+                    "\n\nInitial context:\n ------- \n{context}\n ------- \n"
+                    "\n\nInitial answer to the question:\n ------- \n{answer}\n ------- \n"
+                    "\n\nRewrite weight: {rewrite_weight:.2f} (The higher this value, the more you should doubt the previous answer)"
+                    "\n\nFormulate an improved question in Korean:"
+                )
+            ])
+            logger.info("프롬프트 로드 완료")
+            
+        except Exception as e:
+            logger.error(f"에이전트 초기화 중 오류 발생: {str(e)}")
+            raise
         
     def _create_workflow(self) -> StateGraph:
         """워크플로우 그래프 생성"""
@@ -115,25 +175,24 @@ class LegalAgent:
     def _llm_answer(self, state: AgentState) -> AgentState:
         """LLM 답변 생성"""
         try:
-            rewrite_count = state.get("rewrite_count", 0)
-            rewrite_weight = min(rewrite_count * 0.1, 0.5)
-            original_weight = 1 - rewrite_weight
+            # 컨텍스트 문자열로 변환
+            context = "\n\n".join([
+                f"문서 {i+1}:\n{doc['page_content']}" 
+                for i, doc in enumerate(state["context"])
+            ]) if state["context"] else ""
             
-            response = self.llm.invoke({
+            # 체인 실행
+            chain = self.answer_prompt | self.llm | StrOutputParser()
+            response = chain.invoke({
                 "question": state["question"],
-                "context": state["context"],
-                "rewrite_weight": rewrite_weight,
-                "original_weight": original_weight
+                "context": context
             })
             
             return AgentState(
-                question=state["question"],
-                context=state["context"],
-                answer=response,
-                rewrite_count=rewrite_count,
-                rewrite_weight=rewrite_weight,
-                original_weight=original_weight
+                **state,
+                answer=response
             )
+            
         except Exception as e:
             logger.error(f"답변 생성 중 오류: {str(e)}")
             raise
@@ -144,16 +203,19 @@ class LegalAgent:
             rewrite_count = state.get("rewrite_count", 0) + 1
             rewrite_weight = min(rewrite_count * 0.1, 0.5)
             
-            prompt = ChatPromptTemplate.from_messages([
-                ("system", "질문을 재작성하여 추가 정보를 얻으세요..."),
-                ("human", "{question}\n\n컨텍스트:\n{context}\n\n이전 답변:\n{answer}")
-            ])
+            # 컨텍스트 문자열로 변환
+            context = "\n\n".join([
+                f"문서 {i+1}:\n{doc['page_content']}" 
+                for i, doc in enumerate(state["context"])
+            ]) if state["context"] else ""
             
-            chain = prompt | self.llm | StrOutputParser()
+            # 체인 실행
+            chain = self.rewrite_prompt | self.llm | StrOutputParser()
             new_question = chain.invoke({
                 "question": state["question"],
-                "context": state["context"],
-                "answer": state["answer"]
+                "context": context,
+                "answer": state["answer"],
+                "rewrite_weight": rewrite_weight
             })
             
             return AgentState(
@@ -162,6 +224,7 @@ class LegalAgent:
                 rewrite_weight=rewrite_weight,
                 original_weight=1-rewrite_weight
             )
+            
         except Exception as e:
             logger.error(f"질문 재작성 중 오류: {str(e)}")
             raise
@@ -255,51 +318,83 @@ class LegalAgent:
                 "error": str(e),
                 "answer": "죄송합니다. 답변을 생성하는 중에 오류가 발생했습니다."
             }
-
+            
 # Streamlit UI용 함수
 def create_ui():
-    import streamlit as st
+    
     
     st.title("법률 AI 어시스턴트")
     
+    # 초기화 상태 표시
+    init_status = st.empty()
+    
     # 세션 상태 초기화
-    if "agent" not in st.session_state:
-        st.session_state.agent = LegalAgent()
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-        
-    # 채팅 히스토리 표시
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    if "initialized" not in st.session_state:
+        init_status.info("시스템을 초기화하는 중입니다...")
+        try:
+            # Pinecone 초기화 확인
+            pc = Pinecone(api_key=PINECONE_API_KEY)
+            index = pc.Index(PINECONE_INDEX_NAME)
+            logger.info("Pinecone 연결 성공")
             
-    # 사용자 입력
-    if prompt := st.chat_input("질문을 입력하세요"):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        
-        with st.chat_message("user"):
-            st.markdown(prompt)
+            # 에이전트 초기화
+            st.session_state.agent = LegalAgent()
+            st.session_state.messages = []
+            st.session_state.initialized = True
             
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            message_placeholder.markdown("답변을 생성하는 중입니다...")
+            init_status.success("시스템 초기화가 완료되었습니다!")
+            logger.info("에이전트 초기화 성공")
             
-            response = st.session_state.agent.process_query(prompt)
-            
-            if "error" in response:
-                full_response = f"오류가 발생했습니다: {response['error']}"
-            else:
-                full_response = f"""
-                {response['answer']}
+        except Exception as e:
+            error_msg = f"시스템 초기화 실패: {str(e)}"
+            init_status.error(error_msg)
+            logger.error(error_msg)
+            st.stop()
+    
+    # 초기화 완료 후 UI 표시
+    if st.session_state.initialized:
+        # 채팅 히스토리 표시
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
                 
-                신뢰도: {response['confidence']:.2f}
-                질문 재작성 횟수: {response['rewrites']}
-                """
+        # 사용자 입력
+        if prompt := st.chat_input("질문을 입력하세요"):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            
+            with st.chat_message("user"):
+                st.markdown(prompt)
                 
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append(
-                {"role": "assistant", "content": full_response}
-            )
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                message_placeholder.markdown("답변을 생성하는 중입니다...")
+                
+                try:
+                    response = st.session_state.agent.process_query(prompt)
+                    
+                    if "error" in response:
+                        full_response = f"오류가 발생했습니다: {response['error']}"
+                    else:
+                        full_response = f"""
+                        {response['answer']}
+                        
+                        신뢰도: {response['confidence']:.2f}
+                        질문 재작성 횟수: {response['rewrites']}
+                        """
+                        
+                    message_placeholder.markdown(full_response)
+                    st.session_state.messages.append(
+                        {"role": "assistant", "content": full_response}
+                    )
+                    
+                except Exception as e:
+                    error_message = f"답변 생성 중 오류 발생: {str(e)}"
+                    logger.error(error_message)
+                    message_placeholder.markdown(error_message)
 
 if __name__ == "__main__":
-    create_ui()
+    try:
+        create_ui()
+    except Exception as e:
+        logger.error(f"애플리케이션 실행 중 오류 발생: {str(e)}")
+        st.error(f"애플리케이션 오류: {str(e)}")

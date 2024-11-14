@@ -210,33 +210,42 @@ class LegalSearchEngine:
     def hybrid_search(self, query: str, top_k: int = 5) -> List[Dict]:
         """하이브리드 검색 수행"""
         try:
+            # 1. 쿼리 전처리
+            processed_query = self._preprocess_query(query)
+            
+            # 2. 실제 사용 가능한 검색 파라미터
+            search_params = {
+                "top_k": top_k,  # 반환할 문서 수
+                "alpha": 0.7,    # dense-sparse 가중치 (0.0 ~ 1.0)
+                "namespace": self.namespace,  # Pinecone 네임스페이스
+                
+                # 메타데이터 필터 (Pinecone 지원 형식)
+                "filter": {
+                    "class_name": {"$in": ["민사", "가사", "형사"]},
+                    "courtType": {"$in": ["판례(대법원)", "판례(하급심)"]}
+                }
+            }
+            
             logger.info(f"""
-            === 하이브리드 검색 시작 ===
+            === 검색 파라미터 ===
             쿼리: {query}
-            요청 문서 수: {top_k}
-            검색기 설정:
-            - 네임스페이스: {self.namespace}
-            - Dense 임베딩 모델: {self.dense_embedder.__class__.__name__}
+            처리된 쿼리: {processed_query}
+            top_k: {top_k}
+            alpha: {search_params['alpha']}
+            namespace: {self.namespace}
+            filter: {search_params['filter']}
             """)
             
+            # 3. 검색 실행
             results = self.hybrid_retriever.invoke(
-                query,
-                search_kwargs={"top_k": top_k}
+                processed_query,
+                search_kwargs=search_params
             )
-            
-            logger.info(f"""
-            === 검색 결과 ===
-            찾은 문서 수: {len(results)}
-            문서 내용 샘플:
-            {[doc.page_content[:200] + "..." for doc in results[:2]]}
-            메타데이터 샘플:
-            {[doc.metadata for doc in results[:2]]}
-            """)
             
             return results
             
         except Exception as e:
-            logger.error(f"검색 중 오류 발생: {str(e)}")
+            logger.error(f"하이브리드 검색 중 오류: {str(e)}")
             raise
                     
     def validate_answer(
@@ -352,3 +361,48 @@ class LegalSearchEngine:
         except Exception as e:
             logger.error(f"KoBERT 검사 중 오류 발생: {str(e)}")
             raise
+
+    def _preprocess_query(self, query: str) -> str:
+        """쿼리 전처리"""
+        try:
+            # 1. 법률 용어 정규화
+            legal_terms = {
+                "이혼": ["이혼", "혼인관계해소", "혼인파탄"],
+                "소유권": ["소유권", "물권", "소유권이전"],
+                "귀책사유": ["귀책사유", "책임", "과실"],
+                # ... 추가 법률 용어 매핑
+            }
+            
+            # 2. 쿼리 확장
+            expanded_terms = []
+            for term, synonyms in legal_terms.items():
+                if term in query:
+                    expanded_terms.extend(synonyms)
+            
+            # 3. 메타데이터 키워드 추출
+            metadata_fields = [
+                "caseNm",      # 사건명
+                "courtType",   # 법원 유형
+                "class_name",  # 분류명
+                "keyword"      # 키워드 태그
+            ]
+            
+            # 4. 쿼리 재구성
+            processed_query = f"""
+            원본 쿼리: {query}
+            법률 용어: {' '.join(expanded_terms)}
+            검색 범위: {' '.join(metadata_fields)}
+            """
+            
+            logger.info(f"""
+            === 쿼리 전처리 결과 ===
+            원본: {query}
+            확장: {expanded_terms}
+            메타데이터 필드: {metadata_fields}
+            """)
+            
+            return processed_query
+            
+        except Exception as e:
+            logger.error(f"쿼리 전처리 중 오류: {str(e)}")
+            return query  # 오류 발생 시 원본 쿼리 반환

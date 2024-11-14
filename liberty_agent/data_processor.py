@@ -12,6 +12,7 @@ from pathlib import Path
 import logging
 import glob
 from tqdm import tqdm
+import os
 
 # 로깅 설정
 logging.basicConfig(
@@ -234,3 +235,28 @@ class LegalDataProcessor:
     def get_encoder(self):
         """현재 sparse encoder 반환"""
         return self.sparse_encoder
+
+    def load_test_documents(self, data_path: str) -> List[str]:
+        """테스트용 문서 로드"""
+        documents = []
+        for root, _, files in os.walk(data_path):
+            for file in files:
+                if file.endswith('.json'):
+                    with open(os.path.join(root, file), 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        # 판례 내용 추출
+                        content = data.get('case_text', '')
+                        if content:
+                            documents.append(content)
+        return documents
+
+    def get_relevant_documents(self, query: str) -> List[str]:
+        """
+        쿼리에 대한 관련 문서 반환
+        이 부분은 실제 데이터셋에 맞게 구현 필요
+        """
+        # 예시 구현:
+        # 1. 수동으로 레이블링된 데이터 사용
+        # 2. 특정 키워드나 규칙 기반 매칭
+        # 3. 전문가가 검증한 결과 사용
+        pass

@@ -13,6 +13,7 @@ from search_engine import LegalSearchEngine
 from pinecone import Pinecone
 import streamlit as st
 from langchain import hub 
+import time
 
 # 로깅 설정
 logging.basicConfig(
@@ -163,6 +164,17 @@ class LegalAgent:
         
         return workflow.compile()
         
+    def _safe_retrieve(self, state: AgentState, max_retries: int = 3) -> AgentState:
+        """검색 실패 시 복구 전략"""
+        for attempt in range(max_retries):
+            try:
+                return self._retrieve_document(state)
+            except Exception as e:
+                logger.warning(f"검색 시도 {attempt + 1} 실패: {str(e)}")
+                if attempt == max_retries - 1:
+                    raise
+                time.sleep(1)  # 재시도 전 대기
+
     def _retrieve_document(self, state: AgentState) -> AgentState:
         """문서 검색"""
         try:
@@ -466,9 +478,9 @@ class LegalAgent:
 
     def _get_relevance_status(self, score: float) -> str:
         """점수 기반 관련성 상태 결정"""
-        if score >= 0.7:
+        if score >= 0.6:
             return "grounded"
-        elif score <= 0.3:
+        elif score <= 0.2:
             return "notGrounded"
         return "notSure"
 
@@ -493,8 +505,11 @@ class LegalAgent:
             logger.info(f"previous_weight: {initial_state.get('previous_weight')}")
             
             config = RunnableConfig(
-                recursion_limit=5,
-                configurable={"thread_id": "LEGAL-AGENT"}
+                recursion_limit=10,  # 5에서 10으로 증가
+                configurable={
+                    "thread_id": "LEGAL-AGENT",
+                    "max_rewrite_weight": 0.8  # 가중치 상한선 추가
+                }
             )
             
             result = self.workflow.invoke(initial_state, config=config)

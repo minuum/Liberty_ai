@@ -13,12 +13,22 @@ import logging
 import glob
 from tqdm import tqdm
 import os
-
+from langchain_community.vectorstores import FAISS
+from langchain.schema import Document
+from retrievers.kiwi_bm25 import CustomKiwiBM25Retriever
+from retrievers.hybrid import HybridRetriever
+from langchain.storage import LocalFileStore
+from langchain.embeddings import CacheBackedEmbeddings
+import hashlib
+import pickle
 # 로깅 설정
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
+# httpx 로깅 레벨 조정
+logging.getLogger("httpx").setLevel(logging.WARNING)  # 또는 logging.ERROR
+
 logger = logging.getLogger(__name__)
 
 class LegalDataProcessor:
@@ -28,7 +38,8 @@ class LegalDataProcessor:
         index_name: str,
         encoder_path: Optional[str] = None,
         batch_size: int = 100,
-        load_encoder: bool = False  # 기존 encoder를 로드할지 여부
+        load_encoder: bool = False,
+        cache_dir: Optional[str] = None
     ):
         """
         법률 데이터 처리기 초기화
@@ -39,6 +50,7 @@ class LegalDataProcessor:
             encoder_path: encoder 저장/로드 경로
             batch_size: 배치 처리 크기
             load_encoder: True면 기존 encoder 로드, False면 새로 생성
+            cache_dir: 캐시 디렉토리 경로
         """
         logger.info(f"LegalDataProcessor 초기화 - index_name: {index_name}")
         self.pc = Pinecone(api_key=pinecone_api_key)
@@ -49,12 +61,25 @@ class LegalDataProcessor:
         # Dense Embedder 초기화
         logger.info("Dense Embedder 초기화 중...")
         self.dense_embedder = UpstageEmbeddings(
-            model="solar-embedding-1-large-query"
+            model="solar-embedding-1-large"
         )
         
         # Sparse Encoder 초기화
         logger.info("Sparse Encoder 초기화 중...")
-        self.sparse_encoder = self._initialize_sparse_encoder(load_encoder)
+        #self.sparse_encoder = self._initialize_sparse_encoder(load_encoder)
+        self.sparse_encoder = create_sparse_encoder(stopwords(), mode="kiwi")
+        
+        # Pinecone 인덱스 초기화 추가
+        try:
+            self.pinecone_index = self.pc.Index(index_name)
+            logger.info(f"Pinecone 인덱스 '{index_name}' 초기화 완료")
+        except Exception as e:
+            logger.error(f"Pinecone 인덱스 초기화 실패: {str(e)}")
+            raise
+        
+        # 기본 캐시 디렉토리 설정
+        self.retriever_cache_dir = Path(cache_dir or "./cached_vectors/retrievers").resolve()
+        self.retriever_cache_dir.mkdir(parents=True, exist_ok=True)
         
     def _initialize_sparse_encoder(self, load_encoder: bool, contents: List[str] = []):
         """Sparse Encoder 초기화"""
@@ -110,75 +135,85 @@ class LegalDataProcessor:
     def process_json_data(
         self, 
         file_path: str,
-        include_summary: bool = False,
-        metadata_keys: List[str] = None
-    ) -> List[Dict[str, Any]]:
-        """
-        JSON 파일 또는 디렉토리 내의 모든 JSON 파일들을 처리
-        
-        Args:
-            file_path: JSON 파일 또는 디렉토리 경로
-            include_summary: 요약문 포함 여부
-            metadata_keys: 추출할 메타데이터 키 목록
-        """
-        logger.info(f"JSON 파일 처리 시작: {file_path}")
+        include_summary: bool = False
+    ) -> List[Document]:
+        """JSON 파일 처리 및 필요한 정보만 추출"""
         processed_docs = []
         
-        # 디렉토리인 경우 TL_ 폴더들을 찾아서 처리
-        if Path(file_path).is_dir():
-            # TL_ 로 시작하는 모든 폴더 찾기 (.zip이 포함된 폴더명 제외)
-            tl_folders = [f for f in glob.glob(str(Path(file_path) / "TL_*")) 
-                         if '.zip' not in Path(f).name]
-            logger.info(f"{len(tl_folders)}개의 TL 폴더를 찾았습니다.")
+        try:
+            folders = self._get_tl_folders(file_path)
+            total_files = sum(len(glob.glob(str(Path(folder) / "*.json"))) for folder in folders)
             
-            for folder in tl_folders:
-                if Path(folder).is_file():  # 파일인 경우 건너뛰기
-                    continue
+            with tqdm(total=total_files, desc="전체 파일 처리") as pbar:
+                for folder in folders:
+                    json_files = [f for f in glob.glob(str(Path(folder) / "*.json"))
+                             if not f.endswith('.zip')]
                     
-                json_files = glob.glob(str(Path(folder) / "*.json"))
-                logger.info(f"{Path(folder).name}에서 {len(json_files)}개의 JSON 파일을 찾았습니다.")
-                
-                for json_file in tqdm(json_files, desc=f"Processing {Path(folder).name}"):
-                    try:
-                        with open(json_file, 'r', encoding='utf-8') as f:
-                            data = json.load(f)
+                    logger.info(f"{Path(folder).name}에서 {len(json_files)}개의 JSON 파일을 찾았습니다.")
+                    
+                    for json_file in json_files:
+                        try:
+                            with open(json_file, 'r', encoding='utf-8') as f:
+                                data = json.load(f)
+                                
+                            # 핵심 메타데이터 추출
+                            metadata = {
+                            "case_no": data['info']['caseNo'],
+                            "court": data['info']['courtNm'],
+                            "date": data['info']['judmnAdjuDe'],
+                            "category": data['Class_info']['class_name'],
+                            "subcategory": data['Class_info']['instance_name'],
+                            "reference_rules": data['Reference_info'].get('reference_rules', ''),
+                            "reference_court_case": data['Reference_info'].get('reference_court_case', '')
+                            }
                             
-                        # 메타데이터 추출
-                        metadata = {
-                            'case_id': data.get('info', {}).get('id'),
-                            'case_name': data.get('info', {}).get('caseNm'),
-                            'court_type': data.get('info', {}).get('courtType'),
-                            'court_name': data.get('info', {}).get('courtNm'),
-                            'judgment_date': data.get('info', {}).get('judmnAdjuDe'),
-                            'case_no': data.get('info', {}).get('caseNo'),
-                            'class_name': data.get('Class_info', {}).get('class_name'),
-                            'instance_name': data.get('Class_info', {}).get('instance_name'),
-                            'keywords': [k.get('keyword') for k in data.get('keyword_tagg', [])],
-                            'reference_rules': data.get('Reference_info', {}).get('reference_rules'),
-                            'reference_cases': data.get('Reference_info', {}).get('reference_court_case')
-                        }
-                        
-                        # 요약문 처리
-                        if include_summary and "Summary" in data:
-                            for summary in data["Summary"]:
-                                processed_docs.append({
-                                    "text": summary["summ_contxt"],
-                                    "metadata": {**metadata, "type": "summary"}
-                                })
-                        
-                        # 판결문 처리
-                        if "jdgmn" in data:
-                            processed_docs.append({
-                                "text": data["jdgmn"],
-                                "metadata": {**metadata, "type": "judgment"}
-                            })
+                            # 본문 내용 구성 (우선순위에 따라)
+                            content_parts = []
                             
-                    except Exception as e:
-                        logger.error(f"파일 처리 중 오류 발생 - {json_file}: {str(e)}")
-                        continue
-        
-        logger.info(f"JSON 파일 처리 완료: {len(processed_docs)}개 문서 처리됨")    
-        return processed_docs
+                            # 1. 기본 정보 추가
+                            content_parts.append(f"제목: {data['info']['caseTitle']}")
+                            content_parts.append(f"사건: {data['info']['caseNm']}")
+                            
+                            # 2. 본문 내용 (summ_contxt 우선, 없으면 jdgmn 사용)
+                            if data['Summary'] and data['Summary'][0].get('summ_contxt'):
+                                content_parts.append(f"내용: {data['Summary'][0] ['summ_contxt']}")
+                            elif data.get('jdgmn'):
+                                content_parts.append(f"내용: {data['jdgmn']}")
+                            
+                            # 3. 질의/응답 정보 추가
+                            if data['jdgmnInfo']:
+                                for qa in data['jdgmnInfo']:
+                                    content_parts.append(f"질문: {qa['question']}")
+                                    content_parts.append(f"답변: {qa['answer']}")
+                            
+                                    # Document 생성
+                                doc = Document(
+                                        page_content='\n\n'.join(content_parts),
+                                        metadata=metadata
+                                    )
+                                processed_docs.append(doc)
+                                
+                            pbar.update(1)
+                            pbar.set_postfix({'현재 폴더': Path(folder).name})
+                            
+                        except Exception as e:
+                            logger.error(f"파일 처리 중 오류 발생 ({json_file}): {str(e)}")
+                            continue
+                        
+            return processed_docs
+            
+        except Exception as e:
+            logger.error(f"데이터 처리 중 오류 발생: {str(e)}")
+            raise
+
+    def _get_tl_folders(self, base_path: str) -> List[str]:
+        """TL_ 폴더 목록 반환"""
+        tl_folders = [
+            f for f in glob.glob(str(Path(base_path) / "TL_*"))
+            if not f.endswith('.zip') and Path(f).is_dir()
+        ]
+        logger.info(f"{len(tl_folders)}개의 TL 폴더를 찾았습니다.")
+        return tl_folders
     
     def create_embeddings(
         self, 
@@ -225,8 +260,8 @@ class LegalDataProcessor:
                 
                 # Pinecone 업로드
                 logger.debug(f"배치 {i//self.batch_size + 1} Pinecone 업로드 중...")
-                self.pc.Index(self.index_name).upsert(vectors=vectors)
-                logger.info(f"배치 {i//self.batch_size + 1}/{total_batches} 처리 완료")
+                self.pinecone_index.upsert(vectors=vectors)
+                logger.info(f"배 {i//self.batch_size + 1}/{total_batches} 처리 완료")
                 
             except Exception as e:
                 logger.error(f"배치 {i//self.batch_size + 1} 처리 중 오류 발생: {str(e)}")
@@ -258,5 +293,319 @@ class LegalDataProcessor:
         # 예시 구현:
         # 1. 수동으로 레이블링된 데이터 사용
         # 2. 특정 키워드나 규칙 기반 매칭
-        # 3. 전문가가 검증한 결과 사용
+        # 3. 전문가가 증한 결과 사용
         pass
+
+    def _check_index_exists(self):
+        """Pinecone 인덱스 존재 여부 확인"""
+        try:
+            indexes = self.pc.list_indexes()
+            if self.index_name not in indexes:
+                logger.warning(f"인덱스 '{self.index_name}'가 존재하지 않습니다.")
+                return False
+            return True
+        except Exception as e:
+            logger.error(f"인덱스 확인 중 오류: {str(e)}")
+            return False
+
+    def _check_index_status(self):
+        """인덱스 상태 확인"""
+        try:
+            stats = self.pinecone_index.describe_index_stats()
+            logger.info(f"인덱스 상태: {stats}")
+            return stats
+        except Exception as e:
+            logger.error(f"인덱스 상태 확인 중 오류: {str(e)}")
+            return None
+
+    def save_retrievers(self, 
+                       faiss_store: FAISS = None, 
+                       kiwi_retriever: CustomKiwiBM25Retriever = None,
+                       save_dir: Optional[str] = None,
+                       index_name: str = "legal_index") -> None:
+        """FAISS와 KiwiBM25Retriever를 로컬에 저장"""
+        save_path = Path(save_dir or self.retriever_cache_dir)
+        try:
+            save_path.mkdir(parents=True, exist_ok=True)
+            
+            if faiss_store is not None:
+                logger.info(f"FAISS 인덱스 저장 중... ({save_path})")
+                faiss_store.save_local(str(save_path))
+                
+            if kiwi_retriever is not None:
+                logger.info(f"KiwiBM25 인덱스 저장 중... ({save_path})")
+                kiwi_retriever.save_local(str(save_path), index_name)
+                
+        except Exception as e:
+            logger.error(f"리트리버 저장 중 오류 발: {str(e)}")
+            raise
+
+    def load_retrievers(self,
+                       load_dir: Optional[str] = None,
+                       index_name: str = "legal_index",
+                       allow_dangerous: bool = True) -> tuple:
+        """저장된 FAISS와 KiwiBM25Retriever를 로드"""
+        load_path = Path(load_dir or self.retriever_cache_dir)
+        
+        try:
+            faiss_store = None
+            kiwi_retriever = None
+            
+            faiss_index_path = load_path / "index.faiss"
+            if faiss_index_path.exists():
+                logger.info(f"FAISS 인덱스 로드 중... ({load_path})")
+                faiss_store = FAISS.load_local(
+                    str(load_path), 
+                    self.dense_embedder,
+                    allow_dangerous_deserialization=allow_dangerous
+                )
+                
+            kiwi_path = load_path / f"{index_name}_vectorizer.pkl"
+            if kiwi_path.exists():
+                logger.info(f"KiwiBM25 인덱스 로드 중... ({load_path})")
+                kiwi_retriever = CustomKiwiBM25Retriever.load_local(
+                    str(load_path), 
+                    index_name
+                )
+                
+            return faiss_store, kiwi_retriever
+            
+        except Exception as e:
+            logger.error(f"리트리버 로드 중 오류 발생: {str(e)}")
+            raise
+
+    def create_hybrid_retriever(
+        self,
+        documents: List[Document],
+        cache_dir: Optional[str] = None,
+        k: int = 20,
+        dense_weight: float = 0.3,
+        sparse_weight: float = 0.7,
+        use_cache: bool = True
+    ) -> HybridRetriever:
+        """FAISS와 KiwiBM25를 결합한 하이브리드 검색기 생성"""
+        try:
+            cache_dir = cache_dir or self.retriever_cache_dir
+            
+            # 캐시 모드 설정
+            cache_mode = 'load' if use_cache else 'create'
+            
+            # 기본 검색기 생성
+            retrievers = self.create_retrievers(
+                documents=documents,
+                use_faiss=True,
+                use_kiwi=True,
+                use_pinecone=False,  # 하이브리드에서는 Pinecone 제외
+                cache_mode=cache_mode
+            )
+            
+            if 'faiss' not in retrievers or 'kiwi' not in retrievers:
+                raise ValueError("FAISS와 KiwiBM25 검색기 모두 필요합니다.")
+            
+            # Dense 검색기 설정
+            dense_retriever = retrievers['faiss'].as_retriever(
+                search_type="similarity",
+                search_kwargs={"k": k}
+            )
+
+            # 하이브리드 검색기 생성
+            return HybridRetriever(
+                dense_retriever=dense_retriever,
+                sparse_retriever=retrievers['kiwi'],
+                k=k,
+                dense_weight=dense_weight,
+                sparse_weight=sparse_weight
+            )
+            
+        except Exception as e:
+            logger.error(f"하이브리드 검색기 생성 중 오류 발생: {str(e)}")
+            raise
+
+    def create_vectorstore(self, 
+                          documents: List[Document],
+                          cache_mode: str = 'load',
+                          local_db: str = "./cached_vectors/") -> FAISS:
+        """
+        FAISS 벡터 저장소 생성 또는 로드
+        
+        Args:
+            documents: 문서 리스트
+            cache_mode: 'store' (새로 생성), 'load' (로컬에서 로드), 'create' (캐시 없이 생성)
+            local_db: 로컬 저장소 경로
+            
+        Returns:
+            FAISS: FAISS 벡터 저장소
+        """
+        try:
+            if not documents:
+                logger.warning("문서가 비어있습니다.")
+                cache_mode = 'load'
+                
+            if cache_mode == 'store':
+                logger.info(f"로컬({local_db})에 새로운 FAISS 벡터 저장소 생성 중...")
+                
+                # 저장 디렉토리 생성
+                os.makedirs(local_db, exist_ok=True)
+                
+                # 벡터 저장소 생성
+                vectorstore = FAISS.from_documents(
+                    documents=documents,
+                    embedding=self.dense_embedder
+                )
+                
+                # 로컬에 저장
+                vectorstore.save_local(local_db)
+                logger.info("FAISS 벡터 저장소 생성 및 저장 완료")
+                
+                return vectorstore
+                
+            elif cache_mode == 'load':
+                logger.info(f"로컬({local_db})에서 FAISS 벡터 저장소 로드 중...")
+                
+                if not os.path.exists(os.path.join(local_db, "index.faiss")):
+                    logger.error(f"저장된 FAISS 인덱스를 찾을 수 없습니다: {local_db}")
+                    raise FileNotFoundError(f"FAISS 인덱스 파일이 없습니다: {local_db}")
+                    
+                vectorstore = FAISS.load_local(
+                    local_db,
+                    self.dense_embedder,
+                    allow_dangerous_deserialization=True
+                )
+                logger.info("FAISS 벡터 저장소 로드 완료")
+                
+                return vectorstore
+                
+            else:  # 'create'
+                logger.info("메모리에 FAISS 벡터 저장소 생성 중...")
+                vectorstore = FAISS.from_documents(
+                    documents=documents,
+                    embedding=self.dense_embedder
+                )
+                logger.info("FAISS 벡터 저장소 생성 완료")
+                
+                return vectorstore
+                
+        except Exception as e:
+            logger.error(f"FAISS 벡터 저장소 처리 중 오류 발생: {str(e)}")
+            raise
+
+
+
+
+    def manage_embeddings(
+        self,
+        documents: List[Document],
+        embedding_cache_dir: str = "./cached_vectors/embeddings"
+    ) -> Dict[str, Any]:
+        """문서 임베딩을 관리하고 캐시합니다."""
+        try:
+            # 임베딩 캐시 저장소 초기화
+            embedding_store = LocalFileStore(embedding_cache_dir)
+            
+            # 네임스페이스 생성 (모델명 사용)
+            namespace = f"upstage_{self.dense_embedder.model}"
+            
+            cached_embedder = CacheBackedEmbeddings.from_bytes_store(
+                underlying_embeddings=self.dense_embedder,
+                document_embedding_cache=embedding_store,
+                namespace=namespace
+            )
+
+            # # CacheBackedEmbeddings를 직접 사용하여 임베딩 처리
+            # logger.info("임베딩 처리 중...")
+            # with tqdm(total=len(documents), desc="임베딩 생성") as pbar:
+            #     embeddings = []
+            #     for i in range(0, len(documents), self.batch_size):
+            #         batch = documents[i:min(i+self.batch_size, len(documents))]
+            #         batch_embeddings = cached_embedder.embed_documents([doc.page_content for doc in batch])
+            #         embeddings.extend(batch_embeddings)
+            #         pbar.update(len(batch))
+            #         pbar.set_postfix({'처리': f'{i+len(batch)}/{len(documents)}'})
+
+            return cached_embedder
+            
+
+        except Exception as e:
+            logger.error(f"임베딩 관리 중 오류 발생: {str(e)}")
+            raise
+
+    def create_retrievers(
+        self,
+        documents: Optional[List[Document]],
+        use_faiss: bool = True,
+        use_kiwi: bool = True,
+        use_pinecone: bool = True,
+        cache_mode: str = 'load'
+    ) -> Dict[str, Any]:
+        """통합 검색기 생성"""
+        retrievers = {}
+        
+        try:
+            # 임베딩 관리 (FAISS용)
+            if use_faiss:
+
+                # FAISS 검색기 (자체 save_local 사용)
+                faiss_dir = os.path.join(self.retriever_cache_dir, "faiss")
+                if cache_mode == 'load':
+                    if os.path.exists(os.path.join(faiss_dir, "index.faiss")):
+                        logger.info(f"FAISS 인덱스 로드 중... ({faiss_dir})")
+                        retrievers['faiss'] = FAISS.load_local(
+                            faiss_dir,
+                            self.dense_embedder,
+                            allow_dangerous_deserialization=True
+                        )
+                    else:
+                        logger.warning("저장된 FAISS 인덱스를 찾을 수 없습니다.")
+
+                elif cache_mode =="store":
+                    cached_embedder = self.manage_embeddings(
+                    documents,
+                    embedding_cache_dir=os.path.join(self.retriever_cache_dir, "embeddings")
+                )
+                
+                    logger.info("FAISS 인덱스 저장하며 생성 중...")
+                    retrievers['faiss'] = FAISS.from_documents(
+                        documents=documents,
+                        embedding=cached_embedder
+                    )
+                    logger.info(f"FAISS 인덱스 저장 중... ({faiss_dir})")
+                    os.makedirs(faiss_dir, exist_ok=True)
+                    retrievers['faiss'].save_local(faiss_dir)
+
+
+                else:  # 'store' 또는 'create'
+                    logger.info("FAISS 인덱스 새로 생성 중...")
+                    retrievers['faiss'] = FAISS.from_documents(
+                        documents=documents,embedding=self.dense_embedder
+                        ),
+ 
+            
+            # KiwiBM25 검색기 (CustomKiwiBM25Retriever 사용)
+            if use_kiwi:
+                kiwi_dir = os.path.join(self.retriever_cache_dir, "kiwi")
+                if cache_mode == 'load':
+                    if os.path.exists(os.path.join(kiwi_dir, "legal_kiwi_vectorizer.pkl")):
+                        logger.info(f"KiwiBM25 검색기 로드 중... ({kiwi_dir})")
+                        retrievers['kiwi'] = CustomKiwiBM25Retriever.load_local(
+                            kiwi_dir, 
+                            "legal_kiwi"
+                        )
+                    else:
+                        logger.warning("저장된 KiwiBM25 검색기를 찾을 수 없습니다.")
+                else:  # 'store' 또는 'create'
+                    logger.info("KiwiBM25 검색기 생성 중...")
+                    retrievers['kiwi'] = CustomKiwiBM25Retriever.from_documents(documents)
+                    if cache_mode == 'store':
+                        logger.info(f"KiwiBM25 검색기 저장 중... ({kiwi_dir})")
+                        os.makedirs(kiwi_dir, exist_ok=True)
+                        retrievers['kiwi'].save_local(kiwi_dir, "legal_kiwi")
+            
+            # Pinecone 검색기
+            if use_pinecone:
+                retrievers['pinecone'] = self.pinecone_index
+            
+            return retrievers
+            
+        except Exception as e:
+            logger.error(f"검색기 생성 중 오류 발생: {str(e)}")
+            raise

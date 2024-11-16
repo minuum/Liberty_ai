@@ -23,7 +23,8 @@ class LegalSearchEngine:
         batch_size: int = 100,
         max_workers: int = 30,
         use_combined_check: bool = True,
-        namespace: str = None
+        namespace: str = None,
+        sparse_encoder = None,
     ):
         """
         법률 검색 엔진 초기화
@@ -40,7 +41,7 @@ class LegalSearchEngine:
         self.max_workers = max_workers
         self.use_combined_check = use_combined_check
         self.namespace = namespace
-        
+        self.sparse_encoder = sparse_encoder
         # 임베딩 모델 초기화
         self.dense_embedder = UpstageEmbeddings(
             model="solar-embedding-1-large-query"
@@ -51,7 +52,7 @@ class LegalSearchEngine:
         self._setup_kobert()
         
         # Hybrid Retriever 초기화
-        self.hybrid_retriever = None
+        self.hybrid_retriever = self.setup_hybrid_retriever(self.sparse_encoder)
         
     def _setup_kobert(self):
         """KoBERT 모델 및 토크나이저 설정"""

@@ -29,6 +29,56 @@ class RetrieverTester:
         self.relevant_docs = relevant_docs
         self.results = []
         
+    def _calculate_recall(self, retrieved: List[str], relevant: List[str]) -> float:
+        """
+        재현율(Recall) 계산
+        """
+        if not relevant:  # 관련 문서가 없는 경우
+            return 0.0
+        relevant_retrieved = set(retrieved) & set(relevant)
+        return len(relevant_retrieved) / len(relevant)
+
+    def _calculate_precision(self, retrieved: List[str], relevant: List[str]) -> float:
+        """
+        정밀도(Precision) 계산
+        """
+        if not retrieved:  # 검색된 문서가 없는 경우
+            return 0.0
+        relevant_retrieved = set(retrieved) & set(relevant)
+        return len(relevant_retrieved) / len(retrieved)
+
+    def _calculate_ndcg(self, retrieved: List[str], relevant: List[str], k: int) -> float:
+        """
+        NDCG(Normalized Discounted Cumulative Gain) 계산
+        """
+        if not relevant or not retrieved:
+            return 0.0
+
+        # DCG 계산
+        dcg = 0
+        for i, doc in enumerate(retrieved[:k]):
+            rel = 1 if doc in relevant else 0
+            dcg += rel / np.log2(i + 2)  # i+2 because i starts at 0
+
+        # Ideal DCG 계산
+        idcg = 0
+        for i in range(min(len(relevant), k)):
+            idcg += 1 / np.log2(i + 2)
+
+        if idcg == 0:
+            return 0.0
+
+        return dcg / idcg
+
+    def _get_memory_usage(self) -> float:
+        """
+        현재 프로세스의 메모리 사용량 반환 (MB 단위)
+        """
+        import psutil
+        import os
+        process = psutil.Process(os.getpid())
+        return process.memory_info().rss / 1024 / 1024  # Convert to MB
+
     def test_hybrid_retriever(self, search_engine, k: int = 5) -> RetrieverTestResult:
         """하이브리드 검색기 테스트"""
         start_time = time.time()

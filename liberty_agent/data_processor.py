@@ -21,6 +21,11 @@ from langchain.storage import LocalFileStore
 from langchain.embeddings import CacheBackedEmbeddings
 import hashlib
 import pickle
+import concurrent.futures
+import itertools
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+import secrets
 # 로깅 설정
 logging.basicConfig(
     level=logging.INFO,
@@ -30,6 +35,20 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)  # 또는 logging.ERROR
 
 logger = logging.getLogger(__name__)
+@staticmethod
+def generate_hash() -> str:
+    """24자리 무작위 hex 값을 생성하고 6자리씩 나누어 '-'로 연결합니다."""
+    random_hex = secrets.token_hex(12)
+    return "-".join(random_hex[i: i + 6] for i in range(0, 24, 6))
+    
+@staticmethod
+def chunks(iterable, size):
+    """이터러블을 지정된 크기의 청크로 분할"""
+    it = iter(iterable)
+    chunk = list(itertools.islice(it, size))
+    while chunk:
+        yield chunk
+        chunk = list(itertools.islice(it, size))
 
 class LegalDataProcessor:
     def __init__(
@@ -122,7 +141,7 @@ class LegalDataProcessor:
         save_path = save_path or self.encoder_path
         if not save_path:
             logger.error("저장 경로가 지정되지 않음")
-            raise ValueError("저장 경로가 지정되지 않았습니다.")
+            raise ValueError("저 경로가 지정되지 않았습니다.")
             
         saved_path = fit_sparse_encoder(
             sparse_encoder=self.sparse_encoder,
@@ -203,7 +222,7 @@ class LegalDataProcessor:
             return processed_docs
             
         except Exception as e:
-            logger.error(f"데이터 처리 중 오류 발생: {str(e)}")
+            logger.error(f"데이터 리 중 오류 발생: {str(e)}")
             raise
 
     def _get_tl_folders(self, base_path: str) -> List[str]:
@@ -214,59 +233,136 @@ class LegalDataProcessor:
         ]
         logger.info(f"{len(tl_folders)}개의 TL 폴더를 찾았습니다.")
         return tl_folders
-    
-    def create_embeddings(
-        self, 
-        docs: List[Dict[str, Any]],
-        show_progress: bool = True
-    ):
-        """
-        임베딩 생성 및 Pinecone 업로드
-        
-        Args:
-            docs: 처리할 문서 리스트
-            show_progress: 진행률 표시 여부
-        """
-        from tqdm import tqdm
-        
-        logger.info(f"임베딩 생성 시작: 총 {len(docs)}개 문서")
-        total_batches = (len(docs) + self.batch_size - 1) // self.batch_size
-        batch_iterator = range(0, len(docs), self.batch_size)
-        
-        if show_progress:
-            batch_iterator = tqdm(batch_iterator, total=total_batches)
+
+    def process_batch(
+        self,
+        batch: List[int],
+        documents: List[Document],
+        start_idx: int
+    ) -> Optional[Dict]:
+        """배치 단위로 문서를 처리하여 Pinecone에 업로드"""
+        try:
+            # 현재 배치의 문서와 메타데이터 추출
+            batch_docs = [documents[i] for i in batch]
+            batch_contents = [doc.page_content for doc in batch_docs]
             
-        for i in batch_iterator:
-            batch = docs[i:i + self.batch_size]
-            texts = [doc["text"] for doc in batch]
+            # 임베딩 생성
+            dense_embeds = self.dense_embedder.embed_documents(batch_contents)
+            sparse_embeds = self.sparse_encoder.encode_documents(batch_contents)
+            
+            # 벡터 ID 생성
+            vector_ids = [generate_hash() for _ in range(len(batch_docs))]
+            
+            # Pinecone 업로드용 벡터 생성
+            vectors = [
+                {
+                    "id": id_,
+                    "values": dense_embed,
+                    "sparse_values": sparse_embed,
+                    "metadata": {
+                        **doc.metadata,  # 원본 메타데이터 모두 포함
+                        "context": content[:1000]  # 컨텍스트 길이 제한
+                    }
+                }
+                for id_, dense_embed, sparse_embed, doc, content in zip(
+                    vector_ids, dense_embeds, sparse_embeds, batch_docs, batch_contents
+                )
+            ]
+            
+            logger.info(f"업로드할 벡터 수: {len(vectors)}")
             
             try:
-                # 임베딩 생성
-                logger.debug(f"배치 {i//self.batch_size + 1} Dense 임베딩 생성 중...")
-                dense_vectors = self.dense_embedder.embed_documents(texts)
-                logger.debug(f"배치 {i//self.batch_size + 1} Sparse 임베딩 생성 중...")
-                sparse_vectors = self.sparse_encoder.encode_documents(texts)
+                result = self.pinecone_index.upsert(
+                    vectors=vectors,
+                    namespace=f"{self.index_name}-namespace-legal-agent",
+                    async_req=False
+                )
+                logger.info(f"배치 업로드 성공: {result}")
+                return result
+            except Exception as e:
+                logger.error(f"Upsert 중 오류 발생: {e}")
+                return None
                 
-                # Pinecone 업로드용 벡터 생성
-                vectors = [
-                    {
-                        "id": f"doc_{i+j}",
-                        "values": dense,
-                        "sparse_values": sparse,
-                        "metadata": batch[j]["metadata"]
-                    }
-                    for j, (dense, sparse) in enumerate(zip(dense_vectors, sparse_vectors))
+        except Exception as e:
+            logger.error(f"배치 처리 중 오류: {str(e)}")
+            return None
+
+    def create_embeddings(
+        self, 
+        documents: List[Document],
+        start_batch: int = 0,
+        batch_size: int = 100,  # 배치 크기 증가
+        max_workers: int = 30,  # 워커 수 증가
+        show_progress: bool = True
+    ) -> None:
+        """멀티스레딩을 사용한 임베딩 생성 및 Pinecone 업로드"""
+        try:
+            start_idx = start_batch * batch_size
+            documents_subset = documents[start_idx:]
+            total_docs = len(documents_subset)
+            
+            logger.info(f"임베딩 생성 시작: 총 {total_docs}개 문서 (인덱스 {start_idx}부터)")
+            
+            # 초기 상태 확인
+            initial_stats = self.pinecone_index.describe_index_stats()
+            initial_count = initial_stats['total_vector_count']
+            
+            # 배치 생성
+            batches = list(chunks(range(total_docs), batch_size))
+            
+            results = []
+            if show_progress:
+                pbar = tqdm(total=total_docs, desc="임베딩 생성 중")
+            
+            start_time = time.time()
+            processed_docs = 0
+            
+            # 멀티스레딩 처리
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                futures = [
+                    executor.submit(
+                        self.process_batch,
+                        batch,
+                        documents_subset,
+                        start_idx
+                    ) for batch in batches
                 ]
                 
-                # Pinecone 업로드
-                logger.debug(f"배치 {i//self.batch_size + 1} Pinecone 업로드 중...")
-                self.pinecone_index.upsert(vectors=vectors)
-                logger.info(f"배 {i//self.batch_size + 1}/{total_batches} 처리 완료")
-                
-            except Exception as e:
-                logger.error(f"배치 {i//self.batch_size + 1} 처리 중 오류 발생: {str(e)}")
-                continue
-    
+                for idx, future in enumerate(as_completed(futures)):
+                    result = future.result()
+                    if result:
+                        results.append(result)
+                    
+                    if show_progress:
+                        processed_docs += len(batches[idx])
+                        elapsed_time = time.time() - start_time
+                        progress = processed_docs / total_docs
+                        est_total_time = elapsed_time / progress if progress > 0 else 0
+                        remaining_time = est_total_time - elapsed_time
+                        
+                        pbar.set_postfix({
+                            'progress': f'{processed_docs}/{total_docs}',
+                            'remaining': f'{remaining_time:.1f}s'
+                        })
+                        pbar.update(len(batches[idx]))
+            
+            if show_progress:
+                pbar.close()
+            
+            # 결과 확인
+            total_upserted = sum(result.upserted_count for result in results if result)
+            final_stats = self.pinecone_index.describe_index_stats()
+            vectors_added = final_stats['total_vector_count'] - initial_count
+            
+            logger.info(f"총 {total_upserted}개의 벡터가 업로드되었습니다.")
+            logger.info(f"실제 추가된 벡터 수: {vectors_added}")
+            if vectors_added < total_docs:
+                logger.warning(f"예상보다 적은 벡터가 추가됨: {vectors_added}/{total_docs}")
+            
+        except Exception as e:
+            logger.error(f"임베딩 생성 중 오류 발생: {str(e)}")
+            raise
+
     def get_encoder(self):
         """현재 sparse encoder 반환"""
         return self.sparse_encoder
@@ -455,7 +551,7 @@ class LegalDataProcessor:
                 
                 # 로컬에 저장
                 vectorstore.save_local(local_db)
-                logger.info("FAISS 벡터 저장소 생성 및 저장 완료")
+                logger.info("FAISS 벡터 저장 생성 및 저장 완료")
                 
                 return vectorstore
                 
@@ -463,7 +559,7 @@ class LegalDataProcessor:
                 logger.info(f"로컬({local_db})에서 FAISS 벡터 저장소 로드 중...")
                 
                 if not os.path.exists(os.path.join(local_db, "index.faiss")):
-                    logger.error(f"저장된 FAISS 인덱스를 찾을 수 없습니다: {local_db}")
+                    logger.error(f"저된 FAISS 인덱스를 찾을 수 없습니다: {local_db}")
                     raise FileNotFoundError(f"FAISS 인덱스 파일이 없습니다: {local_db}")
                     
                 vectorstore = FAISS.load_local(

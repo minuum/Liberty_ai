@@ -67,18 +67,19 @@ class LegalAgent:
             pc = Pinecone(api_key=PINECONE_API_KEY)
             self.pinecone_index = pc.Index(PINECONE_INDEX_NAME)
             logger.info("Pinecone 인덱스 초기화 완료")
-            
+            stats = self.pinecone_index.describe_index_stats()
+            logger.info(f"인덱스 통계: {stats}")
             # 데이터 프로세서 초기화
             self.data_processor = LegalDataProcessor(
                 pinecone_api_key=PINECONE_API_KEY,
                 index_name=PINECONE_INDEX_NAME,
                 load_encoder=True,
-                encoder_path="sparse_encoder.pkl"
+                encoder_path="./liberty_agent/KiwiBM25_sparse_encoder.pkl"
             )
             logger.info("데이터 프로세서 초기화 완료")
             
             # sparse encoder 가져오기
-            sparse_encoder = self.data_processor.get_encoder()
+            sparse_encoder = self.data_processor._initialize_sparse_encoder(load_encoder=True)
             if sparse_encoder is None:
                 raise ValueError("Sparse encoder를 로드하지 못했습니다.")
             logger.info("Sparse encoder 로드 완료")
@@ -86,7 +87,7 @@ class LegalAgent:
             # 검색 엔진 초기화
             self.search_engine = LegalSearchEngine(
                 pinecone_index=self.pinecone_index,
-                namespace="liberty-rag-json-namespace-02",
+                namespace="liberty-db-namespace-legal-agent",
                 use_combined_check=True
             )
             logger.info("검색 엔진 초기화 완료")

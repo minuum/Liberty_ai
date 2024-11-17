@@ -246,7 +246,7 @@ class LegalSearchEngine:
             return results
             
         except Exception as e:
-            logger.error(f"하이브리드 검색 중 오류: {str(e)}")
+            logger.error(f"하이브리드 검색 중 오류: {str(e)}{self.sparse_encoder}")
             raise
                     
     def validate_answer(

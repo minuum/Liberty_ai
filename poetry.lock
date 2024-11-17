@@ -7005,30 +7005,32 @@ cffi = {version = "*", markers = "implementation_name == \"pypy\""}
 
 [[package]]
 name = "ragas"
-version = "0.1.21"
+version = "0.2.5"
 description = ""
 optional = false
 python-versions = "*"
 files = [
-    {file = "ragas-0.1.21-py3-none-any.whl", hash = "sha256:c5be4dbe3d4a90a62298889aaef8941516c41e0708a8fe942c9ffa9395cf244d"},
-    {file = "ragas-0.1.21.tar.gz", hash = "sha256:4ded52375d3710a2a2dd23d550fd09d0e26485fc435b14a413174f9d7b45d252"},
+    {file = "ragas-0.2.5-py3-none-any.whl", hash = "sha256:1ce3cee1d71b7922b9d513275aa35df1ed9a875b84d0452210d5e4796b493831"},
+    {file = "ragas-0.2.5.tar.gz", hash = "sha256:7c9e151e20bbdd7c780230d4af940155afab16250c7705a92ec7c7ef52a6aa76"},
 ]
 
 [package.dependencies]
 appdirs = "*"
 datasets = "*"
-langchain = "<0.3"
-langchain-community = "<0.3"
-langchain-core = "<0.3"
+langchain = "*"
+langchain-community = "*"
+langchain-core = "*"
 langchain-openai = "*"
 nest-asyncio = "*"
 numpy = "*"
 openai = ">1"
+pydantic = ">=2"
 pysbd = ">=0.3.4"
 tiktoken = "*"
 
 [package.extras]
-all = ["sentence-transformers", "transformers"]
+all = ["datacompy", "llama-index", "nltk", "pandas", "rapidfuzz", "rouge-score", "sentence-transformers", "transformers"]
+docs = ["mkdocs (>=1.6.1)", "mkdocs-autorefs", "mkdocs-gen-files", "mkdocs-git-committers-plugin-2", "mkdocs-git-revision-date-localized-plugin", "mkdocs-glightbox", "mkdocs-literate-nav", "mkdocs-material", "mkdocs-material[imaging]", "mkdocs-section-index", "mkdocstrings[python]"]
 
 [[package]]
 name = "rank-bm25"
@@ -9952,4 +9954,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.12"
-content-hash = "5f327ca068949371dff59274c3b60719f127a037064032c4a9dbeba54931c738"
+content-hash = "660cd049ea4d2d9a4da416ae1344a0e14c36c56a40cfee0cbfab9a333f62b45b"

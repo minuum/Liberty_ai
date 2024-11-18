@@ -51,7 +51,100 @@ SYSTEM_PROMPT = """당신은 법률 전문 AI 어시스턴트입니다.
 2. 구체적 답변
 3. 주의사항/제한사항
 """
+class DatabaseManager:
+    def __init__(self, db_path: str = "liberty_agent/data/chat.db"):
+        self.db_path = db_path
+        self._init_db()
+    
+    def _init_db(self):
+        """데이터베이스 초기화"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS chat_sessions (
+                    session_id TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    title TEXT
+                )
+            """)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS chat_messages (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id TEXT NOT NULL,
+                    session_id TEXT NOT NULL,
+                    message_type TEXT NOT NULL,
+                    content TEXT NOT NULL,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    metadata TEXT,
+                    FOREIGN KEY (session_id) REFERENCES chat_sessions(session_id)
+                )
+            """)
+            conn.commit()
 
+def generate_suggestions(question: str) -> List[str]:
+    """LLM을 활용한 맥락 기반 추천 질문 생성"""
+    try:
+        prompt = f"""
+        다음 법률 상담 질문을 바탕으로 관련된 추천 질문 3개를 생성해주세요.
+        현재 질문: {question}
+        
+        규칙:
+        1. 각 질문은 구체적이고 실용적이어야 합니다
+        2. 현재 상황과 관련된 법적 절차나 권리에 대해 물어보는 질문이어야 합니다
+        3. 질문은 완전한 문장이어야 합니다
+        
+        출력 형식:
+        질문1|질문2|질문3
+        """
+        
+        response = ChatOpenAI(temperature=0.7).invoke(prompt).content
+        return response.split("|")
+    except Exception as e:
+        logger.error(f"추천 질문 생성 중 오류: {str(e)}")
+        return _get_fallback_suggestions(question)
+
+def handle_user_input(prompt: str):
+    """사용자 입력 처리"""
+    try:
+        # 메시지 저장
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        # 답변 생성
+        with st.spinner("답변 생성 중..."):
+            response = st.session_state.agent.process_query(prompt)
+            st.session_state.messages.append({"role": "assistant", "content": response})
+        
+        # 대화 저장
+        st.session_state.chat_manager.save_message(
+            st.session_state.user_id,
+            st.session_state.current_session_id,
+            "user",
+            prompt
+        )
+        st.session_state.chat_manager.save_message(
+            st.session_state.user_id,
+            st.session_state.current_session_id,
+            "assistant",
+            response
+        )
+        
+    except Exception as e:
+        logger.error(f"사용자 입력 처리 중 오류: {str(e)}")
+        st.error("처리 중 오류가 발생했습니다. 다시 시도해주세요.")
+
+def load_chat_session(session_id: str):
+    """채팅 세션 로드"""
+    try:
+        messages = st.session_state.chat_manager.load_chat_history(
+            st.session_state.user_id,
+            session_id
+        )
+        st.session_state.messages = messages
+        st.session_state.current_session_id = session_id
+    except Exception as e:
+        logger.error(f"채팅 세션 로드 중 오류: {str(e)}")
+        
 class AgentState(TypedDict):
     """에이전트 상태 정의"""
     question: str
@@ -583,10 +676,14 @@ class ChatDBManager:
                     CREATE TABLE IF NOT EXISTS chat_sessions (
                         session_id TEXT PRIMARY KEY,
                         user_id TEXT NOT NULL,
-                        title TEXT NOT NULL,
-                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                        last_updated DATETIME DEFAULT CURRENT_TIMESTAMP
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        title TEXT,
+                        FOREIGN KEY (user_id) REFERENCES users(user_id)
                     )
+                """)
+                cursor.execute("""
+                    CREATE INDEX idx_user_sessions ON chat_sessions(user_id, created_at DESC)
                 """)
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS chat_history (
@@ -687,232 +784,250 @@ class ChatDBManager:
             logger.error(f"채팅 기록 조회 실패: {str(e)}")
             return []
 
-def generate_suggestions(question: str, chat_history: List[Dict]) -> List[str]:
-    """LLM을 활용한 맥락 기반 추천 질문 생성"""
-    try:
-        prompt = f"""
-        다음 법률 상담 대화를 바탕으로 관련된 추천 질문 3개를 생성해주세요.
-        현재 질문: {question}
-        
-        이전 대화:
-        {' '.join([msg['content'] for msg in chat_history[-3:] if msg['message_type'] == 'user'])}
-        
-        규칙:
-        1. 각 질문은 구체적이고 실용적이어야 합니다
-        2. 현재 상황과 관련된 법적 절차나 권리에 대해 물어보는 질문이어야 합니다
-        3. 질문은 완전한 문장이어야 합니다
-        
-        출력 형식:
-        질문1|질문2|질문3
-        """
-        
-        response = ChatOpenAI(temperature=0.7).invoke(prompt).content
-        return response.split("|")
-    except Exception as e:
-        logger.error(f"추천 질문 생성 중 오류: {str(e)}")
-        return _get_fallback_suggestions(question)
-
-def _get_fallback_suggestions(question: str) -> List[str]:
-    """기본 추천 질문 생성"""
-    legal_topics = {
-        "이혼": [
-            "이혼 소송의 구체적인 절차가 궁금합니다",
-            "위자료 청구 금액은 어떻게 정해지나요?",
-            "이혼 후 자녀 양육권 분쟁은 어떻게 해결하나요?"
-        ],
-        "폭력": [
-            "가정폭력 신고 후 진행되는 절차가 궁금합니다",
-            "가해자 접근금지 신���은 어떻게 ��나요?",
-            "임시보호명령을 신청하고 싶습니다"
-        ],
-        "재산": [
-            "이혼 시 재산분할 비율은 어떻게 정해지나요?",
-            "숨긴 재산을 발견했을 때의 법적 대응방법이 궁금합니다",
-            "별거 중 공동재산 처분 문제는 어떻게 해결하나요?"
-        ]
-    }
-    
-    for topic, questions in legal_topics.items():
-        if topic in question:
-            return questions
-    return legal_topics["이혼"]  # 기본값
-
-def create_ui():
-    st.title("법률 AI 어시스턴트")
-    
-    # 세션 상태 초기화
-    if "initialized" not in st.session_state:
-        init_status = st.empty()
-        init_status.info("시스템을 초기화하는 중입니다...")
-        
+    def generate_suggestions(self, question: str, chat_history: List[Dict]) -> List[str]:
+        """LLM을 활용한 맥락 기반 추천 질문 생성"""
         try:
-            # DB 매니저 초기화
-            st.session_state.db_manager = ChatDBManager()
+            prompt = f"""
+            다음 법률 상담 대화를 바탕으로 관련된 추천 질문 3개를 생성해주세요.
+            현재 질문: {question}
             
-            # 사용자 ID 및 세션 ID 초기화
-            if "user_id" not in st.session_state:
-                st.session_state.user_id = str(uuid.uuid4())
-            if "session_id" not in st.session_state:
-                st.session_state.session_id = str(uuid.uuid4())
-            if "messages" not in st.session_state:
-                st.session_state.messages = []
-            if "current_question" not in st.session_state:
-                st.session_state.current_question = None
+            이전 대화:
+            {' '.join([msg['content'] for msg in chat_history[-3:] if msg['message_type'] == 'user'])}
             
-            # 에이전트 초기화
-            st.session_state.agent = LegalAgent()
-            st.session_state.initialized = True
+            규칙:
+            1. 각 질문은 구체적이고 실용적이어야 합니다
+            2. 현재 상황과 관련된 법적 절차나 권리에 대해 물어보는 질문이어야 합니다
+            3. 질문은 완전한 문장이어야 합니다
             
-            init_status.success("시스템 초기화가 완료되었습니다!")
-            logger.info("에이전트 초기화 성공")
+            출력 형식:
+            질문1|질문2|질문3
+            """
             
+            response = ChatOpenAI(temperature=0.7).invoke(prompt).content
+            return response.split("|")
         except Exception as e:
-            error_msg = f"시스템 초기화 실패: {str(e)}"
-            init_status.error(error_msg)
-            logger.error(error_msg)
-            st.stop()
-    
-    # 사이드바 - 세션 관리
-    with st.sidebar:
-        st.subheader("대화 관리")
-        if st.button("새 대화 시작"):
-            st.session_state.session_id = str(uuid.uuid4())
-            st.session_state.messages = []
-            st.session_state.current_question = None
-            st.rerun()
+            logger.error(f"추천 질문 생성 중 오류: {str(e)}")
+            return self._get_fallback_suggestions(question)
+
+    def _get_fallback_suggestions(self, question: str) -> List[str]:
+        """기본 추천 질문 생성"""
+        legal_topics = {
+            "이혼": [
+                "이혼 소송의 구체적인 절차가 궁금합니다",
+                "위자료 청구 금액은 어떻게 정해지나요?",
+                "이혼 후 자녀 양육권 분쟁은 어떻게 해결하나요?"
+            ],
+            "폭력": [
+                "가정폭력 신고 후 진행되는 절차가 궁금합니다",
+                "가해자 접근금지 신은 어떻게 나요?",
+                "임시보호명령을 신청하고 싶습니다"
+            ],
+            "재산": [
+                "이혼 시 재산분할 비율은 어떻게 정해지나요?",
+                "숨긴 재산을 발견했을 때의 법적 대응방법이 궁금합니다",
+                "별거 중 공동재산 처분 문제는 어떻게 해결하나요?"
+            ]
+        }
         
-        st.divider()
-        st.subheader("이전 대화")
-        sessions = st.session_state.db_manager.get_chat_history(
-            st.session_state.user_id
-        )
-        for session in sessions:
-            if st.button(f"대화 {session['timestamp'][:10]}", 
-                        key=session['session_id']):
-                st.session_state.session_id = session['session_id']
-                st.session_state.messages = []
-                st.session_state.current_question = None
-                st.rerun()
-    
-    def handle_user_input(user_input: str):
-        """사용자 입력 처리를 위한 통합 함수"""
-        st.session_state.current_question = user_input
-        st.session_state.messages.append({"role": "user", "content": user_input})
-    
-    def display_suggestions(question: str, handle_user_input):
-        """추천 질문 표시 함수"""
+        for topic, questions in legal_topics.items():
+            if topic in question:
+                return questions
+        return legal_topics["이혼"]  # 기본값
+def load_css():
+    with open('liberty_agent/styles.css') as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+class ChatManager:
+    def __init__(self, db_manager: DatabaseManager):
+        self.db_manager = db_manager
+        self.chat_history_manager = ChatHistoryManager(db_manager)
+        
+    def display_suggestions(self, question: str, handle_input_func):
+        """추천 질문 표시"""
         try:
-            chat_history = st.session_state.db_manager.get_chat_history(
-                st.session_state.user_id,
-                st.session_state.session_id
-            )
-            suggested_questions = generate_suggestions(question, chat_history)
-            
+            suggested_questions = self.generate_suggestions(question)
             if suggested_questions:
                 st.markdown("### 💡 관련 질문")
                 cols = st.columns(len(suggested_questions))
-                for i, question in enumerate(suggested_questions):
+                for i, sugg_q in enumerate(suggested_questions):
                     with cols[i]:
-                        if st.button(
-                            question,
-                            key=f"suggest_{i}_{hash(question)}",
-                            use_container_width=True
-                        ):
-                            handle_user_input(question)
+                        if st.button(sugg_q, key=f"sugg_{i}"):
+                            handle_input_func(sugg_q)
                             st.rerun()
-                        
         except Exception as e:
             logger.error(f"추천 질문 표시 중 오류: {str(e)}")
-    
-    # 채팅 히스토리 표시
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-    
-    # 현재 질문 처리
-    if st.session_state.current_question:
+
+    def display_previous_chats(self):
+        """이전 대화 목록 표시"""
         try:
-            with st.chat_message("assistant"):
-                message_placeholder = st.empty()
-                with st.spinner("답변을 생성하는 중입니다..."):
-                    response = st.session_state.agent.process_query(
-                        st.session_state.current_question
-                    )
-                    
-                    if "error" in response:
-                        full_response = response["error"]
-                    else:
-                        full_response = f"""
-                        {response['answer']}
-                        
-                        신뢰도: {response['confidence']:.2f}
-                        질문 재작성 횟수: {response['rewrites']}
-                        """
-                    
-                    # DB에 저장
-                    st.session_state.db_manager.save_message(
-                        st.session_state.user_id,
-                        st.session_state.session_id,
-                        "user",
-                        st.session_state.current_question
-                    )
-                    
-                    st.session_state.db_manager.save_message(
-                        st.session_state.user_id,
-                        st.session_state.session_id,
-                        "assistant",
-                        full_response,
-                        {
-                            "confidence": response.get('confidence', 0),
-                            "rewrites": response.get('rewrites', 0)
-                        }
-                    )
-                    
-                    message_placeholder.markdown(full_response)
-                    st.session_state.messages.append(
-                        {"role": "assistant", "content": full_response}
-                    )
-                    st.success("답변이 준비되었습니다")
-                    
-                    # 추천 질문 표시
-                    if "error" not in response:
-                        display_suggestions(st.session_state.current_question, handle_user_input)
-                    
-                    # 현재 질문 초기화
-                    st.session_state.current_question = None
+            sessions = self.chat_history_manager.get_chat_sessions(
+                st.session_state.user_id
+            )
+            if sessions:
+                st.subheader("이전 대화")
+                for session in sessions:
+                    if st.button(
+                        f"대화 {session['created_at'].strftime('%Y-%m-%d %H:%M')}",
+                        key=f"session_{session['session_id']}"
+                    ):
+                        self.load_chat_session(session['session_id'])
+                        st.rerun()
+        except Exception as e:
+            logger.error(f"이전 대화 표시 중 오류: {str(e)}")
+
+    def load_chat_session(self, session_id: str):
+        """채팅 세션 로드"""
+        try:
+            messages = self.chat_history_manager.load_chat_history(
+                st.session_state.user_id,
+                session_id
+            )
+            st.session_state.messages = messages
+            st.session_state.current_session_id = session_id
+        except Exception as e:
+            logger.error(f"채팅 세션 로드 중 오류: {str(e)}")
+def initialize_app():
+    """앱 초기화"""
+    if 'initialized' not in st.session_state:
+        try:
+            st.session_state.initialized = True
+            st.session_state.agent = LegalAgent()
+            st.session_state.db_manager = DatabaseManager()
+            st.session_state.chat_manager = ChatManager(st.session_state.db_manager)
+            reset_session_state()
+            
+            # 사용자 ID 설정 (임시)
+            if 'user_id' not in st.session_state:
+                st.session_state.user_id = str(uuid.uuid4())
                 
         except Exception as e:
-            logger.error(f"답변 생성 중 오류: {str(e)}")
-            st.error("죄송합니다. 처리 중 오류가 발생했습니다.")
-    
-    # 일반 입력 처리
-    if prompt := st.chat_input("질문을 입력하세요"):
-        handle_user_input(prompt)
-        st.rerun()
+            logger.error(f"앱 초기화 중 오류: {str(e)}")
+            st.error("앱 초기화 중 오류가 발생했습니다.")
 
-# def display_suggestions(question: str):
-#     """추천 질문 표시 함수"""
-#     try:
-#         chat_history = st.session_state.db_manager.get_chat_history(
-#             st.session_state.user_id,
-#             st.session_state.session_id
-#         )
-#         suggested_questions = generate_suggestions(question, chat_history)
-#         if suggested_questions:
-#             st.markdown("### 💡 관련 질문")
-#             cols = st.columns(len(suggested_questions))
-#             for i, question in enumerate(suggested_questions):
-#                 with cols[i]:
-#                     # 버튼 클릭 시 상태 업데이트
-#                     if st.button(
-#                         question,
-#                         key=f"suggest_{i}_{hash(question)}",  # 질문 내용 기반 키 생성
-#                         use_container_width=True
-#                     ):
-#                         handle_user_input(question)
-#                         st.rerun()     
-#     except Exception as e:
-#         logger.error(f"추천 질문 표시 중 오류: {str(e)}")
+def create_ui():
+    """UI 생성"""
+    try:
+        load_css()
+        initialize_app()
+        
+        # 헤더
+        st.markdown("""
+            <h1 style='text-align: center;'>⚖️ 법률 AI 어시스턴트</h1>
+            <p style='text-align: center;'>법률 관련 궁금하신 점을 질문해주세요.</p>
+        """, unsafe_allow_html=True)
+        
+        # 메인 레이아웃
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            display_chat_interface()
+        
+        with col2:
+            st.sidebar.title("대화 관리")
+            if st.sidebar.button("새 대화 시작"):
+                reset_session_state()
+                st.rerun()
+            
+            # 이전 대화 표시
+            st.session_state.chat_manager.display_previous_chats()
+            
+    except Exception as e:
+        logger.error(f"UI 생성 중 오류: {str(e)}")
+        st.error("UI 생성 중 오류가 발생했습니다.")
+
+def init_session_state():
+    """세션 상태 초기화"""
+    if 'initialized' not in st.session_state:
+        st.session_state.initialized = True
+        st.session_state.messages = []
+        st.session_state.current_session_id = generate_session_id()
+        st.session_state.chat_history = []
+        
+def load_previous_chats():
+    """이전 대화 불러오기"""
+    try:
+        if 'user_id' in st.session_state:
+            history = st.session_state.db_manager.get_chat_sessions(
+                st.session_state.user_id
+            )
+            return history
+    except Exception as e:
+        logger.error(f"이전 대화 로드 중 오류: {str(e)}")
+        return []
+
+def handle_session_selection():
+    """세션 선택 처리"""
+    sessions = load_previous_chats()
+    if sessions:
+        selected = st.sidebar.selectbox(
+            "이전 대화 선택",
+            options=[s['session_id'] for s in sessions],
+            format_func=lambda x: sessions[sessions.index({'session_id': x})]['created_at']
+        )
+        if selected:
+            st.session_state.current_session_id = selected
+            messages = st.session_state.chat_history_manager.load_chat_history(
+                st.session_state.user_id,
+                selected
+            )
+            display_chat_history(messages)
+
+def setup_sidebar():
+    with st.sidebar:
+        st.title("대화 관리")
+        if st.button("새 대화 시작"):
+            st.session_state.current_session_id = generate_session_id()
+            st.session_state.messages = []
+            st.rerun()
+
+def display_chat_interface():
+    """채팅 인터페이스 표시"""
+    # 채팅 컨테이너
+    chat_container = st.container()
+    
+    with chat_container:
+        # 채팅 히스토리
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+                
+                # 메타데이터 표시 (있는 경우)
+                if "metadata" in msg and msg["metadata"]:
+                    with st.expander("참고 자료"):
+                        st.json(msg["metadata"])
+
+def display_suggestions(question: str):
+    """추천 질문 표시"""
+    try:
+        suggested_questions = generate_suggestions(question)
+        if suggested_questions:
+            st.markdown("### 💡 관련 질문")
+            cols = st.columns(len(suggested_questions))
+            for i, sugg_q in enumerate(suggested_questions):
+                with cols[i]:
+                    if st.button(sugg_q, key=f"sugg_{i}"):
+                        handle_user_input(sugg_q)
+                        st.rerun()
+    except Exception as e:
+        logger.error(f"추천 질문 표시 중 오류: {str(e)}")
+
+def show_error_message(error_type: str):
+    """에러 메시지 표시"""
+    error_messages = {
+        "connection": "연결 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+        "processing": "처리 중 오류가 발생했습니다. 다시 시도해주세요.",
+        "invalid_input": "잘못된 입력입니다. 다시 입력해주세요."
+    }
+    st.error(error_messages.get(error_type, "알 수 없는 오류가 발생했습니다."))
+
+def display_chat_history(messages):
+    """채팅 기록 표시"""
+    for message in messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+def generate_session_id():
+    """세션 ID 생성"""
+    return str(uuid.uuid4())
 
 class SuggestionManager:
     def __init__(self, db_manager: ChatDBManager):
@@ -982,9 +1097,34 @@ def apply_custom_css():
     }
     </style>
     """, unsafe_allow_html=True)
+def reset_session_state():
+    """세션 상태 초기화"""
+    st.session_state.messages = []
+    st.session_state.current_session_id = generate_session_id()
+    st.session_state.chat_history = []
+
+def display_previous_chats():
+    """이전 대화 목록 표시"""
+    st.subheader("이전 대화")
+    for session in st.session_state.chat_sessions:
+        if st.button(
+            f"대화 {session['created_at'].strftime('%Y-%m-%d %H:%M')}",
+            key=f"session_{session['session_id']}"
+        ):
+            load_chat_session(session['session_id'])
+            st.rerun()
+
+def initialize_app():
+    """앱 초기화"""
+    if 'initialized' not in st.session_state:
+        st.session_state.initialized = True
+        st.session_state.agent = LegalAgent()
+        st.session_state.db_manager = DatabaseManager()
+        reset_session_state()
 
 if __name__ == "__main__":
     try:
+        initialize_app()
         create_ui()
     except Exception as e:
         logger.error(f"애플리케이션 실행 중 오류 발생: {str(e)}")
@@ -1014,3 +1154,58 @@ def normalize_context(context: Union[Dict, List]) -> List[Document]:
                 for category, docs in context.items() 
                 for doc in docs]
     return [DocumentWrapper(doc) for doc in context]
+
+class ChatHistoryManager:
+    def __init__(self, db_manager):
+        self.db_manager = db_manager
+        self.current_session = None
+        
+    def load_chat_history(self, user_id: str, session_id: str) -> List[Dict]:
+        """대화 기록 로드"""
+        try:
+            messages = self.db_manager.get_chat_history(user_id, session_id)
+            # 세션 상태 업데이트
+            if 'messages' not in st.session_state:
+                st.session_state.messages = []
+            st.session_state.messages.extend(messages)
+            return messages
+        except Exception as e:
+            logger.error(f"대화 기록 로드 중 오류: {str(e)}")
+            return []
+
+    def save_message(self, user_id: str, session_id: str, role: str, content: str, metadata: Dict = None):
+        """메시지 저장"""
+        try:
+            # DB에 저장
+            self.db_manager.save_message(user_id, session_id, role, content, metadata)
+            
+            # 세션 상태 업데이트
+            if 'messages' not in st.session_state:
+                st.session_state.messages = []
+            st.session_state.messages.append({
+                "role": role,
+                "content": content,
+                "metadata": metadata
+            })
+        except Exception as e:
+            logger.error(f"메시지 저장 중 오류: {str(e)}")
+
+def show_processing_status():
+    """처리 상태 표시"""
+    with st.status("답변 생성 중...", expanded=True) as status:
+        st.write("컨텍스트 검색 중...")
+        time.sleep(1)
+        st.write("관련 판례 분석 중...")
+        time.sleep(1)
+        st.write("답변 생성 중...")
+        time.sleep(1)
+        status.update(label="답변이 준비되었습니다!", state="complete")
+
+def display_confidence_score(score: float):
+    """신뢰도 점수 표시"""
+    color = "green" if score > 0.8 else "orange" if score > 0.6 else "red"
+    st.markdown(f"""
+        <div style='text-align: right; color: {color}'>
+            신뢰도: {score:.2f}
+        </div>
+    """, unsafe_allow_html=True)

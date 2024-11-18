@@ -6,3 +6,14 @@ faiss_index
 __pycache__/
 *.pyc
 .venv/
+rag/__pycache__
+.streamlit/secrets.toml
+.streamlit/config.toml
+*.dockerfile
+.DS_Store
+
+liberty_agent/cached_vectors/retrievers/embeddings
+liberty_agent/cached_vectors/retrievers/emdebackup
+liberty_agent/cached_vectors/retrievers/faiss
+chat_history.db
+>>>>>>> 0ae808c3ad69ce0e2527a68d49b36c79f7d0c268

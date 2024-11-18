@@ -1,90 +1,96 @@
-# Liberty LangGraph QA 챗봇
 
-Liberty LangGraph QA 챗봇은 LangChain과 LangGraph를 활용하여 PDF 문서에서 정보를 추출하고 사용자의 질문에 답변하는 고급 질의응답 시스템입니다. Streamlit을 통해 사용자 친화적인 인터페이스를 제공합니다.
 
-## 주요 기능
+### 📝 README.md
 
-- PDF 문서 기반 정보 추출 및 검색
-- LLM을 활용한 동적 질문 답변 생성
-- 답변의 관련성 검사 및 질문 재작성 기능
-- KoBERT와 Upstage Groundedness Check를 결합한 하이브리드 관련성 검증
-- 대화형 채팅 인터페이스
+```markdown
+# Legal AI Assistant Project
 
-## 기술 스택
+## 🚀 Overview
+법률 상담을 위한 AI 어시스턴트 프로젝트입니다. 판례 데이터를 기반으로 사용자의 법률 관련 질문에 대해 정확하고 신뢰할 수 있는 답변을 제공합니다.
 
-- **프레임워크**: Streamlit, LangChain, LangGraph
-- **언어 모델**: OpenAI GPT-4
-- **임베딩 모델**: KoBERT
-- **관련성 검사**: Upstage Groundedness Check
-- **문서 처리**: PyPDF2 (추정)
+## 🛠 Core Technologies
+- **검색 엔진**: Pinecone, FAISS
+- **임베딩**: Upstage Embeddings, KoBERT
+- **하이브리드 검색**: BM25 + Dense Retrieval
+- **LLM**: Claude 3.5 Sonnet
+- **프레임워크**: Streamlit, LangChain
 
-## 설치 및 실행
+## 🌟 Key Features
+1. **하이브리드 검색 시스템**
+   - Dense + Sparse 임베딩 결합
+   - 컨텍스트 기반 동적 가중치 조정
+   - 폴백 메커니즘
 
-1. 저장소 클론:
-   ```
-   git clone https://github.com/your-repo/liberty-langgraph-qa.git
-   cd liberty-langgraph-qa
-   ```
+2. **신뢰도 검증 시스템**
+   - Upstage 기반 검증
+   - KoBERT 유사도 분석
+   - 다중 검증 점수 결합
 
-2. 가상 환경 생성 및 활성화:
-   ```
-   python -m venv venv
-   source venv/bin/activate  # Windows: venv\Scripts\activate
-   ```
+3. **질문 최적화**
+   - 질문 재작성
+   - 의도 분석
+   - 컨텍스트 기반 가중치
 
-3. 의존성 패키지 설치:
-   ```
-   pip install -r requirements.txt
-   ```
+4. **데이터 처리**
+   - 멀티스레딩 처리
+   - 배치 프로세싱
+   - 캐싱 시스템
 
-4. 환경 변수 설정:
-   `.env` 파일을 생성하고 필요한 API 키를 설정하세요:
-   ```
-   OPENAI_API_KEY=your_openai_api_key
-   UPSTAGE_API_KEY=your_upstage_api_key
-   ```
+## 📊 Project Status
+- 전체 진행률: 85%
+- 핵심 기능 구현: 90%
+- UI/UX: 70%
+- 테스트 커버리지: 60%
 
-5. 애플리케이션 실행:
-   ```
-   streamlit run app.py
-   ```
-
-## 사용 방법
-
-1. 애플리케이션을 실행하면 Streamlit 인터페이스가 브라우저에서 열립니다.
-2. 채팅 입력창에 질문을 입력하세요.
-3. 시스템이 PDF 문서에서 관련 정보를 검색하고 답변을 생성합니다.
-4. 답변의 관련성이 낮다고 판단되면 자동으로 질문을 재작성하고 프로세스를 반복합니다.
-5. 최종 답변과 질문 재작성 횟수가 표시됩니다.
-
-## 프로젝트 구조
-
-```
-liberty-langgraph-qa/
-│
-├── app.py                 # 메인 Streamlit 애플리케이션
-├── rag/
-│   ├── pdf.py             # PDF 처리 및 검색 기능
-│   └── utils.py           # 유틸리티 함수
-├── data/
-│   └── Minbub Selected Provisions.pdf  # 샘플 PDF 문서
-├── requirements.txt       # 프로젝트 의존성
-├── .env                   # 환경 변수 (git에서 제외)
-└── README.md              # 프로젝트 문서
+## 🔄 Agent Flow
+```mermaid
+graph TD
+    A[Entry] --> B[Retrieve]
+    B --> C[LLM Answer]
+    C --> D[Relevance Check]
+    D -->|Grounded| E[End]
+    D -->|Not Grounded| F[Rewrite]
+    F --> B
 ```
 
-## 기여하기
+## 📋 Installation & Setup
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
 
-프로젝트 기여는 언제나 환영합니다. 버그 리포트, 기능 제안 또는 풀 리퀘스트를 통해 참여해 주세요.
+## 🔧 Configuration
+```yaml
+PINECONE_API_KEY: your_api_key
+OPENAI_API_KEY: your_api_key
+MODEL_NAME: gpt-4o
+```
 
-## 라이센스
+## 🚀 Next Steps
+1. 컨텍스트 처리 개선
+2. 에러 핸들링 강화
+3. UI/UX 개선
+4. 테스트 자동화
+```
 
-이 프로젝트는 MIT 라이센스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+### 📌 주요 기술 스택 상세
 
-## 연락처
+```markdown
+## 🔍 Search Engine
+- Pinecone: 벡터 데이터베이스
+- FAISS: 로컬 벡터 검색
+- BM25: 스파스 검색
+- Hybrid Retrieval: 밀집/희소 벡터 결합
 
-프로젝트 관련 문의: minwool0357@gmail.com
+## 🧠 AI/ML
+- Upstage Embeddings: 한국어 특화 임베딩
+- KoBERT: 한국어 BERT 모델
+- Claude 3.5: 메인 LLM
+- Custom Reranking: 컨텍스트 기반 재순위화
 
----
-
-© 2024 Liberty LangGraph QA 챗봇. All rights reserved.
+## 🛠 Infrastructure
+- Streamlit: UI 프레임워크
+- LangChain: LLM 통합
+- SQLite: 메시지 저장
+- ThreadPoolExecutor: 병렬 처리
+```

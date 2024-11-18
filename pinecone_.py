@@ -66,7 +66,7 @@ class PineconeRetrievalChain:
         """Pinecone 인덱스를 초기화하거나 존재하지 않으면 생성합니다."""
         host = "https://liberty-index-hwsbh8f.svc.aped-4627-b74a.pinecone.io"
         index = self.create_index(api_key=PINECONE_API_KEY, host=host, index_name=index_name)
-        return {"index": index, "namespace": index_name + "-namespace-01"}
+        return {"index": index, "namespace": index_name + "-namespace-02"}
     
     def load_documents(self, data_dir="./data", mode="pdf"):
         split_docs = []

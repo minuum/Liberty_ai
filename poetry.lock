@@ -7005,30 +7005,32 @@ cffi = {version = "*", markers = "implementation_name == \"pypy\""}
 
 [[package]]
 name = "ragas"
-version = "0.1.21"
+version = "0.2.5"
 description = ""
 optional = false
 python-versions = "*"
 files = [
-    {file = "ragas-0.1.21-py3-none-any.whl", hash = "sha256:c5be4dbe3d4a90a62298889aaef8941516c41e0708a8fe942c9ffa9395cf244d"},
-    {file = "ragas-0.1.21.tar.gz", hash = "sha256:4ded52375d3710a2a2dd23d550fd09d0e26485fc435b14a413174f9d7b45d252"},
+    {file = "ragas-0.2.5-py3-none-any.whl", hash = "sha256:1ce3cee1d71b7922b9d513275aa35df1ed9a875b84d0452210d5e4796b493831"},
+    {file = "ragas-0.2.5.tar.gz", hash = "sha256:7c9e151e20bbdd7c780230d4af940155afab16250c7705a92ec7c7ef52a6aa76"},
 ]
 
 [package.dependencies]
 appdirs = "*"
 datasets = "*"
-langchain = "<0.3"
-langchain-community = "<0.3"
-langchain-core = "<0.3"
+langchain = "*"
+langchain-community = "*"
+langchain-core = "*"
 langchain-openai = "*"
 nest-asyncio = "*"
 numpy = "*"
 openai = ">1"
+pydantic = ">=2"
 pysbd = ">=0.3.4"
 tiktoken = "*"
 
 [package.extras]
-all = ["sentence-transformers", "transformers"]
+all = ["datacompy", "llama-index", "nltk", "pandas", "rapidfuzz", "rouge-score", "sentence-transformers", "transformers"]
+docs = ["mkdocs (>=1.6.1)", "mkdocs-autorefs", "mkdocs-gen-files", "mkdocs-git-committers-plugin-2", "mkdocs-git-revision-date-localized-plugin", "mkdocs-glightbox", "mkdocs-literate-nav", "mkdocs-material", "mkdocs-material[imaging]", "mkdocs-section-index", "mkdocstrings[python]"]
 
 [[package]]
 name = "rank-bm25"
@@ -7302,6 +7304,26 @@ files = [
     {file = "regex-2024.9.11-cp39-cp39-win_amd64.whl", hash = "sha256:faa3c142464efec496967359ca99696c896c591c56c53506bac1ad465f66e919"},
     {file = "regex-2024.9.11.tar.gz", hash = "sha256:6c188c307e8433bcb63dc1915022deb553b4203a70722fc542c363bf120a01fd"},
 ]
+
+[[package]]
+name = "reportlab"
+version = "4.2.5"
+description = "The Reportlab Toolkit"
+optional = false
+python-versions = "<4,>=3.7"
+files = [
+    {file = "reportlab-4.2.5-py3-none-any.whl", hash = "sha256:eb2745525a982d9880babb991619e97ac3f661fae30571b7d50387026ca765ee"},
+    {file = "reportlab-4.2.5.tar.gz", hash = "sha256:5cf35b8fd609b68080ac7bbb0ae1e376104f7d5f7b2d3914c7adc63f2593941f"},
+]
+
+[package.dependencies]
+chardet = "*"
+pillow = ">=9.0.0"
+
+[package.extras]
+accel = ["rl-accel (>=0.9.0,<1.1)"]
+pycairo = ["freetype-py (>=2.3.0,<2.4)", "rlPyCairo (>=0.2.0,<1)"]
+renderpm = ["rl-renderPM (>=4.0.3,<4.1)"]
 
 [[package]]
 name = "requests"
@@ -9952,4 +9974,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.12"
-content-hash = "5f327ca068949371dff59274c3b60719f127a037064032c4a9dbeba54931c738"
+content-hash = "f46146d785b673417643325efec6a7df284357792d2cf5d52166d2782787cc5a"

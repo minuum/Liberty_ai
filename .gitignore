@@ -10,3 +10,9 @@ rag/__pycache__
 .streamlit/secrets.toml
 .streamlit/config.toml
 *.dockerfile
+.DS_Store
+
+liberty_agent/cached_vectors/retrievers/embeddings
+liberty_agent/cached_vectors/retrievers/emdebackup
+liberty_agent/cached_vectors/retrievers/faiss
+chat_history.db

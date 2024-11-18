@@ -1,112 +1,96 @@
-# AI Agent Liberty - 랭그래프 기반 질의응답 시스템
-
-## 프로젝트 소개
-
-AI Agent Liberty는 랭그래프(LangGraph) 기법을 활용한 민간 법률 고급 질의응답 시스템입니다. 이 프로젝트는 사용자의 질문에 대해 정확하고 관련성 높은 법률 답변을 제공하기 위해 설계되었습니다.
-
-## 시스템 구조도
-
-AI Agent Liberty의 시스템 구조를 자세히 보려면 아래 Figma 링크를 참조하세요:
-
-[AI Agent Liberty 시스템 구조도](https://www.figma.com/board/0LivhrgVnLyiOM9qjRxVR9/Liberty_Constructure?node-id=0-1&node-type=canvas&t=v77ZqJiqpJL8Std6-0)
-
-## 주요 기능
-
-- 사용자 질문 입력 및 처리
-- 랭그래프를 이용한 동적 질문 재작성
-- 관련 문서 검색 및 답변 생성
-- 답변의 관련성 검사
-- 채팅 기록 관리
-
-## 기술 스택
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/f16b12c4-a786-40f2-86ff-8267cebd0027" alt="Python" width="200">
-</p>
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/fca98822-0741-4356-b5da-bb392cbefcfb" alt="Streamlit" width="300">
-    <img src="https://github.com/user-attachments/assets/c8072f9d-770f-47fa-8135-00f739b5c7df" alt="LangChain" width="300">
-  <img src="https://github.com/user-attachments/assets/5190d84a-c348-47c5-bb18-3ce47915e3cb" alt="LangGraph" width="300">
-</p>
 
 
+### 📝 README.md
 
-- Python
-- Streamlit
-- LangChain
-- LangGraph
+```markdown
+# Legal AI Assistant Project
 
-## 설치 방법
+## 🚀 Overview
+법률 상담을 위한 AI 어시스턴트 프로젝트입니다. 판례 데이터를 기반으로 사용자의 법률 관련 질문에 대해 정확하고 신뢰할 수 있는 답변을 제공합니다.
 
-1. 저장소를 클론합니다:
-   ```
-   git clone https://github.com/your-username/ai-agent-liberty.git
-   ```
+## 🛠 Core Technologies
+- **검색 엔진**: Pinecone, FAISS
+- **임베딩**: Upstage Embeddings, KoBERT
+- **하이브리드 검색**: BM25 + Dense Retrieval
+- **LLM**: Claude 3.5 Sonnet
+- **프레임워크**: Streamlit, LangChain
 
-2. 프로젝트 디렉토리로 이동합니다:
-   ```
-   cd ai-agent-liberty
-   ```
+## 🌟 Key Features
+1. **하이브리드 검색 시스템**
+   - Dense + Sparse 임베딩 결합
+   - 컨텍스트 기반 동적 가중치 조정
+   - 폴백 메커니즘
 
-3. 필요한 패키지를 설치합니다:
-   ```
-   pip install -r requirements.txt
-   ```
+2. **신뢰도 검증 시스템**
+   - Upstage 기반 검증
+   - KoBERT 유사도 분석
+   - 다중 검증 점수 결합
 
-## 사용 방법
+3. **질문 최적화**
+   - 질문 재작성
+   - 의도 분석
+   - 컨텍스트 기반 가중치
 
-1. Streamlit 앱을 실행합니다:
-   ```
-   streamlit run app.py
-   ```
+4. **데이터 처리**
+   - 멀티스레딩 처리
+   - 배치 프로세싱
+   - 캐싱 시스템
 
-2. 웹 브라우저에서 표시된 URL로 접속합니다.
+## 📊 Project Status
+- 전체 진행률: 85%
+- 핵심 기능 구현: 90%
+- UI/UX: 70%
+- 테스트 커버리지: 60%
 
-3. 질문을 입력하고 AI Agent Liberty의 답변을 확인합니다.
+## 🔄 Agent Flow
+```mermaid
+graph TD
+    A[Entry] --> B[Retrieve]
+    B --> C[LLM Answer]
+    C --> D[Relevance Check]
+    D -->|Grounded| E[End]
+    D -->|Not Grounded| F[Rewrite]
+    F --> B
+```
 
-## 프로젝트 구조
+## 📋 Installation & Setup
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
 
-- `app.py`: 메인 애플리케이션 파일
-- `pages/`: Streamlit 멀티페이지 구조를 위한 디렉토리
-  - `home.py`: 홈 페이지
-  - `settings.py`: 설정 페이지
-  - `profile.py`: 프로필 페이지
+## 🔧 Configuration
+```yaml
+PINECONE_API_KEY: your_api_key
+OPENAI_API_KEY: your_api_key
+MODEL_NAME: gpt-4o
+```
 
-## 랭그래프 기법 설명
+## 🚀 Next Steps
+1. 컨텍스트 처리 개선
+2. 에러 핸들링 강화
+3. UI/UX 개선
+4. 테스트 자동화
+```
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/930fca9e-8d22-4a6d-87b1-0bc67d53e51a" alt="LangGraph 프로세스" width="600">
-</p>
+### 📌 주요 기술 스택 상세
 
-AI Agent Liberty는 랭그래프 기법을 사용하여 다음과 같은 프로세스를 구현합니다:
+```markdown
+## 🔍 Search Engine
+- Pinecone: 벡터 데이터베이스
+- FAISS: 로컬 벡터 검색
+- BM25: 스파스 검색
+- Hybrid Retrieval: 밀집/희소 벡터 결합
 
-1. 사용자 질문 입력
-2. 관련 문서 검색
-3. LLM을 이용한 답변 생성
-4. 답변의 관련성 검사
-5. 필요시 질문 재작성 및 프로세스 반복
+## 🧠 AI/ML
+- Upstage Embeddings: 한국어 특화 임베딩
+- KoBERT: 한국어 BERT 모델
+- Claude 3.5: 메인 LLM
+- Custom Reranking: 컨텍스트 기반 재순위화
 
-이 접근 방식을 통해 더 정확하고 관련성 높은 답변을 제공할 수 있습니다.
-
-## 기여 방법
-
-프로젝트에 기여하고 싶으시다면 다음 단계를 따라주세요:
-
-1. 이 저장소를 포크합니다.
-2. 새 브랜치를 생성합니다 (`git checkout -b feature/AmazingFeature`).
-3. 변경 사항을 커밋합니다 (`git commit -m 'Add some AmazingFeature'`).
-4. 브랜치에 푸시합니다 (`git push origin feature/AmazingFeature`).
-5. Pull Request를 생성합니다.
-6. 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/4c13647e-0358-4b91-9abd-36ad93201795" width="200">
-</p>
-## 라이선스
-
-이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
-
-## 연락처
-
-프로젝트 관리자 - [@mniuum](https://github.com/dashboard) - minwool0357@gmail.com
-
-프로젝트 링크: [https://github.com/minuum/Liberty_ai](https://github.com/minuum/Liberty_ai)
+## 🛠 Infrastructure
+- Streamlit: UI 프레임워크
+- LangChain: LLM 통합
+- SQLite: 메시지 저장
+- ThreadPoolExecutor: 병렬 처리
+```

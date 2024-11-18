@@ -15,3 +15,4 @@ rag/__pycache__
 liberty_agent/cached_vectors/retrievers/embeddings
 liberty_agent/cached_vectors/retrievers/emdebackup
 liberty_agent/cached_vectors/retrievers/faiss
+chat_history.db

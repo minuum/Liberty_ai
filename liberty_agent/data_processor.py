@@ -7,7 +7,7 @@ from langchain_teddynote.community.pinecone import (
 from langchain_teddynote.korean import stopwords
 from pinecone import Pinecone
 import json
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path
 import logging
 import glob
@@ -16,6 +16,7 @@ import os
 from langchain_community.vectorstores import FAISS
 from langchain.schema import Document
 from retrievers.kiwi_bm25 import CustomKiwiBM25Retriever
+from langchain_teddynote.community.pinecone import PineconeKiwiHybridRetriever
 from retrievers.hybrid import HybridRetriever
 from langchain.storage import LocalFileStore
 from langchain.embeddings import CacheBackedEmbeddings
@@ -53,52 +54,37 @@ def chunks(iterable, size):
 class LegalDataProcessor:
     def __init__(
         self, 
-        pinecone_api_key: str, 
+        pinecone_api_key: str,
         index_name: str,
         encoder_path: Optional[str] = None,
-        batch_size: int = 100,
-        load_encoder: bool = False,
-        cache_dir: Optional[str] = None
+        cache_dir: Optional[str] = "./liberty_agent/cached_vectors",
+        cache_mode: bool = True,
     ):
-        """
-        법률 데이터 처리기 초기화
-        
-        Args:
-            pinecone_api_key: Pinecone API 키
-            index_name: Pinecone 인덱스 이름
-            encoder_path: encoder 저장/로드 경로
-            batch_size: 배치 처리 크기
-            load_encoder: True면 기존 encoder 로드, False면 새로 생성
-            cache_dir: 캐시 디렉토리 경로
-        """
-        logger.info(f"LegalDataProcessor 초기화 - index_name: {index_name}")
+        # Pinecone 초기화
         self.pc = Pinecone(api_key=pinecone_api_key)
         self.index_name = index_name
-        self.batch_size = batch_size
-        self.encoder_path = encoder_path
-        
-        # Dense Embedder 초기화
-        logger.info("Dense Embedder 초기화 중...")
+        self.pinecone_index = self.pc.Index(index_name)
+        self.namespace = "liberty-db-namespace-legal-agent"
+    
+        # 캐시 설정
+        self.cache_dir = Path(cache_dir)
+        self.cache_mode = cache_mode
+        self.retriever_cache_dir = self.cache_dir / "retrievers"
+        logger.info(f"캐시 디렉토리: {self.cache_dir}")
+        logger.info(f"리트리버 캐시 디렉토리: {self.retriever_cache_dir}")
+        # 임베딩 모델 초기화
         self.dense_embedder = UpstageEmbeddings(
-            model="solar-embedding-1-large"
+            model="solar-embedding-1-large-query"
         )
         
-        # Sparse Encoder 초기화
-        logger.info("Sparse Encoder 초기화 중...")
-        #self.sparse_encoder = self._initialize_sparse_encoder(load_encoder)
-        self.sparse_encoder = create_sparse_encoder(stopwords(), mode="kiwi")
+        # Sparse 인코더 초기화
+        self.encoder_path = encoder_path
+        self.sparse_encoder =None
         
-        # Pinecone 인덱스 초기화 추가
-        try:
-            self.pinecone_index = self.pc.Index(index_name)
-            logger.info(f"Pinecone 인덱스 '{index_name}' 초기화 완료")
-        except Exception as e:
-            logger.error(f"Pinecone 인덱스 초기화 실패: {str(e)}")
-            raise
-        
-        # 기본 캐시 디렉토리 설정
-        self.retriever_cache_dir = Path(cache_dir or "./cached_vectors/retrievers").resolve()
-        self.retriever_cache_dir.mkdir(parents=True, exist_ok=True)
+        # 캐시 디렉토리 생성
+        if self.cache_mode:
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
+            self.retriever_cache_dir.mkdir(parents=True, exist_ok=True)
         
     def _initialize_sparse_encoder(self, load_encoder: bool, contents: List[str] = []):
         """Sparse Encoder 초기화"""
@@ -202,7 +188,7 @@ class LegalDataProcessor:
                             # 3. 질의/응답 정보 추가
                             if data['jdgmnInfo']:
                                 for qa in data['jdgmnInfo']:
-                                    content_parts.append(f"질문: {qa['question']}")
+                                    content_parts.append(f"���문: {qa['question']}")
                                     content_parts.append(f"답변: {qa['answer']}")
                             
                                     # Document 생성
@@ -274,7 +260,7 @@ class LegalDataProcessor:
             try:
                 result = self.pinecone_index.upsert(
                     vectors=vectors,
-                    namespace=f"{self.index_name}-namespace-legal-agent",
+                    namespace=self.namespace,
                     async_req=False
                 )
                 logger.info(f"배치 업로드 성공: {result}")
@@ -472,40 +458,39 @@ class LegalDataProcessor:
 
     def create_hybrid_retriever(
         self,
-        documents: List[Document],
+        documents: Optional[List[Document]] = None,
         cache_dir: Optional[str] = None,
         k: int = 20,
-        dense_weight: float = 0.3,
-        sparse_weight: float = 0.7,
+        dense_weight: float = 0.7,
+        sparse_weight: float = 0.3,
         use_cache: bool = True
-    ) -> HybridRetriever:
+    ) -> Optional[HybridRetriever]:
         """FAISS와 KiwiBM25를 결합한 하이브리드 검색기 생성"""
         try:
             cache_dir = cache_dir or self.retriever_cache_dir
-            
-            # 캐시 모드 설정
             cache_mode = 'load' if use_cache else 'create'
             
             # 기본 검색기 생성
-            retrievers = self.create_retrievers(
+            retrievers, _ = self.create_retrievers(
                 documents=documents,
                 use_faiss=True,
                 use_kiwi=True,
-                use_pinecone=False,  # 하이브리드에서는 Pinecone 제외
+                use_pinecone=False,
                 cache_mode=cache_mode
             )
             
-            if 'faiss' not in retrievers or 'kiwi' not in retrievers:
-                raise ValueError("FAISS와 KiwiBM25 검색기 모두 필요합니다.")
-            
+            if not retrievers or 'faiss' not in retrievers or 'kiwi' not in retrievers:
+                logger.error("필요한 검색기를 찾을 수 없습니다.")
+                return None
+                
             # Dense 검색기 설정
             dense_retriever = retrievers['faiss'].as_retriever(
                 search_type="similarity",
                 search_kwargs={"k": k}
             )
-
+            
             # 하이브리드 검색기 생성
-            return HybridRetriever(
+            hybrid = HybridRetriever(
                 dense_retriever=dense_retriever,
                 sparse_retriever=retrievers['kiwi'],
                 k=k,
@@ -513,9 +498,12 @@ class LegalDataProcessor:
                 sparse_weight=sparse_weight
             )
             
+            logger.info("하이브리드 검색기 생성 완료")
+            return hybrid
+            
         except Exception as e:
-            logger.error(f"하이브리드 검색기 생성 중 오류 발생: {str(e)}")
-            raise
+            logger.error(f"하이브리드 검색기 생성 중 오류: {str(e)}")
+            return None
 
     def create_vectorstore(self, 
                           documents: List[Document],
@@ -632,15 +620,15 @@ class LegalDataProcessor:
         use_kiwi: bool = True,
         use_pinecone: bool = True,
         cache_mode: str = 'load'
-    ) -> Dict[str, Any]:
+    ) -> Tuple[Dict[str, Any], Any]:
         """통합 검색기 생성"""
-        retrievers = {}
-        
         try:
-            # 임베딩 관리 (FAISS용)
+            retrievers = {}
+            # Sparse 인코더 초기화
+            sparse_encoder = self._initialize_sparse_encoder(load_encoder=True)
+            
+            # FAISS 검색기
             if use_faiss:
-
-                # FAISS 검색기 (자체 save_local 사용)
                 faiss_dir = os.path.join(self.retriever_cache_dir, "faiss")
                 if cache_mode == 'load':
                     if os.path.exists(os.path.join(faiss_dir, "index.faiss")):
@@ -652,31 +640,8 @@ class LegalDataProcessor:
                         )
                     else:
                         logger.warning("저장된 FAISS 인덱스를 찾을 수 없습니다.")
-
-                elif cache_mode =="store":
-                    cached_embedder = self.manage_embeddings(
-                    documents,
-                    embedding_cache_dir=os.path.join(self.retriever_cache_dir, "embeddings")
-                )
-                
-                    logger.info("FAISS 인덱스 저장하며 생성 중...")
-                    retrievers['faiss'] = FAISS.from_documents(
-                        documents=documents,
-                        embedding=cached_embedder
-                    )
-                    logger.info(f"FAISS 인덱스 저장 중... ({faiss_dir})")
-                    os.makedirs(faiss_dir, exist_ok=True)
-                    retrievers['faiss'].save_local(faiss_dir)
-
-
-                else:  # 'store' 또는 'create'
-                    logger.info("FAISS 인덱스 새로 생성 중...")
-                    retrievers['faiss'] = FAISS.from_documents(
-                        documents=documents,embedding=self.dense_embedder
-                        ),
- 
-            
-            # KiwiBM25 검색기 (CustomKiwiBM25Retriever 사용)
+        
+            # KiwiBM25 검색기
             if use_kiwi:
                 kiwi_dir = os.path.join(self.retriever_cache_dir, "kiwi")
                 if cache_mode == 'load':
@@ -688,20 +653,20 @@ class LegalDataProcessor:
                         )
                     else:
                         logger.warning("저장된 KiwiBM25 검색기를 찾을 수 없습니다.")
-                else:  # 'store' 또는 'create'
-                    logger.info("KiwiBM25 검색기 생성 중...")
-                    retrievers['kiwi'] = CustomKiwiBM25Retriever.from_documents(documents)
-                    if cache_mode == 'store':
-                        logger.info(f"KiwiBM25 검색기 저장 중... ({kiwi_dir})")
-                        os.makedirs(kiwi_dir, exist_ok=True)
-                        retrievers['kiwi'].save_local(kiwi_dir, "legal_kiwi")
-            
-            # Pinecone 검색기
-            if use_pinecone:
-                retrievers['pinecone'] = self.pinecone_index
-            
-            return retrievers
+        
+            # Pinecone 하이브리드 검색기
+            if use_pinecone and sparse_encoder is not None:
+                pinecone_params = {
+                    "index": self.pinecone_index,
+                    "namespace": self.namespace,
+                    "embeddings": self.dense_embedder,
+                    "sparse_encoder": sparse_encoder
+                }
+                retrievers['pinecone'] = PineconeKiwiHybridRetriever(**pinecone_params)
+                logger.info("Pinecone KiwiBM25 하이브리드 검색기 초기화 완료")
+        
+            return retrievers, sparse_encoder
             
         except Exception as e:
             logger.error(f"검색기 생성 중 오류 발생: {str(e)}")
-            raise
+            return {}, None  # 에러 발생 시 빈 딕셔너리와 None 반환

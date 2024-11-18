@@ -3,7 +3,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END
-from typing import TypedDict, Annotated, Dict, List
+from typing import TypedDict, Annotated, Dict, List, Union
 import operator
 from dotenv import load_dotenv
 import os
@@ -14,6 +14,11 @@ from pinecone import Pinecone
 import streamlit as st
 from langchain import hub 
 import time
+from langchain.schema import Document
+import sqlite3
+import uuid
+from datetime import datetime
+import json
 
 # 로깅 설정
 logging.basicConfig(
@@ -50,7 +55,7 @@ SYSTEM_PROMPT = """당신은 법률 전문 AI 어시스턴트입니다.
 class AgentState(TypedDict):
     """에이전트 상태 정의"""
     question: str
-    context: List[str]
+    context: Union[List[Union[Document, str]], Dict[str, List[str]]]
     answer: str
     previous_answer: str
     rewrite_count: int
@@ -60,7 +65,7 @@ class AgentState(TypedDict):
     combined_score: float
 
 class LegalAgent:
-    def __init__(self):
+    def __init__(self, cache_mode: bool = False):
         """법률 에이전트 초기화"""
         try:
             # Pinecone 초기화
@@ -69,32 +74,43 @@ class LegalAgent:
             logger.info("Pinecone 인덱스 초기화 완료")
             stats = self.pinecone_index.describe_index_stats()
             logger.info(f"인덱스 통계: {stats}")
+            
             # 데이터 프로세서 초기화
             self.data_processor = LegalDataProcessor(
                 pinecone_api_key=PINECONE_API_KEY,
                 index_name=PINECONE_INDEX_NAME,
-                load_encoder=True,
-                encoder_path="./liberty_agent/KiwiBM25_sparse_encoder.pkl"
+                cache_dir="./liberty_agent/cached_vectors",
+                cache_mode=cache_mode,
+                encoder_path='./liberty_agent/KiwiBM25_sparse_encoder.pkl'
             )
             logger.info("데이터 프로세서 초기화 완료")
             
-            # sparse encoder 가져오기
-            sparse_encoder = self.data_processor._initialize_sparse_encoder(load_encoder=True)
-            if sparse_encoder is None:
-                raise ValueError("Sparse encoder를 로드하지 못했습니다.")
-            logger.info("Sparse encoder 로드 완료")
+            # 리트리버 생성 (캐시 사용)
+            retrievers, sparse_encoder = self.data_processor.create_retrievers(
+                documents=None,
+                use_faiss=True,
+                use_kiwi=True,
+                use_pinecone=True,
+                cache_mode="load"
+            )
             
             # 검색 엔진 초기화
             self.search_engine = LegalSearchEngine(
+                retrievers=retrievers,
+                sparse_encoder=sparse_encoder,
                 pinecone_index=self.pinecone_index,
                 namespace="liberty-db-namespace-legal-agent",
-                use_combined_check=True
+                cache_dir="./cached_vectors/search_engine"
             )
             logger.info("검색 엔진 초기화 완료")
             
-            # 하이브리드 검색기 설정
-            self.search_engine.setup_hybrid_retriever(sparse_encoder)
-            logger.info("하이브리드 검색기 설정 완료")
+            # 세션 종료 시 저장
+            if cache_mode:
+                import atexit
+                atexit.register(
+                    self.data_processor.save_retrievers,
+                    retrievers=retrievers
+                )
             
             # LLM 초기화
             self.llm = ChatOpenAI(
@@ -141,7 +157,7 @@ class LegalAgent:
         workflow = StateGraph(AgentState)
         
         # 노드 추가
-        workflow.add_node("retrieve", self._retrieve_document)
+        workflow.add_node("retrieve", self._retrieve)
         workflow.add_node("llm_answer", self._llm_answer)
         workflow.add_node("rewrite", self._rewrite)
         workflow.add_node("relevance_check", self._relevance_check)
@@ -169,144 +185,147 @@ class LegalAgent:
         """검색 실패 시 복구 전략"""
         for attempt in range(max_retries):
             try:
-                return self._retrieve_document(state)
+                return self._retrieve(state)
             except Exception as e:
                 logger.warning(f"검색 시도 {attempt + 1} 실패: {str(e)}")
                 if attempt == max_retries - 1:
                     raise
                 time.sleep(1)  # 재시도 전 대기
 
-    def _retrieve_document(self, state: AgentState) -> AgentState:
+    def _retrieve(self, state: AgentState) -> AgentState:
         """문서 검색"""
         try:
             logger.info(f"""
             === RETRIEVE NODE 디버깅 ===
             검색 쿼리: {state["question"]}
-            하이브리드 검색기 상태: {self.search_engine.hybrid_retriever is not None}
+            하이브리드 검색기 상태: {hasattr(self.search_engine, 'hybrid_retriever')}
             네임스페이스: {self.search_engine.namespace}
             """)
             
-            context = self.search_engine.hybrid_search(state["question"])
+            # 검색 실행
+            results = self.search_engine.hybrid_search(state["question"])
+            
+            # 결과를 Document 객체로 변환
+            processed_results = []
+            
+            # 딕셔너리 형태로 반환된 경우 처리
+            if isinstance(results, dict):
+                for category, docs in results.items():
+                    for doc in docs:
+                        if isinstance(doc, str):
+                            processed_results.append(Document(
+                                page_content=doc,
+                                metadata={"category": category}
+                            ))
+                        elif isinstance(doc, Document):
+                            processed_results.append(doc)
+                        else:
+                            logger.warning(f"Unexpected document type: {type(doc)}")
+                            
+            # 리스트 형태로 반환된 경우 처리
+            elif isinstance(results, list):
+                for doc in results:
+                    if isinstance(doc, str):
+                        processed_results.append(Document(
+                            page_content=doc,
+                            metadata={"category": "general"}
+                        ))
+                    elif isinstance(doc, Document):
+                        processed_results.append(doc)
+                    else:
+                        logger.warning(f"Unexpected document type: {type(doc)}")
+            
+            # 검색 결과가 없는 경우 폴백 메커니즘 실행
+            if not processed_results:
+                logger.warning("검색 결과 없음 - 폴백 메커니즘 실행")
+                fallback_results = self.search_engine._get_fallback_results(
+                    state["question"],
+                    self.search_engine._analyze_query_intent(state["question"])
+                )
+                processed_results = [
+                    Document(
+                        page_content=doc if isinstance(doc, str) else str(doc),
+                        metadata={"category": "fallback"}
+                    ) for doc in fallback_results
+                ]
+            
+            # 상태 업데이트
+            updated_state = state.copy()
+            updated_state["context"] = processed_results
             
             logger.info(f"""
-            검색 결과:
-            - 문서 수: {len(context)}
-            - 첫 번째 문서 길이: {len(context[0].page_content) if context else 0}
-            - 메타데이터: {context[0].metadata if context else None}
+            === RETRIEVE NODE 종료 ===
+            검색된 문서 수: {len(processed_results)}
+            다음 노드: llm_answer
             """)
             
-            return AgentState(
-                question=state["question"],
-                context=context,
-                rewrite_count=state.get("rewrite_count", 0)
-            )
+            return AgentState(**updated_state)
+            
         except Exception as e:
             logger.error(f"문서 검색 중 오류: {str(e)}")
-            raise
+            # 에러 발생 시에도 기본 컨텍스트 제공
+            fallback_doc = Document(
+                page_content="검색 시스템에 일시적인 문제가 발생했습니다. 일반적인 법률 정보를 제공합니다.",
+                metadata={"source": "fallback", "reliability": "low"}
+            )
+            return AgentState(
+                question=state["question"],
+                context=[fallback_doc],
+                answer="",
+                previous_answer="",
+                rewrite_count=state.get("rewrite_count", 0),
+                rewrite_weight=state.get("rewrite_weight", 0.0),
+                previous_weight=state.get("previous_weight", 0.0),
+                original_weight=state.get("original_weight", 1.0),
+                combined_score=0.0
+            )
 
     def _llm_answer(self, state: AgentState) -> AgentState:
-        """LLM 답변 생성"""
+        """LLM을 사용한 답변 생성"""
         try:
+            context = normalize_context(state["context"])
+            context_text = "\n\n".join(safe_get_content(doc) for doc in context)
+            
             logger.info(f"""
             === LLM_ANSWER NODE 진입 ===
             질문: {state["question"]}
             재작성 횟수: {state.get("rewrite_count", 0)}
             이전 답변 존재: {"있음" if state.get("previous_answer") else "없음"}
             재작성 가중치: {state.get("rewrite_weight", 0.0)}
+            컨텍스트 개수: {len(state["context"])}
             """)
             
-            # 중요한 에러 로그만 남김
-            if state.get("rewrite_weight") is None:
-                logger.error(f"rewrite_weight is None in state")
-            
-            # ERROR 레벨로 변경하여 반드시 보이도록 함
-            logger.error(f"State received in _llm_answer: {state}")
-            logger.error(f"rewrite_weight value: {state.get('rewrite_weight')}")
-            context = "\n\n".join([
-                f"문서 {i+1}:\n{doc.page_content}" 
-                for i, doc in enumerate(state["context"])
-            ]) if state["context"] else ""
-            
-            # 디버깅을 위한 상태 로깅 추가
-            logger.error(f"Current state values:")
-            logger.error(f"rewrite_weight: {state.get('rewrite_weight')}")
-            logger.error(f"previous_weight: {state.get('previous_weight')}")
-            logger.error(f"rewrite_count: {state.get('rewrite_count')}")
-            
-            # None 체크 추가
-            rewrite_weight = state.get("rewrite_weight")
-            if rewrite_weight is None:
-                logger.error(f"rewrite_weight is None in state: {state}")
-                rewrite_weight = 0.0  # 기본값 설정
-            
-            try:
-                exploration_type = "More exploratory and critical" if rewrite_weight > 0.3 else "Slightly refined"
-            except TypeError as e:
-                logger.error(f"TypeError in exploration_type comparison: {e}")
-                logger.error(f"rewrite_weight type: {type(rewrite_weight)}")
-                raise
-            
-            # 새로운 프롬프트 템플릿
-            answer_prompt = ChatPromptTemplate.from_messages([
-                (
-                    "system",
-                    """You are analyzing this question for the {rewrite_count}th time.
-                    
-                    Previous weight: {previous_weight:.2f}
-                    Current weight: {rewrite_weight:.2f}
-                    
-                    This weight progression indicates:
-                    - Initial response (weight 0.0): Direct answer from context
-                    - Current response (weight {rewrite_weight:.2f}): {exploration_type}
-                    
-                    Your task is to {revision_type} the previous interpretation.
-                    
-                    Context:
-                    {context}
-                    
-                    Previous answer:
-                    {previous_answer}
-                    
-                    Remember to maintain legal accuracy and provide Korean responses."""
-                ),
-                ("human", "{question}")
+            # 프롬프트 준비
+            prompt = ChatPromptTemplate.from_messages([
+                ("system", SYSTEM_PROMPT),
+                ("user", "{question}")
             ])
             
-            # 체인 실행
-            chain = answer_prompt | self.llm | StrOutputParser()
-            
-            # 기본값 설정
-            rewrite_weight = state.get("rewrite_weight", 0.0)
-            exploration_type = "More exploratory and critical" if rewrite_weight > 0.3 else "Slightly refined"
-            revision_type = "significantly revise" if rewrite_weight > 0.3 else "slightly adjust"
-            
-            response = chain.invoke({
-                "question": state["question"],
-                "context": context,
-                "previous_answer": state.get("previous_answer", ""),
-                "rewrite_count": state.get("rewrite_count", 0),
-                "previous_weight": state.get("previous_weight", 0.0),  # 기본값 추가
-                "rewrite_weight": rewrite_weight,  # 이미 기본값이 설정된 변수 사용
-                "exploration_type": exploration_type,
-                "revision_type": revision_type
+            # 답변 생성
+            chain = prompt | self.llm | StrOutputParser()
+            raw_answer = chain.invoke({
+                "context": context_text,
+                "question": state["question"]
             })
             
-            # 수정된 부분: state 업데이트 방식 변경
+            # 포맷된 답변 생성
+            formatted_answer = self._format_answer(raw_answer, state["context"])
+            
+            # 상태 업데이트
             updated_state = state.copy()
-            updated_state["previous_answer"] = state.get("answer", "")
-            updated_state["answer"] = response
+            updated_state["answer"] = formatted_answer
             
             logger.info(f"""
             === LLM_ANSWER NODE 종료 ===
-            답변 길이: {len(response)}
+            답변 길이: {len(formatted_answer)}
             다음 노드: relevance_check
             """)
             
             return AgentState(**updated_state)
             
         except Exception as e:
-            logger.error(f"답변 생성 중 오류: {str(e)}")
-            raise
+            logger.error(f"LLM answer generation failed: {e}")
+            return self._create_error_state(state)
 
     def _rewrite(self, state: AgentState) -> AgentState:
         """질문 재작성"""
@@ -485,11 +504,12 @@ class LegalAgent:
             return "notGrounded"
         return "notSure"
 
-    def process_query(self, question: str) -> Dict:
-        """질문 처리 및 답변 생성"""
+    def process_query(self, query: str) -> Dict:
+        """쿼리 처리 메인 함수"""
         try:
+            # 초기 상태 설정
             initial_state = AgentState(
-                question=question,
+                question=query,
                 context=[],
                 answer="",
                 previous_answer="",
@@ -500,51 +520,247 @@ class LegalAgent:
                 combined_score=0.0
             )
             
-            # 초기 상태 로깅
-            logger.info(f"Initial state created with values:")
-            logger.info(f"rewrite_weight: {initial_state.get('rewrite_weight')}")
-            logger.info(f"previous_weight: {initial_state.get('previous_weight')}")
+            # 그래프 실행
+            final_state = self.workflow.invoke(initial_state)
             
-            config = RunnableConfig(
-                recursion_limit=10,  # 5에서 10으로 증가
-                configurable={
-                    "thread_id": "LEGAL-AGENT",
-                    "max_rewrite_weight": 0.8  # 가중치 상한선 추가
-                }
-            )
-            
-            result = self.workflow.invoke(initial_state, config=config)
             return {
-                "answer": result["answer"],
-                "confidence": result["combined_score"],
-                "rewrites": result["rewrite_count"]
+                "answer": final_state["answer"],
+                "confidence": final_state.get("combined_score", 0.0),
+                "rewrites": final_state.get("rewrite_count", 0)
             }
+            
         except Exception as e:
             logger.error(f"Error in process_query: {str(e)}")
             logger.error(f"State at error: {initial_state}")
+            return {
+                "error": "죄송합니다. 답변을 생성하는 중에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.",
+                "confidence": 0.0,
+                "rewrites": 0
+            }
+
+    def _format_answer(self, answer: str, context: List[Document | str]) -> str:
+        """답변 포맷팅 - 참고 자료 포함"""
+        references = []
+        for doc in context:
+            if isinstance(doc, Document):
+                meta = doc.metadata
+                ref = {
+                    "판례번호": meta.get("caseNo", ""),
+                    "법원": meta.get("courtName", ""),
+                    "판결일자": meta.get("judgementDate", ""),
+                    "사건명": meta.get("caseName", ""),
+                    "사건종류": meta.get("caseType", "")
+                }
+                if any(ref.values()):
+                    references.append(ref)
+
+        formatted_answer = f"""
+답변:
+{answer}
+"""
+        if references:
+            formatted_answer += "\n참고 판례:"
+            for i, ref in enumerate(references, 1):
+                formatted_answer += f"""
+{i}. {ref['법원']} {ref['판례번호']}
+   - 판결일자: {ref['판결일자']}
+   - 사건명: {ref['사건명']}
+   - 사건종류: {ref['사건종류']}
+"""
+        
+        return formatted_answer
+
+class ChatDBManager:
+    def __init__(self, db_path: str = "chat_history.db"):
+        self.db_path = db_path
+        self._init_db()
+    
+    def _init_db(self):
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS chat_sessions (
+                        session_id TEXT PRIMARY KEY,
+                        user_id TEXT NOT NULL,
+                        title TEXT NOT NULL,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        last_updated DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS chat_history (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id TEXT NOT NULL,
+                        session_id TEXT NOT NULL,
+                        message_type TEXT NOT NULL,
+                        content TEXT NOT NULL,
+                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        metadata TEXT,
+                        FOREIGN KEY (session_id) REFERENCES chat_sessions(session_id)
+                    )
+                """)
+                conn.commit()
+                logger.info("채팅 DB 초기화 완료")
+        except Exception as e:
+            logger.error(f"DB 초기화 실패: {str(e)}")
             raise
+
+    def save_message(self, user_id: str, session_id: str, message_type: str, content: str, metadata: Dict = None):
+        try:
+            # 중요 키워드 추출
+            keywords = self._extract_keywords(content)
             
-# Streamlit UI용 함수
+            # 세션 제목 생성
+            session_title = f"{','.join(keywords[:3])}_{datetime.now().strftime('%Y%m%d')}"
+            
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                # 세션 제목 업데이트
+                cursor.execute("""
+                    INSERT OR REPLACE INTO chat_sessions 
+                    (session_id, user_id, title, created_at) 
+                    VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+                """, (session_id, user_id, session_title))
+                
+                # 메시지 저장
+                cursor.execute("""
+                    INSERT INTO chat_history 
+                    VALUES (NULL, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+                """, (user_id, session_id, message_type, content, 
+                     json.dumps(metadata) if metadata else None))
+                conn.commit()
+        except Exception as e:
+            logger.error(f"메시지 저장 실패: {str(e)}")
+            raise
+
+    def _extract_keywords(self, content: str) -> List[str]:
+        """주요 키워드 추출"""
+        legal_keywords = ["이혼", "소송", "계약", "손해배상", "형사", "민사", "부동산"]
+        found_keywords = []
+        for keyword in legal_keywords:
+            if keyword in content:
+                found_keywords.append(keyword)
+        return found_keywords or ["일반상담"]
+
+    def get_chat_history(self, user_id: str, 
+                        session_id: str = None, 
+                        limit: int = 50) -> List[Dict]:
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                if session_id:
+                    cursor.execute("""
+                        SELECT h.*, s.title 
+                        FROM chat_history h
+                        JOIN chat_sessions s ON h.session_id = s.session_id
+                        WHERE h.user_id = ? AND h.session_id = ?
+                        ORDER BY h.timestamp ASC LIMIT ?
+                    """, (user_id, session_id, limit))
+                else:
+                    cursor.execute("""
+                        SELECT DISTINCT s.session_id, s.title, s.created_at
+                        FROM chat_sessions s
+                        WHERE s.user_id = ?
+                        ORDER BY s.created_at DESC LIMIT ?
+                    """, (user_id, limit))
+                
+                rows = cursor.fetchall()
+                if session_id:
+                    return [{
+                        "id": row[0],
+                        "user_id": row[1],
+                        "session_id": row[2],
+                        "message_type": row[3],
+                        "content": row[4],
+                        "timestamp": row[5],
+                        "metadata": json.loads(row[6]) if row[6] else None,
+                        "title": row[7]
+                    } for row in rows]
+                else:
+                    return [{
+                        "session_id": row[0],
+                        "title": row[1],
+                        "timestamp": row[2]
+                    } for row in rows]
+        except Exception as e:
+            logger.error(f"채팅 기록 조회 실패: {str(e)}")
+            return []
+
+def generate_suggestions(question: str, chat_history: List[Dict]) -> List[str]:
+    """LLM을 활용한 맥락 기반 추천 질문 생성"""
+    try:
+        prompt = f"""
+        다음 법률 상담 대화를 바탕으로 관련된 추천 질문 3개를 생성해주세요.
+        현재 질문: {question}
+        
+        이전 대화:
+        {' '.join([msg['content'] for msg in chat_history[-3:] if msg['message_type'] == 'user'])}
+        
+        규칙:
+        1. 각 질문은 구체적이고 실용적이어야 합니다
+        2. 현재 상황과 관련된 법적 절차나 권리에 대해 물어보는 질문이어야 합니다
+        3. 질문은 완전한 문장이어야 합니다
+        
+        출력 형식:
+        질문1|질문2|질문3
+        """
+        
+        response = ChatOpenAI(temperature=0.7).invoke(prompt).content
+        return response.split("|")
+    except Exception as e:
+        logger.error(f"추천 질문 생성 중 오류: {str(e)}")
+        return _get_fallback_suggestions(question)
+
+def _get_fallback_suggestions(question: str) -> List[str]:
+    """기본 추천 질문 생성"""
+    legal_topics = {
+        "이혼": [
+            "이혼 소송의 구체적인 절차가 궁금합니다",
+            "위자료 청구 금액은 어떻게 정해지나요?",
+            "이혼 후 자녀 양육권 분쟁은 어떻게 해결하나요?"
+        ],
+        "폭력": [
+            "가정폭력 신고 후 진행되는 절차가 궁금합니다",
+            "가해자 접근금지 신���은 어떻게 ��나요?",
+            "임시보호명령을 신청하고 싶습니다"
+        ],
+        "재산": [
+            "이혼 시 재산분할 비율은 어떻게 정해지나요?",
+            "숨긴 재산을 발견했을 때의 법적 대응방법이 궁금합니다",
+            "별거 중 공동재산 처분 문제는 어떻게 해결하나요?"
+        ]
+    }
+    
+    for topic, questions in legal_topics.items():
+        if topic in question:
+            return questions
+    return legal_topics["이혼"]  # 기본값
+
 def create_ui():
-    
-    
     st.title("법률 AI 어시스턴트")
-    
-    # 초기화 상태 표시
-    init_status = st.empty()
     
     # 세션 상태 초기화
     if "initialized" not in st.session_state:
+        init_status = st.empty()
         init_status.info("시스템을 초기화하는 중입니다...")
+        
         try:
-            # Pinecone 초기화 확인
-            pc = Pinecone(api_key=PINECONE_API_KEY)
-            index = pc.Index(PINECONE_INDEX_NAME)
-            logger.info("Pinecone 연결 성공")
+            # DB 매니저 초기화
+            st.session_state.db_manager = ChatDBManager()
+            
+            # 사용자 ID 및 세션 ID 초기화
+            if "user_id" not in st.session_state:
+                st.session_state.user_id = str(uuid.uuid4())
+            if "session_id" not in st.session_state:
+                st.session_state.session_id = str(uuid.uuid4())
+            if "messages" not in st.session_state:
+                st.session_state.messages = []
+            if "current_question" not in st.session_state:
+                st.session_state.current_question = None
             
             # 에이전트 초기화
             st.session_state.agent = LegalAgent()
-            st.session_state.messages = []
             st.session_state.initialized = True
             
             init_status.success("시스템 초기화가 완료되었습니다!")
@@ -556,46 +772,216 @@ def create_ui():
             logger.error(error_msg)
             st.stop()
     
-    # 초기화 완료 후 UI 표시
-    if st.session_state.initialized:
-        # 채팅 히스토리 표시
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-                
-        # 사용자 입력
-        if prompt := st.chat_input("질문을 입력하세요"):
-            st.session_state.messages.append({"role": "user", "content": prompt})
+    # 사이드바 - 세션 관리
+    with st.sidebar:
+        st.subheader("대화 관리")
+        if st.button("새 대화 시작"):
+            st.session_state.session_id = str(uuid.uuid4())
+            st.session_state.messages = []
+            st.session_state.current_question = None
+            st.rerun()
+        
+        st.divider()
+        st.subheader("이전 대화")
+        sessions = st.session_state.db_manager.get_chat_history(
+            st.session_state.user_id
+        )
+        for session in sessions:
+            if st.button(f"대화 {session['timestamp'][:10]}", 
+                        key=session['session_id']):
+                st.session_state.session_id = session['session_id']
+                st.session_state.messages = []
+                st.session_state.current_question = None
+                st.rerun()
+    
+    def handle_user_input(user_input: str):
+        """사용자 입력 처리를 위한 통합 함수"""
+        st.session_state.current_question = user_input
+        st.session_state.messages.append({"role": "user", "content": user_input})
+    
+    def display_suggestions(question: str, handle_user_input):
+        """추천 질문 표시 함수"""
+        try:
+            chat_history = st.session_state.db_manager.get_chat_history(
+                st.session_state.user_id,
+                st.session_state.session_id
+            )
+            suggested_questions = generate_suggestions(question, chat_history)
             
-            with st.chat_message("user"):
-                st.markdown(prompt)
-                
+            if suggested_questions:
+                st.markdown("### 💡 관련 질문")
+                cols = st.columns(len(suggested_questions))
+                for i, question in enumerate(suggested_questions):
+                    with cols[i]:
+                        if st.button(
+                            question,
+                            key=f"suggest_{i}_{hash(question)}",
+                            use_container_width=True
+                        ):
+                            handle_user_input(question)
+                            st.rerun()
+                        
+        except Exception as e:
+            logger.error(f"추천 질문 표시 중 오류: {str(e)}")
+    
+    # 채팅 히스토리 표시
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+    
+    # 현재 질문 처리
+    if st.session_state.current_question:
+        try:
             with st.chat_message("assistant"):
                 message_placeholder = st.empty()
-                message_placeholder.markdown("답변을 생성하는 중입니다...")
-                
-                try:
-                    response = st.session_state.agent.process_query(prompt)
+                with st.spinner("답변을 생성하는 중입니다..."):
+                    response = st.session_state.agent.process_query(
+                        st.session_state.current_question
+                    )
                     
                     if "error" in response:
-                        full_response = f"오류가 발생했습니다: {response['error']}"
+                        full_response = response["error"]
                     else:
                         full_response = f"""
                         {response['answer']}
                         
                         신뢰도: {response['confidence']:.2f}
-                        질문 재작성 횟수: {response['rewrites']}    
+                        질문 재작성 횟수: {response['rewrites']}
                         """
-                        
+                    
+                    # DB에 저장
+                    st.session_state.db_manager.save_message(
+                        st.session_state.user_id,
+                        st.session_state.session_id,
+                        "user",
+                        st.session_state.current_question
+                    )
+                    
+                    st.session_state.db_manager.save_message(
+                        st.session_state.user_id,
+                        st.session_state.session_id,
+                        "assistant",
+                        full_response,
+                        {
+                            "confidence": response.get('confidence', 0),
+                            "rewrites": response.get('rewrites', 0)
+                        }
+                    )
+                    
                     message_placeholder.markdown(full_response)
                     st.session_state.messages.append(
                         {"role": "assistant", "content": full_response}
                     )
+                    st.success("답변이 준비되었습니다")
                     
-                except Exception as e:
-                    error_message = f"답변 생성 중 오류 발생: {str(e)}"
-                    logger.error(error_message)
-                    message_placeholder.markdown(error_message)
+                    # 추천 질문 표시
+                    if "error" not in response:
+                        display_suggestions(st.session_state.current_question, handle_user_input)
+                    
+                    # 현재 질문 초기화
+                    st.session_state.current_question = None
+                
+        except Exception as e:
+            logger.error(f"답변 생성 중 오류: {str(e)}")
+            st.error("죄송합니다. 처리 중 오류가 발생했습니다.")
+    
+    # 일반 입력 처리
+    if prompt := st.chat_input("질문을 입력하세요"):
+        handle_user_input(prompt)
+        st.rerun()
+
+# def display_suggestions(question: str):
+#     """추천 질문 표시 함수"""
+#     try:
+#         chat_history = st.session_state.db_manager.get_chat_history(
+#             st.session_state.user_id,
+#             st.session_state.session_id
+#         )
+#         suggested_questions = generate_suggestions(question, chat_history)
+#         if suggested_questions:
+#             st.markdown("### 💡 관련 질문")
+#             cols = st.columns(len(suggested_questions))
+#             for i, question in enumerate(suggested_questions):
+#                 with cols[i]:
+#                     # 버튼 클릭 시 상태 업데이트
+#                     if st.button(
+#                         question,
+#                         key=f"suggest_{i}_{hash(question)}",  # 질문 내용 기반 키 생성
+#                         use_container_width=True
+#                     ):
+#                         handle_user_input(question)
+#                         st.rerun()     
+#     except Exception as e:
+#         logger.error(f"추천 질문 표시 중 오류: {str(e)}")
+
+class SuggestionManager:
+    def __init__(self, db_manager: ChatDBManager):
+        self.db_manager = db_manager
+        self._init_suggestion_table()
+    
+    def _init_suggestion_table(self):
+        """추천 질문 테이블 초기화"""
+        with sqlite3.connect(self.db_manager.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS suggested_questions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    category TEXT NOT NULL,
+                    question TEXT NOT NULL,
+                    click_count INTEGER DEFAULT 0,
+                    last_used DATETIME
+                )
+            """)
+            conn.commit()
+    
+    def update_suggestion_stats(self, question: str):
+        """질문 사용 통계 업데이트"""
+        with sqlite3.connect(self.db_manager.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE suggested_questions 
+                SET click_count = click_count + 1,
+                    last_used = CURRENT_TIMESTAMP
+                WHERE question = ?
+            """, (question,))
+            conn.commit()
+
+def apply_custom_css():
+    st.markdown("""
+    <style>
+    /* 추천 질문 버튼 스타일 */
+    .stButton > button {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        color: #495057;
+        padding: 12px 16px;
+        text-align: left;
+        transition: all 0.2s ease;
+        font-size: 0.9em;
+        min-height: 80px;
+        height: 100%;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .stButton > button:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* 추천 질문 섹션 스타일 */
+    .suggestion-section {
+        margin-top: 2rem;
+        padding: 1rem;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     try:
@@ -603,3 +989,28 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"애플리케이션 실행 중 오류 발생: {str(e)}")
         st.error(f"애플리케이션 오류: {str(e)}")
+
+class DocumentWrapper:
+    def __init__(self, content: Union[str, Document], category: str = None):
+        self.content = content
+        self.category = category
+        
+    @property
+    def page_content(self) -> str:
+        if isinstance(self.content, Document):
+            return self.content.page_content
+        return str(self.content)
+
+def safe_get_content(doc: Union[Document, str]) -> str:
+    try:
+        return doc.page_content if hasattr(doc, 'page_content') else str(doc)
+    except Exception as e:
+        logger.warning(f"Content extraction failed: {e}")
+        return str(doc)
+
+def normalize_context(context: Union[Dict, List]) -> List[Document]:
+    if isinstance(context, dict):
+        return [DocumentWrapper(doc, category) 
+                for category, docs in context.items() 
+                for doc in docs]
+    return [DocumentWrapper(doc) for doc in context]

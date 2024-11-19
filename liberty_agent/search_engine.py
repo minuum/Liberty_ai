@@ -1,4 +1,5 @@
 from datetime import datetime
+import traceback
 from langchain_upstage import UpstageEmbeddings, UpstageGroundednessCheck
 from transformers import AutoModel, AutoTokenizer
 import torch
@@ -111,7 +112,7 @@ class LegalSearchEngine:
             )
             
         except Exception as e:
-            logger.error(f"배치 처리 중 오류 발생: {str(e)}")
+            logger.error(f"배치 ���리 중 오류 발생: {str(e)}")
             return None
             
     def batch_upload(
@@ -197,33 +198,46 @@ class LegalSearchEngine:
             raise
             
     def hybrid_search(self, query: str, top_k: int = 5) -> List[Document]:
-        """컨텍스트 기반 하이브리드 검색"""
+        """개선된 하이브리드 검색"""
         try:
-            # 디버깅 로그 추가
-            logger.debug(f"검색 시작 - 쿼리: {query}")
+            # 1. 쿼리 의도 분석
+            query_intent = self._analyze_query_intent(query)
+            logger.info(f"쿼리 의도 분석 결과: {query_intent}")
             
-            expanded_query = self._expand_legal_query(query)
-            logger.debug(f"확장된 쿼리: {expanded_query}")
+            # 2. 검색 파라미터 설정
+            search_params = self._create_search_params(query_intent)
             
-            results = {}
-            for category in ['criminal', 'civil', 'procedure']:
-                category_results = self.retrievers['pinecone'].invoke(
-                    expanded_query,
-                    search_kwargs={
-                        'filter': {'category': category},
-                        'k': top_k
-                    }
+            # 3. 메인 검색 실행
+            try:
+                results = self.retrievers['pinecone'].invoke(
+                    query,
+                    search_kwargs=search_params
                 )
-                logger.debug(f"{category} 검색 결과: {len(category_results)}개")
-                results[category] = self._post_process_results(
-                    results=category_results,
-                    query=expanded_query
-                )
-            
-            return results
+                
+                # 4. 결과 품질 평가
+                if results:
+                    quality_score = self._evaluate_result_quality(results, query_intent)
+                    logger.info(f"검색 결과 품질 점수: {quality_score}")
+                    
+                    if quality_score >= 0.5:  # 품질 임계값
+                        return self._post_process_results(results, query)
+                
+                # 5. 폴백 검색 실행
+                logger.info("메인 검색 실패, 폴백 검색 시작")
+                fallback_results = self._get_fallback_results(query, query_intent)
+                
+                return fallback_results
+                
+            except Exception as search_error:
+                logger.error(f"검색 실행 중 오류: {str(search_error)}")
+                return self._get_fallback_results(query, query_intent)
+                
         except Exception as e:
-            logger.error(f"검색 실패: {str(e)}")
-            return []
+            logger.error(f"하이브리드 검색 중 오류: {str(e)}")
+            return [Document(
+                page_content="시스템 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+                metadata={"source": "error", "reliability": "low"}
+            )]
 
     def _expand_legal_query(self, query: str) -> str:
         """법률 도메인 특화 쿼리 확장"""
@@ -250,7 +264,8 @@ class LegalSearchEngine:
             year = self._extract_year(doc.page_content)
             recency_weight = self._calculate_recency_weight(year)
             
-            # 2. 판례 중요도 가중치
+            # 2. 판례
+            #  중요도 가중치
             importance_weight = self._calculate_importance_weight(doc)
             
             # 최종 점수 계산
@@ -319,7 +334,7 @@ class LegalSearchEngine:
         pass
 
     def _calculate_recency_weight(self, year: int) -> float:
-        """판례 최신성 가중치 계산"""
+        """례 최신성 가중치 계산"""
         # 판례 최신성 가중치 계산 로직 구현
         pass
 
@@ -330,17 +345,17 @@ class LegalSearchEngine:
 
     def validate_answer(
         self,
-        context: str,
+        context: List[Document],
         answer: str,
-        upstage_weight: float = 0.6,
-        kobert_weight: float = 0.4
+        upstage_weight: float = 0.3,
+        kobert_weight: float = 0.7
     ) -> float:
         """
         답변의 신뢰도 검증
         """
         logger.info(f"""
         === 답변 신뢰도 검증 시작 ===
-        컨텍스트 길이: {len(context)}
+        컨텍스트 수: {len(context)}
         답변 길이: {len(answer)}
         """)
         
@@ -379,22 +394,36 @@ class LegalSearchEngine:
             logger.error(f"신뢰도 검증 중 오류 발생: {str(e)}")
             raise
         
-    def _kobert_check(self, context: str, answer: str) -> float:
+    def _kobert_check(self, context: List[Document], answer: str) -> float:
         """KoBERT를 사용한 관련성 점수 계산"""
         logger.info("=== KoBERT 관련성 검사 시작 ===")
         
         try:
+            # Document 객체에서 텍스트 추출
+            context_text = [doc.page_content for doc in context]
+            
+            # 컨텍스트가 비어있으면 기본값 반환
+            if not context_text or not answer:
+                logger.warning("컨텍스트 또는 답변이 비어있음")
+                return 0.0
+                
+            # 컨텍스트 텍스트 결합
+            combined_context = " ".join(context_text)
+            
             # 토크나이즈
             context_inputs = self.kobert_tokenizer(
-                context,
+                combined_context,  # str 타입으로 변환된 컨텍스트
                 return_tensors="pt",
                 truncation=True,
+                max_length=512,  # 최대 길이 제한
                 padding=True
             )
+            
             answer_inputs = self.kobert_tokenizer(
-                answer,
+                answer,  # 이미 str 타입
                 return_tensors="pt",
                 truncation=True,
+                max_length=512,
                 padding=True
             )
             
@@ -439,8 +468,8 @@ class LegalSearchEngine:
             return final_score
             
         except Exception as e:
-            logger.error(f"KoBERT 검사 중 오류 발생: {str(e)}")
-            raise
+            logger.error(f"KoBERT 검사 중 오류: {str(e)}")
+            return 0.0
 
     def _preprocess_query(self, query: str) -> str:
         """쿼리 전처리"""
@@ -512,6 +541,7 @@ class LegalSearchEngine:
         return search_params
 
     def _analyze_query_intent(self, query: str) -> Dict:
+        logger.info("=== 쿼리 의도 분석 시작 ===")
         """
         쿼리 의도를 단계적으로 분석하여 검색 범위를 좁혀가는 로직
         """
@@ -528,6 +558,8 @@ class LegalSearchEngine:
 
         # 1단계: 기본 법률 분야 분류
         PRIMARY_AREAS = {
+            "상속��": ["상속", "상속인", "상속순위", "상속권", "유산"],
+            "가족법": ["가족", "친족", "혼인", "이혼", "입양"],
             "민사": ["계약", "손해배상", "소유권", "채권", "부동산", "임대차", "보증", "매매"],
             "가사": ["이혼", "상속", "친권", "양육", "혼인", "부양", "가족"],
             "형사A": ["폭행", "절도", "사기", "강도", "폭력", "협박", "모욕"],
@@ -542,6 +574,11 @@ class LegalSearchEngine:
 
         # 2단계: 세부 카테고리 분류
         SUB_CATEGORIES = {
+            "상속법": {
+                "법정상속": ["상속순위", "상속인", "법정상속인"],
+                "유언상속": ["유언", "유언장", "유증"],
+                "상속포기": ["상속포기", "상속승인", "한정승인"]
+            },
             "민사": {
                 "계약관계": ["계약", "약정", "합의", "위약"],
                 "손해배상": ["손해", "배상", "보상", "책임"],
@@ -552,19 +589,7 @@ class LegalSearchEngine:
                 "폭력": ["폭행", "상해", "협박", "폭력"],
                 "재산범죄": ["절도", "사기", "횡령", "배임"],
                 "명예훼손": ["명예훼손", "모욕", "비방"]
-            }
-            # ... 다른 분야의 세부 카테고리
-        }
-
-        # 3단계: 사건 처리 단계
-        CASE_STAGES = {
-            "1심": ["1심", "제1심", "지방법원", "단독판사"],
-            "항소심": ["2심", "항소", "고등법원"],
-            "상고심": ["3심", "상고", "대법원", "파기환송"]
-        }
-
-        # 4단계: 세부 카테고리 추가
-        SUB_CATEGORIES.update({
+            },
             "가사": {
                 "이혼": ["이혼", "협의이혼", "재판이혼", "위자료"],
                 "양육": ["양육권", "친권", "양육비", "면접교섭"],
@@ -580,8 +605,15 @@ class LegalSearchEngine:
                 "인허가": ["허가", "신고", "등록", "취소"],
                 "행정처분": ["과태료", "영업정지", "시정명령"],
                 "행정심판": ["행정심판", "행정소송", "취소소송"]
-            }
-        })
+                }
+        }
+
+        # 3단계: 사건 처리 단계
+        CASE_STAGES = {
+            "1심": ["1심", "제1심", "지방법원", "단독판사"],
+            "항소심": ["2심", "항소", "고등법원"],
+            "상고심": ["3심", "상고", "대법원", "파기환송"]
+        }
 
         def _extract_temporal_info(query: str) -> dict:
             """시간 정보 추출 개선"""
@@ -613,7 +645,6 @@ class LegalSearchEngine:
                 if any(p in query for p in patterns):
                     return level
             return "normal"
-
         # 쿼리 분석 실행
         try:
             # 1. 기본 법률 분야 확인
@@ -719,47 +750,102 @@ class LegalSearchEngine:
         return params
     
     def _get_fallback_results(self, query: str, intent: Dict) -> List[Document]:
-        """검색 결과가 없을 때의 대체 로직"""
+        """검색 결과가 없을 때의 개선된 폴백 로직"""
         try:
             fallback_results = []
             
-            # 1. 키워드 기반 일반 검색
+            # 1. 기본 법률 정보 데이터베이스
+            DEFAULT_LEGAL_INFO = {
+                "상속": {
+                    "content": """
+                    상속 순위에 대한 기본 정보:
+                    1순위: 직계비속 (자녀, 손자녀 등)
+                    2순위: 직계존속 (부모, 조부모 등)
+                    3순위: 형제자매
+                    4순위: 4촌 이내의 방계혈족
+                    
+                    관련 법령: 민법 제1000조, 제1003조
+                    자세한 상담은 법률구조공단을 통해 받으실 수 있습니다.
+                    """,
+                    "metadata": {
+                        "source": "default_response",
+                        "category": "상속법",
+                        "reliability": "high"
+                    }
+                },
+                "이혼": {
+                    "content": """
+                    이혼의 종류:
+                    1. 협의이혼: 부부 간의 합의로 이루어지는 이혼
+                    2. 재판이혼: 법원의 판결로 이루어지는 이혼
+                    
+                    필요 서류:
+                    - 협의이혼: 협의이혼의사확인신청서, 혼인관계증명서 등
+                    - 재판이혼: 이혼청구서, 증거자료 등
+                    
+                    자세한 상담은 가까운 법원 또는 법률구조공단을 방문하시기 바랍니다.
+                    """,
+                    "metadata": {
+                        "source": "default_response",
+                        "category": "가족법",
+                        "reliability": "high"
+                    }
+                }
+                # 다른 주요 법률 분야 추가...
+            }
+            
+            # 2. 키워드 기반 폴백 검색
             if intent["keywords"]:
                 basic_query = " ".join(intent["keywords"])
-                fallback_results.extend(
-                    self.retrievers['pinecone'].invoke(
-                        basic_query,
-                        search_kwargs={"top_k": 5}
-                    )
+                keyword_results = self.retrievers['pinecone'].invoke(
+                    basic_query,
+                    search_kwargs={
+                        "top_k": 3,
+                        "filter": {"reliability": {"$gte": 0.7}}
+                    }
                 )
+                if keyword_results:
+                    fallback_results.extend(keyword_results)
             
-            # 2. 법률 분야 기반 일반적 문서 검색
-            if intent["legal_areas"]:
-                for area in intent["legal_areas"]:
-                    area_results = self.retrievers['pinecone'].invoke(
-                        area,
-                        search_kwargs={
-                            "filter": {"category": area},
-                            "top_k": 3
-                        }
+            # 3. 법률 분야 기반 기본 정보 제공
+            for area in intent["legal_areas"]:
+                area_lower = area.replace("법", "")  # "상속법" -> "상속"
+                if area_lower in DEFAULT_LEGAL_INFO:
+                    info = DEFAULT_LEGAL_INFO[area_lower]
+                    fallback_results.append(
+                        Document(
+                            page_content=info["content"],
+                            metadata=info["metadata"]
+                        )
                     )
-                    fallback_results.extend(area_results)
             
-            # 3. 일반적인 법률 정보 문서
+            # 4. 일반적인 법률 정보 문서 (아무 결과도 없을 때)
             if not fallback_results:
-                default_docs = [
-                    Document(
-                        page_content="일반적인 법률 상담은 법률구조공단이나 변호사와의 상담을 권장합니다.",
-                        metadata={"source": "default", "reliability": "high"}
-                    )
-                ]
-                fallback_results.extend(default_docs)
+                fallback_results.append(Document(
+                    page_content="""
+                    죄송합니다. 귀하의 질문에 대한 정확한 정보를 찾지 못했습니다.
+                    보다 정확한 법률 상담을 위해서는:
+                    1. 대한법률구조공단 (국번없이 132)
+                    2. 가까운 법률구조공단 지부
+                    3. 법률구조공단 홈페이지 (https://www.klac.or.kr/)
+                    를 이용해주시기 바랍니다.
+                    """,
+                    metadata={
+                        "source": "default_response",
+                        "reliability": "medium",
+                        "category": "general"
+                    }
+                ))
             
             return fallback_results
-            
+                
         except Exception as e:
             logger.error(f"폴백 검색 중 오류: {str(e)}")
-            return []
+            # 최소한의 응답 보장
+            return [Document(
+                page_content="죄송합니다. 일시적인 시스템 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+                metadata={"source": "error", "reliability": "low"}
+            )]
     def _adjust_search_weights(self, intent: Dict, initial_results: List[Document]) -> Dict:
         """검색 결과에 따른 가중치 동적 조정"""
         weights = {
@@ -797,7 +883,7 @@ class LegalSearchEngine:
             return weights
 
     def _evaluate_result_quality(self, results: List[Document], intent: Dict) -> float:
-        """검색 결과 품질 평가"""
+        """검색 결과 품질 평가 개선"""
         try:
             if not results:
                 return 0.0
@@ -807,35 +893,35 @@ class LegalSearchEngine:
             for doc in results:
                 score = 0.0
                 
-                # 1. 기본 검색 점수
-                score += doc.metadata.get('score', 0) * 0.4
+                # 1. 기본 검색 점수 (가중치 상향)
+                score += doc.metadata.get('score', 0) * 0.5  # 0.4 -> 0.5
                 
-                # 2. 키워드 매칭
+                # 2. 키워드 매칭 (정확도 향상)
+                content_lower = doc.page_content.lower()
                 matched_keywords = sum(1 for kw in intent["keywords"] 
-                                    if kw in doc.page_content.lower())
-                keyword_score = matched_keywords / len(intent["keywords"]) if intent["keywords"] else 0
+                                    if kw.lower() in content_lower)
+                keyword_score = matched_keywords / max(1, len(intent["keywords"]))
                 score += keyword_score * 0.3
                 
-                # 3. 법률 분야 일치도
-                if any(area.lower() in doc.metadata.get('category', '').lower() 
-                    for area in intent["legal_areas"]):
+                # 3. 법률 분야 일치도 (더 세밀한 매칭)
+                doc_category = doc.metadata.get('category', '').lower()
+                legal_area_match = any(
+                    area.lower() in doc_category or 
+                    doc_category in area.lower() 
+                    for area in intent["legal_areas"]
+                )
+                if legal_area_match:
                     score += 0.2
-                
-                # 4. 최신성
-                if 'judgment_year' in doc.metadata:
-                    years_old = datetime.now().year - doc.metadata['judgment_year']
-                    recency_score = max(0, 1 - (years_old / 10))  # 10년 이상이면 0점
-                    score += recency_score * 0.1
                 
                 quality_scores.append(score)
             
-            # 전체 품질 점수 계산
+            # 최소 품질 점수 설정
             avg_quality = sum(quality_scores) / len(quality_scores)
-            return min(1.0, avg_quality)  # 0~1 범위로 정규화
+            return max(0.4, min(1.0, avg_quality))  # 최소 0.4 보장
             
         except Exception as e:
             logger.error(f"결과 품질 평가 중 오류: {str(e)}")
-            return 0.0
+            return 0.4  # 오류 시 기본값 반환
 
     def _calculate_search_weight(self, query_intent: Dict) -> float:
         """검색 가중치 계산"""
@@ -856,69 +942,105 @@ class LegalSearchEngine:
 
 
     def optimize_hybrid_search(self, query: str, top_k: int = 5) -> List[Document]:
-        """최적화된 하이브리드 검색 수행"""
+        """최적화된 하이브리드 검색"""
         try:
-            # 1. 쿼리 의도 분석
-            query_intent = self._analyze_query_intent(query)
-            logger.info(f"쿼리 의도 분석 결과: {query_intent}")
+            # 1. 쿼리 전처리
+            processed_query = self._preprocess_query(query)
+            logger.info(f"""
+            === 쿼리 전처리 결과 ===
+            원본: {query}
+            처리됨: {processed_query}
+            """)
             
-            # 2. 검색 가중치 동적 조정
-            alpha = self._calculate_dynamic_weights(query)
-            logger.info(f"계산된 검색 가중치: {alpha}")
+            # 2. 쿼리 의도 분석
+            query_intent = self._analyze_query_intent(processed_query)
+            logger.info(f"""
+            === 쿼리 의도 분석 결과 ===
+            의도: {query_intent}
+            """)
             
-            # 3. 하이브리드 검색 파라미터 설정
+            # 3. 동적 가중치 계산
+            alpha = self._calculate_dynamic_weights(processed_query)
+            logger.info(f"동적 가중치(alpha): {alpha}")
+            
+            # 4. 검색 파라미터 최적화
             search_params = {
-                "top_k": top_k * 2,
+                "top_k": min(top_k * 3, 20),
                 "alpha": alpha,
-                "filter": self._create_metadata_filters(query_intent)
+                "filter": self._create_metadata_filters(query_intent),
+                "include_metadata": True
             }
-            # 4. 검색 실행
+            
+            # 5. 검색 실행
             try:
                 results = self.retrievers['pinecone'].invoke(
-                    query,
+                    processed_query,
                     search_kwargs=search_params
                 )
-                logger.info(f"검색 결과 수: {len(results)}")
                 
-                # 5. 후처리 및 재순위화
-                if results:
-                    processed_results = self._post_process_results(
-                        results=results,
-                        query=query  # query 파라미터 추가
-                    )
-                    return processed_results[:top_k]
-                return []
+                if not results:
+                    logger.warning("검색 결과 없음 - 폴백 결과 반환")
+                    return self._get_fallback_results(query, query_intent)
                 
-            except Exception as e:
-                logger.error(f"검색 실행 중 오류: {str(e)}")
-                return []
+                # 6. 결과 후처리 및 품질 검증
+                processed_results = self._post_process_results(results, query)
+                quality_score = self._evaluate_result_quality(processed_results, query_intent)
+                
+                logger.info(f"""
+                === 검색 품질 평가 ===
+                품질 점수: {quality_score}
+                처리된 결과 수: {len(processed_results)}
+                """)
+                
+                if quality_score < 0.4:
+                    logger.warning(f"품질 점수 미달({quality_score}) - 폴백 결과 반환")
+                    return self._get_fallback_results(query, query_intent)
+                
+                return processed_results[:top_k]
+                
+            except Exception as search_error:
+                logger.error(f"검색 실행 중 오류: {str(search_error)}")
+                return self._get_fallback_results(query, query_intent)
                 
         except Exception as e:
             logger.error(f"하이브리드 검색 중 오류: {str(e)}")
             return []
 
     def _calculate_dynamic_weights(self, query: str) -> float:
-        """쿼리 특성에 따른 동적 가중치 계산"""
-        # 기본 dense 가중치
-        alpha = 0.7
-        
-        # 1. 쿼리 길이 기반 조정
-        query_length = len(query.split())
-        if query_length <= 3:  # 짧은 쿼리
-            alpha -= 0.1  # sparse 가중치 증가
-        elif query_length >= 8:  # 긴 쿼리
-            alpha += 0.1  # dense 가중치 증가
-        
-        # 2. 전문 용어 포함 여부
-        legal_terms = ["판례", "법원", "소송", "계약", "위반", "책임"]
-        if any(term in query for term in legal_terms):
-            alpha -= 0.15  # 전문 용어가 있으면 sparse 가중치 증가
-        
-        # 3. 숫자/날짜 포함 여부
-        if any(char.isdigit() for char in query):
-            alpha -= 0.1  # 숫자가 있으면 sparse 가중치 증가
-        
-        return max(0.1, min(0.9, alpha))  # 0.1~0.9 범위로 제한
+        """개선된 동적 가중치 계산"""
+        try:
+            # 기본 dense 가중치
+            alpha = 0.65  # 기본값 조정
+            
+            # 1. 쿼리 길이 기반 조정
+            query_length = len(query.split())
+            if query_length <= 3:
+                alpha -= 0.15  # sparse 가중치 더 강화
+            elif query_length >= 8:
+                alpha += 0.15
+            
+            # 2. 전문 용어 가중치
+            legal_terms = {
+                "강": 0.1, "중": 0.15, "약": 0.2,
+                "강도": ["판례", "법원", "소송"],
+                "중도": ["계약", "위반", "책임"],
+                "약도": ["문의", "질문", "상담"]
+            }
+            
+            term_weights = []
+            for term_type, terms in legal_terms.items():
+                if isinstance(terms, list):
+                    if any(term in query for term in terms):
+                        term_weights.append(legal_terms[term_type[0]])
+            
+            if term_weights:
+                alpha -= sum(term_weights) / len(term_weights)
+            
+            return max(0.2, min(0.8, alpha))  # 범위 조정
+            
+        except Exception as e:
+            logger.error(f"가중치 계산 중 오류: {str(e)}")
+            return 0.65  # 오류 시 기본값
 
     def _create_metadata_filters(self, query_intent: Dict) -> Dict:
         """메타데이터 필터 생성"""
@@ -966,3 +1088,49 @@ class LegalSearchEngine:
         # 재정렬
         results.sort(key=lambda x: x.metadata.get('adjusted_score', 0), reverse=True)
         return results
+
+    def search(self, query: str) -> List[Document]:
+        """검색 실행"""
+        try:
+            logger.info(f"""
+            === SEARCH 시작 ===
+            쿼리: {query}
+            """)
+            
+            # 하이브리드 검색 실행 (쿼리 의도 분석 포함)
+            results = self.optimize_hybrid_search(query)
+            logger.info(f"""
+            === 하이브리드 검색 결과 ===
+            결과 개수: {len(results)}
+            스코어 범위: {min([doc.metadata.get('score', 0) for doc in results]) if results else 'N/A'} 
+                        ~ {max([doc.metadata.get('score', 0) for doc in results]) if results else 'N/A'}
+            """)
+
+            return results
+            
+        except Exception as e:
+            logger.error(f"""
+            === SEARCH 오류 ===
+            쿼리: {query}
+            오류 메시지: {str(e)}
+            스택 트레이스: {traceback.format_exc()}
+            """)
+            return []
+
+    def _get_fallback_results(self, query: str, query_intent: dict) -> List[Document]:
+        """폴백 결과 생성"""
+        try:
+            # 기본 응답 생성
+            fallback_doc = Document(
+                page_content="죄송합니다. 관련 판례를 찾을 수 없습니다.",
+                metadata={
+                    "score": 0.0,
+                    "source": "fallback",
+                    "query": query,
+                    "intent": query_intent
+                }
+            )
+            return [fallback_doc]
+        except Exception as e:
+            logger.error(f"폴백 결과 생성 중 오류: {str(e)}")
+            return []

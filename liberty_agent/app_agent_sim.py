@@ -26,148 +26,122 @@ PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
 
 class AppManagerSimple:
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(AppManagerSimple, cls).__new__(cls)
+            cls._initialized = False
+        return cls._instance
+    
     def __init__(self):
-        """앱 매니저 초기화"""
-        try:
+        if not self._initialized:
+            logger.info("======================= AppManagerSimple 초기화 시작 =======================")
             self.db_manager = DatabaseManager()
             self.chat_manager = ChatManager(self.db_manager)
-            self.ui_manager = UIManager()
+            self.ui_manager = UIManager(db_manager=self.db_manager)
             self.legal_agent = LegalAgent()
+            self._initialized = True
             logger.info("앱 매니저 초기화 완료")
-        except Exception as e:
-            logger.error(f"앱 매니저 초기화 실패: {str(e)}")
-            raise
 
     def initialize_session_state(self, reset: bool = False):
         """세션 상태 초기화"""
         try:
-            # 이미 초기화되어 있고 reset이 False면 early return
-            if not reset and 'initialized' in st.session_state:
-                return
+            # 기본 세션 상태 초기화
+            if 'initialized' not in st.session_state:
+                st.session_state.initialized = False
             
-            # 사용자 ID는 유지
-            if 'user_id' not in st.session_state:
+            # user_id가 없거나 reset이 True인 경우 새로 생성
+            if 'user_id' not in st.session_state or reset:
                 st.session_state.user_id = str(uuid.uuid4())
             
-            # reset이 True이거나 초기화가 필요한 경우에만 새 세션 생성
-            if reset or 'current_session_id' not in st.session_state:
-                new_session_id = str(uuid.uuid4())
-                
-                # 새 세션을 DB에 저장
-                self.db_manager.save_chat_session(
-                    user_id=st.session_state.user_id,
-                    session_id=new_session_id
-                )
-                
-                # 세션 상태 업데이트
-                st.session_state.current_session_id = new_session_id
+            # messages가 없거나 reset이 True인 경우 초기화
+            if 'messages' not in st.session_state or reset:
                 st.session_state.messages = []
             
+            # current_session_id가 없거나 reset이 True인 경우 새로 생성
+            if 'current_session_id' not in st.session_state or reset:
+                st.session_state.current_session_id = str(uuid.uuid4())
+            
+            # 처리 상태 초기화
+            if 'processing' not in st.session_state:
+                st.session_state.processing = False
+            
+            # 선택된 질문 초기화
+            if 'selected_question' not in st.session_state:
+                st.session_state.selected_question = None
+            
             st.session_state.initialized = True
-            logger.info(f"세션 상태 {'리셋' if reset else '초기화'} 완료")
+            logger.info("세션 상태 초기화 완료")
             
         except Exception as e:
-            logger.error(f"세션 상태 {'리셋' if reset else '초기화'} 중 오류: {str(e)}")
+            logger.error(f"세션 상태 초기화 중 오류: {str(e)}")
             raise
 
-    def process_user_input(self, prompt: str) -> Dict:
-        """사용자 입력 처리"""
+    def process_user_input(self, user_input: str):
         try:
-            # 상태 표시
-            with st.status("답변 생성 중...", expanded=True) as status:
-                st.write("컨텍스트 검색 중...")
-                # 답변 생성
-                response = self.legal_agent.process_query(prompt)
+            with st.status("답변 생성 중...") as status:
+                response = self.legal_agent.process_query(user_input)
                 
-                if response and isinstance(response, dict) and 'answer' in response:
-                    st.write("답변 생성 완료")
-                    status.update(label="답변이 준비되었습니다!", state="complete")
+                if not response or "answer" not in response:
+                    return {"error": "답변 생성 실패"}
                     
-                    # 메시지 저장
-                    self.chat_manager.save_message(
-                        user_id=st.session_state.user_id,
-                        session_id=st.session_state.current_session_id,
-                        message_type="user",
-                        content=prompt
-                    )
-                    
-                    self.chat_manager.save_message(
-                        user_id=st.session_state.user_id,
-                        session_id=st.session_state.current_session_id,
-                        message_type="assistant",
-                        content=response['answer']
-                    )
-                    
-                    return response
-                else:
-                    status.update(label="답변 생성 실패", state="error")
-                    logger.error("유효하지 않은 응답 형식")
-                    return {"answer": "죄송합니다. 답변을 생성하는 중에 오류가 발생했습니다."}
+                self._update_chat_messages(
+                    user_input=user_input,
+                    response=response["answer"]
+                )
+                return response
                 
         except Exception as e:
             logger.error(f"사용자 입력 처리 중 오류: {str(e)}")
-            return {"answer": "죄송합니다. 처리 중에 오류가 발생했습니다."}
+            return {"answer": "처리 중 오류가 발생했습니다."}
 
     def run(self):
-        """앱 실행"""
+        """애플리케이션 실행"""
         try:
             # 세션 상태 초기화
             self.initialize_session_state()
             
-            # 헤더 생성
-            st.markdown("""
-                <h1 style='text-align: center;'>⚖️ 법률 AI 어시스턴트</h1>
-                <p style='text-align: center;'>법률 관련 궁금하신 점을 질문해주세요.</p>
-            """, unsafe_allow_html=True)
+            # UI 생성
+            self.ui_manager.create_ui(self.chat_manager)
             
-            # 메인 레이아웃
-            col1, col2 = st.columns([3, 1])
+            # 선택된 질문이 있는 경우 처리
+            if st.session_state.get('selected_question'):
+                question = st.session_state.selected_question
+                st.session_state.selected_question = None
+                self.process_user_input(question)
+                st.rerun()
             
-            with col1:
-                # 자주 묻는 질문 카테고리
-                selected_category = self.ui_manager.create_category_buttons()
+            # 사용자 입력 처리 (중복 호출 제거)
+            if user_input := st.chat_input("질문을 입력하세요", key="chat_input"):
+                st.session_state.messages.append({"role": "user", "content": user_input})
+                self.process_user_input(user_input)
+                st.rerun()
                 
-                # 채팅 히스토리 표시
-                chat_container = st.container()
-                with chat_container:
-                    for message in st.session_state.messages:
-                        with st.chat_message(message["role"]):
-                            st.markdown(message["content"])
-                            if message["role"] == "assistant":
-                                self.ui_manager.add_copy_button(message["content"])
-                
-                # 선택된 카테고리가 있으면 처리
-                if selected_category:
-                    with st.status("답변 생성 중...", expanded=True) as status:
-                        response = self.process_user_input(selected_category)
-                        if response:
-                            st.session_state.messages.append({"role": "user", "content": selected_category})
-                            st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
-                            status.update(label="답변이 준비되었습니다!", state="complete")
-                
-                # 채팅 입력창
-                if prompt := st.chat_input("질문을 입력하세요", key="chat_input"):
-                    with st.status("답변 생성 중...", expanded=True) as status:
-                        response = self.process_user_input(prompt)
-                        if response:
-                            st.session_state.messages.append({"role": "user", "content": prompt})
-                            st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
-                            status.update(label="답변이 준비되었습니다!", state="complete")
-            
-            with col2:
-                st.sidebar.title("대화 관리")
-                if st.sidebar.button("새 대화 시작"):
-                    self.initialize_session_state(reset=True)
-                    st.rerun()
-                
-                # 이전 대화 표시
-                self.chat_manager.display_previous_chats()
-            
-            logger.info("앱 실행 완료")
-            
         except Exception as e:
-            logger.error(f"앱 실행 중 오류 발생: {str(e)}")
-            st.error("애플리케이션 오류가 발생했습니다.")
+            logger.error(f"앱 실행 중 오류: {str(e)}")
+            st.error("오류가 발생했습니다. 다시 시도해주세요.")
+
+    def _initialize_session_state(self):
+        """세션 상태 초기화"""
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+        if "current_session_id" not in st.session_state:
+            st.session_state.current_session_id = str(uuid.uuid4())
+        if "processing" not in st.session_state:
+            st.session_state.processing = False
+        if "user_id" not in st.session_state:
+            st.session_state.user_id = str(uuid.uuid4())
+
+
+    def _update_chat_messages(self, user_input: str, response: str):
+        """채팅 메시지 업데이트 (단일 rerun 사용)"""
+        st.session_state.messages.extend([
+            {"role": "user", "content": user_input},
+            {"role": "assistant", "content": response}
+        ])
+        st.rerun()  # 단 한 번의 rerun
 
     def _generate_chat_title(self, question: str, answer: str) -> str:
         """대화 제목 생성"""
@@ -193,6 +167,23 @@ class AppManagerSimple:
             logger.error(f"대화 제목 생성 중 오류: {str(e)}")
             return f"법률상담 {datetime.now().strftime('%Y-%m-%d %H:%M')}"
 
+    def _handle_category_selection(self):
+        """카테고리 선택 처리"""
+        categories = {
+            "이혼/가족": ["이혼 절차", "위자료", "양육권", "재산분할"],
+            "상속": ["상속 순위", "유류분", "상속포기", "유언장"],
+            "계약": ["계약서 작성", "계약 해지", "손해배상", "보증"],
+            "부동산": ["매매", "임대차", "등기", "재개발"],
+            "형사": ["고소/고발", "변호사 선임", "형사절차", "보석"]
+        }
+        
+        for main_cat, sub_cats in categories.items():
+            if selected := st.button(main_cat):
+                st.session_state.selected_category = main_cat
+                return True
+                
+        return False
+
 def main():
     try:
         st.set_page_config(
@@ -206,7 +197,7 @@ def main():
         
     except Exception as e:
         logger.error(f"메인 실행 중 오류: {str(e)}")
-        st.error("애플리케이션을 시작할 수 없습니다.")
+        st.error("���플리케이션을 시작할 수 없습니다.")
 
 if __name__ == "__main__":
     main() 

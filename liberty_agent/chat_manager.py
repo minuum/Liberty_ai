@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 class ChatManager:
     def __init__(self, db_manager):
+        logger.info(f"======================= ChatManager 초기화 시작 =======================")
         self.db_manager = db_manager
         
     def save_message(self, user_id: str, session_id: str, 
@@ -26,10 +27,12 @@ class ChatManager:
 
     def display_chat_interface(self):
         """채팅 인터페이스 표시"""
-        chat_container = st.container()
-        
-        with chat_container:
-            # 채팅 히스토리
+        try:
+            # 메시지 기록이 없으면 초기화
+            if 'messages' not in st.session_state:
+                st.session_state.messages = []
+            
+            # 채팅 히스토리 표시
             for msg in st.session_state.messages:
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"])
@@ -38,23 +41,55 @@ class ChatManager:
                     if "metadata" in msg and msg["metadata"]:
                         with st.expander("참고 자료"):
                             st.json(msg["metadata"])
+            
+            # 입력창 표시
+            return st.chat_input("질문을 입력하세요", key="chat_input")
+            
+        except Exception as e:
+            logger.error(f"채팅 인터페이스 표시 중 오류: {str(e)}")
+            st.error("채팅 인터페이스를 표시할 수 없습니다.")
+            return None
 
     def display_previous_chats(self):
         """이전 대화 목록 표시"""
         try:
             chats = self.db_manager.get_chat_sessions(st.session_state.user_id)
+            
             if chats:
-                st.sidebar.subheader("이전 상담 내역")
+                st.sidebar.markdown("### 💬 이전 상담 내역")
+                
                 for chat in chats:
-                    # 현재 세션이 아닌 경우에만 버튼 표시
+                    # 현재 세션이 아닌 경우에만 표시
                     if chat['session_id'] != st.session_state.get('current_session_id'):
-                        # 제목이 있으면 제목을, 없으면 날짜를 표시
-                        display_text = chat.get('title') or f"상담 {chat['created_at'].strftime('%Y-%m-%d %H:%M')}"
-                        if st.sidebar.button(display_text, key=f"chat_{chat['session_id']}"):
-                            self.load_chat_session(chat['session_id'])
-                            st.rerun()
+                        col1, col2 = st.sidebar.columns([4, 1])
+                        
+                        with col1:
+                            # 제목이나 날짜를 버튼으로 표시
+                            if st.button(
+                                f"📝 {chat.get('title') or chat['created_at'].strftime('%Y-%m-%d %H:%M')}",
+                                key=f"chat_{chat['session_id']}",
+                                use_container_width=True
+                            ):
+                                # 세션 로드 전 상태 초기화
+                                st.session_state.messages = []
+                                st.session_state.current_session_id = chat['session_id']
+                                # 채팅 내역 로드
+                                messages = self.db_manager.load_chat_history(
+                                    st.session_state.user_id,
+                                    chat['session_id']
+                                )
+                                st.session_state.messages = messages
+                                st.rerun()
+                        
+                        with col2:
+                            # 삭제 버튼
+                            if st.button("🗑️", key=f"del_{chat['session_id']}"):
+                                self.db_manager.delete_chat_session(chat['session_id'])
+                                st.rerun()
+                            
         except Exception as e:
             logger.error(f"이전 대화 표시 중 오류: {str(e)}")
+            st.sidebar.error("이전 대화 목록을 불러올 수 없습니다.")
 
     def load_chat_session(self, session_id: str):
         """채팅 세션 로드"""

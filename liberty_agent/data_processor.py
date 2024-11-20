@@ -60,6 +60,7 @@ class LegalDataProcessor:
         cache_dir: Optional[str] = "./liberty_agent/cached_vectors",
         cache_mode: bool = True,
     ):
+        logger.info(f"======================= DataProcessor 초기화 시작 =======================")
         # Pinecone 초기화
         self.pc = Pinecone(api_key=pinecone_api_key)
         self.index_name = index_name
@@ -435,7 +436,7 @@ class LegalDataProcessor:
             
             faiss_index_path = load_path / "index.faiss"
             if faiss_index_path.exists():
-                logger.info(f"FAISS 인덱스 로드 중... ({load_path})")
+                #logger.info(f"FAISS 인덱스 로드 중... ({load_path})")
                 faiss_store = FAISS.load_local(
                     str(load_path), 
                     self.dense_embedder,
@@ -444,12 +445,12 @@ class LegalDataProcessor:
                 
             kiwi_path = load_path / f"{index_name}_vectorizer.pkl"
             if kiwi_path.exists():
-                logger.info(f"KiwiBM25 인덱스 로드 중... ({load_path})")
+                #logger.info(f"KiwiBM25 인덱스 로드 중... ({load_path})")
                 kiwi_retriever = CustomKiwiBM25Retriever.load_local(
                     str(load_path), 
                     index_name
                 )
-                
+            logger.info(f"KiwiBM25 인덱스 로드 완료 ({load_path})")
             return faiss_store, kiwi_retriever
             
         except Exception as e:
@@ -632,12 +633,13 @@ class LegalDataProcessor:
                 faiss_dir = os.path.join(self.retriever_cache_dir, "faiss")
                 if cache_mode == 'load':
                     if os.path.exists(os.path.join(faiss_dir, "index.faiss")):
-                        logger.info(f"FAISS 인덱스 로드 중... ({faiss_dir})")
+                        #logger.info(f"FAISS 인덱스 로드 중... ({faiss_dir})")
                         retrievers['faiss'] = FAISS.load_local(
                             faiss_dir,
                             self.dense_embedder,
                             allow_dangerous_deserialization=True
                         )
+                        logger.info(f"FAISS 인덱스 로드 완료 ({faiss_dir})")
                     else:
                         logger.warning("저장된 FAISS 인덱스를 찾을 수 없습니다.")
         
@@ -646,11 +648,12 @@ class LegalDataProcessor:
                 kiwi_dir = os.path.join(self.retriever_cache_dir, "kiwi")
                 if cache_mode == 'load':
                     if os.path.exists(os.path.join(kiwi_dir, "legal_kiwi_vectorizer.pkl")):
-                        logger.info(f"KiwiBM25 검색기 로드 중... ({kiwi_dir})")
+                        #logger.info(f"KiwiBM25 검색기 로드 중... ({kiwi_dir})")
                         retrievers['kiwi'] = CustomKiwiBM25Retriever.load_local(
                             kiwi_dir, 
                             "legal_kiwi"
                         )
+                        logger.info(f"KiwiBM25 검색기 로드 완료 ({kiwi_dir})")
                     else:
                         logger.warning("저장된 KiwiBM25 검색기를 찾을 수 없습니다.")
         

@@ -8,13 +8,20 @@ import os
 logger = logging.getLogger(__name__)
 
 class DatabaseManager:
+    _instance = None
+    _initialized = False
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(DatabaseManager, cls).__new__(cls)
+        return cls._instance
+    
     def __init__(self, db_path: str = "liberty_agent/data/chat.db"):
-        """데이터베이스 매니저 초기화"""
-        # 디렉토리가 없으면 생성
-        os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        
-        self.db_path = db_path
-        self._init_db()
+        if not self._initialized:
+            logger.info("======================= DatabaseManager 초기화 시작 =======================")
+            os.makedirs(os.path.dirname(db_path), exist_ok=True)
+            self.db_path = db_path
+            self._init_db()
+            self._initialized = True
     
     def _init_db(self):
         """데이터베이스 초기화"""
@@ -62,13 +69,33 @@ class DatabaseManager:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
+                
+                # 세션이 이미 존재하는지 확인
                 cursor.execute("""
-                    INSERT INTO chat_sessions (session_id, user_id, title)
-                    VALUES (?, ?, ?)
-                """, (session_id, user_id, title))
-                conn.commit()
-                logger.info(f"새 채팅 세션 저장 완료: {session_id}")
+                    SELECT session_id FROM chat_sessions 
+                    WHERE session_id = ?
+                """, (session_id,))
+                
+                if cursor.fetchone() is None:
+                    # 새 세션 저장
+                    cursor.execute("""
+                        INSERT INTO chat_sessions (session_id, user_id, title)
+                        VALUES (?, ?, ?)
+                    """, (session_id, user_id, title))
+                    conn.commit()
+                    logger.info(f"새 채팅 세션 저장 완료: {session_id}")
+                else:
+                    # 기존 세션 제목 업데이트
+                    if title:
+                        cursor.execute("""
+                            UPDATE chat_sessions 
+                            SET title = ?
+                            WHERE session_id = ?
+                        """, (title, session_id))
+                        conn.commit()
+                        logger.info(f"채팅 세션 제목 업데이트 완료: {session_id}")
                 return True
+                
         except Exception as e:
             logger.error(f"채팅 세션 저장 중 오류: {str(e)}")
             return False
@@ -176,4 +203,26 @@ class DatabaseManager:
                 
         except Exception as e:
             logger.error(f"채팅 기록 조회 중 오류: {str(e)}")
-            return []   
+            return []
+
+    def load_chat_history(self, user_id: str, session_id: str) -> List[Dict]:
+        """세션의 채팅 기록을 불러옴"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT 
+                        message_type as role,
+                        content
+                    FROM chat_messages 
+                    WHERE user_id = ? AND session_id = ?
+                    ORDER BY timestamp ASC
+                """, (user_id, session_id))
+                
+                return [{'role': row['role'], 'content': row['content']} 
+                       for row in cursor.fetchall()]
+                   
+        except Exception as e:
+            logger.error(f"채팅 기록 로드 중 오류: {str(e)}")
+            return []

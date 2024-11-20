@@ -40,8 +40,9 @@ class AppManagerSimple:
             logger.info("======================= AppManagerSimple 초기화 시작 =======================")
             self.db_manager = DatabaseManager()
             self.chat_manager = ChatManager(self.db_manager)
-            self.ui_manager = UIManager(db_manager=self.db_manager)
             self.legal_agent = LegalAgent()
+            self.ui_manager = UIManager(db_manager=self.db_manager, legal_agent=self.legal_agent)
+            
             self._initialized = True
             logger.info("앱 매니저 초기화 완료")
 

@@ -16,11 +16,12 @@ class UIManager:
             cls._instance = super(UIManager, cls).__new__(cls)
         return cls._instance
     
-    def __init__(self, db_manager=None):
+    def __init__(self, db_manager=None, legal_agent=None):
         if not self._initialized:
             logger.info(f"======================= UIManager 초기화 시작 =======================")
             self.css_loaded = False
             self.db_manager = db_manager
+            self.legal_agent = legal_agent
             self.categories = {
             "이혼/가족": ["이혼 절차", "위자료", "양육권", "재산분할"],
             "상속": ["상속 순위", "유류분", "상속포기", "유언장"],
@@ -148,12 +149,11 @@ class UIManager:
                             key=f"cat_{category}_{subcat}",
                             use_container_width=True
                         ):
-                            # 선택된 질문을 세션 상태에 저장
-                            st.session_state.selected_question = f"{subcat}에 대해 자세히 설명해주세요."
-                            st.session_state.processing = True
-                            return st.session_state.selected_question
+                            # 카테고리 선택 처리
+                            selected_question = self._handle_category_selection(category, subcat)
+                            break
         
-        return None
+        return selected_question
 
     def _load_css(self):
         """CSS 스타일 로드"""
@@ -324,44 +324,40 @@ class UIManager:
 
     def _handle_suggestion_click(self, question: str):
         """추천 질문 클릭 처리"""
-        st.session_state.messages.append({"role": "user", "content": question})
+        # 카테고리와 서브카테고리 추출
+        for category, subcategories in self.categories.items():
+            if any(subcat in question for subcat in subcategories):
+                selected_category = category
+                selected_subcategory = next(
+                    subcat for subcat in subcategories if subcat in question
+                )
+                logger.info(f"선택된 카테고리: {selected_category}, 서브카테고리: {selected_subcategory}")
+                # 최적화된 프롬프트 사용
+                optimized_prompt = self.legal_agent.selected_category_prompt(
+                    selected_category, 
+                    selected_subcategory
+                )
+                st.session_state.messages.append({
+                    "role": "system",
+                    "content": optimized_prompt
+                })
+                break
+                
+        st.session_state.messages.append({
+            "role": "user", 
+            "content": question
+        })
         st.rerun()
 
     def show_error_message(self, error_type: str):
         """에러 메시지 표시"""
         error_messages = {
-            "connection": "연결 ��류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+            "connection": "연결 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
             "processing": "처리 중 오류가 발생했습니다. 다시 시도해주세요.",
             "invalid_input": "잘못된 입력입니다. 다시 입력해주세요."
         }
         st.error(error_messages.get(error_type, "알 수 없는 오류가 발생했습니다."))
 
-    def create_category_buttons(self):
-        """자주 묻는 질문 카테고리 버튼 생성"""
-        st.markdown("### 💡 자주 묻는 법률 상담")
-        
-        selected_question = None
-        
-        # 탭으로 메인 카테고리 생성
-        tabs = st.tabs(list(self.categories.keys()))
-        
-        # 각 탭에 서브카테고리 버튼 배치
-        for tab, (category, subcategories) in zip(tabs, self.categories.items()):
-            with tab:
-                cols = st.columns(2)
-                for i, subcat in enumerate(subcategories):
-                    with cols[i % 2]:
-                        if st.button(
-                            f"📌 {subcat}",
-                            key=f"cat_{category}_{subcat}",
-                            use_container_width=True
-                        ):
-                            # 선택된 질문을 세션 상태에 저장
-                            st.session_state.selected_question = f"{subcat}에 대해 자세히 설명해주세요."
-                            st.session_state.processing = True
-                            return st.session_state.selected_question
-        
-        return None
 
     def add_copy_button(self, text: str):
         """답변 복사 버튼 추가"""
@@ -689,3 +685,45 @@ class UIManager:
         except Exception as e:
             logger.error(f"이메일 전송 중 오류: {str(e)}")
             raise
+
+    def _handle_category_selection(self, category: str, subcategory: str):
+        """카테고리 선택 처리"""
+        try:
+            # 1. 기본 프롬프트 가져오기
+            optimized_prompt = self.legal_agent.selected_category_prompt(category, subcategory)
+            
+            # 2. 시스템 메시지로 프롬프트 추가
+            st.session_state.messages.extend([
+                {
+                    "role": "system",
+                    "content": f"다음 질문에 대해 상세히 답변해주세요: {subcategory}"
+                }
+            ])
+            
+            # 3. 질문을 legal_agent의 process_query로 전달
+            response = self.legal_agent.process_query(optimized_prompt)
+            
+            # 4. 사용자 질문과 응답을 세션에 추가
+            st.session_state.messages.extend([
+                {
+                    "role": "user",
+                    "content": f"{subcategory}에 대해 자세히 설명해주세요."
+                },
+                {
+                    "role": "assistant",
+                    "content": response["answer"],
+                    "metadata": {
+                        "confidence": response["confidence"],
+                        "category": category,
+                        "subcategory": subcategory
+                    }
+                }
+            ])
+            
+            st.session_state.processing = True
+            return optimized_prompt
+
+        except Exception as e:
+            logger.error(f"카테고리 선택 처리 중 오류: {str(e)}")
+            st.error("답변을 생성하는 중에 문제가 발생했습니다.")
+            return None

@@ -9,7 +9,39 @@ class ChatManager:
     def __init__(self, db_manager):
         logger.info(f"======================= ChatManager 초기화 시작 =======================")
         self.db_manager = db_manager
+        self.state = self._initialize_state()
         
+    def _initialize_state(self) -> Dict:
+        """langgraph State 초기화"""
+        return {
+            "messages": st.session_state.get("messages", []),
+            "context": [],
+            "current_query": "",
+            "answer": "",
+            "rewrite_count": 0,
+            "rewrite_weight": 0.0,
+            "previous_weight": 0.0,
+            "original_weight": 1.0,
+            "combined_score": 0.0,
+            "chat_history": self._get_formatted_history()
+        }
+    
+    def _get_formatted_history(self) -> List[Dict]:
+        if "current_session_id" not in st.session_state:
+            return []
+            
+        history = self.db_manager.get_chat_history(
+            st.session_state.user_id,
+            st.session_state.current_session_id
+        )
+        
+        return [{
+            "role": msg["role"],
+            "content": msg["content"],
+            "metadata": msg.get("metadata", {}),
+            "timestamp": msg["timestamp"]
+        } for msg in history]
+
     def save_message(self, user_id: str, session_id: str, 
                     message_type: str, content: str, metadata: Dict = None):
         """메시지 저장"""
@@ -26,29 +58,37 @@ class ChatManager:
             raise
 
     def display_chat_interface(self):
-        """채팅 인터페이스 표시"""
+        """State를 반영한 채팅 인터페이스"""
         try:
-            # 메시지 기록이 없으면 초기화
-            if 'messages' not in st.session_state:
-                st.session_state.messages = []
-            
-            # 채팅 히스토리 표시
-            for msg in st.session_state.messages:
+            for msg in self.state["messages"]:
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"])
                     
-                    # 메타데이터 표시 (있는 경우)
                     if "metadata" in msg and msg["metadata"]:
-                        with st.expander("참고 자료"):
-                            st.json(msg["metadata"])
+                        with st.expander("상세 정보"):
+                            self._display_enhanced_metadata(msg["metadata"])
             
-            # 입력창 표시
             return st.chat_input("질문을 입력하세요", key="chat_input")
             
         except Exception as e:
             logger.error(f"채팅 인터페이스 표시 중 오류: {str(e)}")
-            st.error("채팅 인터페이스를 표시할 수 없습니다.")
             return None
+
+    def _display_enhanced_metadata(self, metadata: Dict):
+        """개선된 메타데이터 표시"""
+        cols = st.columns(2)
+        
+        with cols[0]:
+            if "category" in metadata:
+                st.info(f"분야: {metadata['category']}")
+            if "confidence" in metadata:
+                self.display_confidence_score(metadata["confidence"])
+                
+        with cols[1]:
+            if "related_cases" in metadata:
+                st.subheader("관련 판례")
+                for case in metadata["related_cases"]:
+                    st.markdown(f"- {case}")
 
     def display_previous_chats(self):
         """이전 대화 목록 표시"""
@@ -189,3 +229,47 @@ class ChatManager:
                 신뢰도: {score:.2f}
             </div>
         """, unsafe_allow_html=True)
+
+    def process_message_with_state(self, message: str) -> Dict:
+        """State를 활용한 메시지 처리"""
+        try:
+            # 1. State 업데이트
+            self.update_state(
+                current_query=message,
+                chat_history=self._get_formatted_history()
+            )
+            
+            # 2. 이전 컨텍스트 추출
+            context = self._extract_context_from_history()
+            self.update_state(context=context)
+            
+            # 3. 메시지 저장
+            self.save_message(
+                st.session_state.user_id,
+                st.session_state.current_session_id,
+                "user",
+                message,
+                {"context": context}
+            )
+            
+            return self.state
+            
+        except Exception as e:
+            logger.error(f"메시지 처리 중 오류: {str(e)}")
+            return self.state
+
+    def _extract_context_from_history(self) -> List[Dict]:
+        """채팅 기록에서 관련 컨텍스트 추출"""
+        history = self.state["chat_history"]
+        context = []
+        
+        for msg in history[-5:]:  # 최근 5개 메시지만 사용
+            if msg["role"] == "assistant" and "metadata" in msg:
+                context.append({
+                    "content": msg["content"],
+                    "metadata": msg["metadata"],
+                    "category": msg["metadata"].get("category", ""),
+                    "timestamp": msg["timestamp"]
+                })
+        
+        return context

@@ -57,11 +57,11 @@ class RAGEvaluator:
             if retriever_name == 'faiss':
                 return retriever.similarity_search(query, k=k)
             elif retriever_name == 'hybrid':
-                return retriever._get_relevant_documents(query)
+                return retriever._get_relevant_documents(query, top_k=k)
             elif retriever_name == 'kiwi':
                 return retriever.search_with_score(query, top_k=k)
             elif retriever_name == 'pinecone':
-                return retriever.invoke(query)
+                return retriever.invoke(query, top_k=k)
         except Exception as e:
             logger.error(f"{retriever_name} 검색 중 오류 발생: {str(e)}")
             return []

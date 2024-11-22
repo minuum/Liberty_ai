@@ -190,7 +190,7 @@ class LegalAgent:
         if state["rewrite_count"] >= 3:  # 재작성 횟수 제한
             return "grounded"  # 강제 종료
         
-        if state["combined_score"] > 0.8:
+        if state["combined_score"] > 0.7:
             return "grounded"
         elif state["combined_score"] < 0.3:
             return "notGrounded"
@@ -640,7 +640,7 @@ class LegalAgent:
                 )
                 
                 # 결과 결정
-                if combined_score >= 0.8:
+                if combined_score >= 0.7:
                     return self._update_state_score(state, combined_score, "grounded")
                 elif combined_score <= 0.3:
                     return self._update_state_score(state, combined_score, "notGrounded")
@@ -990,8 +990,8 @@ class LegalAgent:
             combined_score = self.search_engine.validate_answer(
                 context=context,
                 answer=answer,
-                upstage_weight=0.3,  # Upstage 가중치
-                kobert_weight=0.7    # KoBERT 가중치
+                upstage_weight=0.2,  # Upstage 가중치
+                kobert_weight=0.8    # KoBERT 가중치
             )
             
             # 상태 업데이트
@@ -1001,8 +1001,8 @@ class LegalAgent:
             === 상세 품질 검사 완료 ===
             결합 점수: {combined_score:.3f}
             기준:
-            - 높음 (≥ 0.8): 진행
-            - 중간 (0.3-0.8): 재작성
+            - 높음 (≥ 0.7): 진행
+            - 중간 (0.3-0.7): 재작성
             - 낮음 (< 0.3): 재검색
             """)
             
@@ -1065,7 +1065,7 @@ class LegalAgent:
             재작성 횟수: {rewrite_count}
             """)
             
-            if score >= 0.8:
+            if score >= 0.7:
                 return "proceed"
             elif score < 0.3:
                 return "re_retrieve"

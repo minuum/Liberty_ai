@@ -358,8 +358,8 @@ class LegalSearchEngine:
         self,
         context: List[Document],
         answer: str,
-        upstage_weight: float = 0.3,
-        kobert_weight: float = 0.7
+        upstage_weight: float = 0.2,
+        kobert_weight: float = 0.8
     ) -> float:
         """
         답변의 신뢰도 검증
@@ -527,7 +527,7 @@ class LegalSearchEngine:
             logger.error(f"쿼리 전처리 중 오류: {str(e)}")
             return query  # 오류 발생 시 원본 쿼리 반환
 
-    def _create_dynamic_filters(self, query_intent: Dict, top_k: int = 5) -> Dict:
+    def _create_dynamic_filters(self, query_intent: Dict, top_k: int = 20) -> Dict:
         """동적 검색 파라미터 생성"""
         search_params = {
             "top_k": top_k,
@@ -1194,10 +1194,10 @@ class LegalSearchEngine:
     def evaluate_context_quality(self, context: List[Document], question: str) -> float:
         """컨텍스트 품질 평가 (quick_filter용)"""
         weights = {
-            'keyword': 0.4,    # 키워드 중요도 증가
-            'semantic': 0.4,   # 의미적 유사도 비중 조정
-            'metadata': 0.2    # 메타데이터 유지
-        }
+                    'semantic': 0.8,  # 의미적 유사도 강화
+                    'keyword': 0.5,
+                    'metadata': 0.2
+                }
         
         try:
             # 빠른 필터링을 위한 기준값 설정

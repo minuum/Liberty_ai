@@ -5,13 +5,14 @@ import os
 from typing import Dict
 import uuid
 from datetime import datetime
-
+import re
 # 커스텀 모듈 임포트
 from legal_agent import LegalAgent
 from database_manager import DatabaseManager
 from chat_manager import ChatManager
 from ui_manager import UIManager
-
+import threading
+import time
 # 로깅 설정
 logging.basicConfig(
     level=logging.INFO,
@@ -80,20 +81,45 @@ class AppManagerSimple:
             logger.error(f"세션 상태 초기화 중 오류: {str(e)}")
             raise
 
-    def process_user_input(self, user_input: str):
+
+
+    def process_user_input(self, user_input: str, is_ui_input: bool = False):
         try:
-            with st.status("답변 생성 중...") as status:
+            response = {"answer": ""}
+            state = {"current_step": "준비 중"}
+
+            def run_workflow():
+                nonlocal response
                 response = self.legal_agent.process_query(user_input)
-                
-                if not response or "answer" not in response:
-                    return {"error": "답변 생성 실패"}
-                    
+                state["current_step"] = "완료"
+
+            thread = threading.Thread(target=run_workflow)
+            thread.start()
+
+            with st.spinner("처리 중..."):
+                while thread.is_alive():
+                    current_step = self.legal_agent.get_current_step()
+                    st.spinner(f"{current_step}")
+                    time.sleep(0.5)
+                thread.join()
+
+            if not response or "answer" not in response:
+                return {"error": "답변 생성 실패"}
+
+            # 메시지 업데이트
+            if not is_ui_input:
                 self._update_chat_messages(
                     user_input=user_input,
                     response=response["answer"]
                 )
-                return response
-                
+            else:
+                # UI 입력인 경우에도 사용자 메시지를 저장
+                st.session_state.messages.extend([
+                    {"role": "user", "content": user_input},
+                    {"role": "assistant", "content": response["answer"]}
+                ])
+            return response
+
         except Exception as e:
             logger.error(f"사용자 입력 처리 중 오류: {str(e)}")
             return {"answer": "처리 중 오류가 발생했습니다."}
@@ -104,22 +130,36 @@ class AppManagerSimple:
             # 세션 상태 초기화
             self.initialize_session_state()
             
-            # UI 생성
-            self.ui_manager.create_ui(self.chat_manager)
-            
-            # 선택된 질문이 있는 경우 처리
-            if st.session_state.get('selected_question'):
-                question = st.session_state.selected_question
-                st.session_state.selected_question = None
-                self.process_user_input(question)
-                st.rerun()
-            
-            # 사용자 입력 처리 (중복 호출 제거)
-            if user_input := st.chat_input("질문을 입력하세요", key="chat_input"):
-                st.session_state.messages.append({"role": "user", "content": user_input})
-                self.process_user_input(user_input)
-                st.rerun()
+            # 메인 컨테이너
+            main_container = st.container()
+            with main_container:
+                # 헤더
+                st.title("⚖️ 법률 AI 어시스턴트")
+                st.markdown("법률 관련 궁금하신 점을 질문해주세요.")
                 
+                # 카테고리 버튼 생성
+                self._handle_category_selection()
+                
+                # 채팅 히스토리 표시
+                for message in st.session_state.messages:
+                    with st.chat_message(message["role"]):
+                        st.markdown(message["content"])
+                
+                # 선택된 질문이 있는 경우 처리
+                if st.session_state.get('selected_question'):
+                    question = st.session_state.selected_question
+                    st.session_state.selected_question = None
+                    is_ui_input = st.session_state.get('is_ui_input', False)
+                    st.session_state.is_ui_input = False
+                    self.process_user_input(question, is_ui_input=is_ui_input)
+                    st.rerun()
+                
+                # 사용자 입력 처리
+                if user_input := st.chat_input("질문을 입력하세요", key="chat_input"):
+                    st.session_state.messages.append({"role": "user", "content": user_input})
+                    self.process_user_input(user_input)
+                    st.rerun()
+                    
         except Exception as e:
             logger.error(f"앱 실행 중 오류: {str(e)}")
             st.error("오류가 발생했습니다. 다시 시도해주세요.")
@@ -137,12 +177,16 @@ class AppManagerSimple:
 
 
     def _update_chat_messages(self, user_input: str, response: str):
-        """채팅 메시지 업데이트 (단일 rerun 사용)"""
+        """채팅 메시지 업데이트"""
+        # HTML 태그 제거
+        clean_response = re.sub(r'<[^>]+>', '', response)
+        clean_response = re.sub(r'\)" class="copy-button">[^<]+', '', clean_response)
+
         st.session_state.messages.extend([
             {"role": "user", "content": user_input},
-            {"role": "assistant", "content": response}
+            {"role": "assistant", "content": clean_response}
         ])
-        st.rerun()  # 단 한 번의 rerun
+        st.rerun()
 
     def _generate_chat_title(self, question: str, answer: str) -> str:
         """대화 제목 생성"""
@@ -178,12 +222,28 @@ class AppManagerSimple:
             "형사": ["고소/고발", "변호사 선임", "형사절차", "보석"]
         }
         
-        for main_cat, sub_cats in categories.items():
-            if selected := st.button(main_cat):
+        st.markdown("### 💡 자주 묻는 법률 상담")
+        
+        # 카테고리 선택
+        if 'selected_category' not in st.session_state:
+            st.session_state.selected_category = None
+        
+        # 카테고리 버튼 생성
+        cols = st.columns(len(categories))
+        for idx, main_cat in enumerate(categories.keys()):
+            if cols[idx].button(main_cat):
                 st.session_state.selected_category = main_cat
-                return True
-                
-        return False
+                st.session_state.selected_subcategories = categories[main_cat]
+        
+        # 선택된 카테고리가 있으면 서브카테고리 버튼 생성
+        if st.session_state.selected_category:
+            st.markdown(f"#### {st.session_state.selected_category} 관련 상담")
+            subcategories = st.session_state.selected_subcategories
+            sub_cols = st.columns(len(subcategories))
+            for idx, sub_cat in enumerate(subcategories):
+                if sub_cols[idx].button(f"📌 {sub_cat}"):
+                    st.session_state.selected_question = sub_cat
+                    st.session_state.is_ui_input = True
 
 def main():
     try:
@@ -198,7 +258,7 @@ def main():
         
     except Exception as e:
         logger.error(f"메인 실행 중 오류: {str(e)}")
-        st.error("���플리케이션을 시작할 수 없습니다.")
+        st.error("애플리케이션을 시작할 수 없습니다.")
 
 if __name__ == "__main__":
     main() 

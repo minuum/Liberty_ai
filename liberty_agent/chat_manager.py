@@ -2,8 +2,49 @@ import streamlit as st
 from typing import Dict, List
 import logging
 from datetime import datetime
+import json
+import os
 
 logger = logging.getLogger(__name__)
+
+class ChatHistory:
+    def __init__(self, session_id: str, storage_path: str = "./chat_logs"):
+        self.session_id = session_id
+        self.storage_path = storage_path
+        self.current_chat: List[Dict] = []
+        
+        # 저장 디렉토리 생성
+        os.makedirs(storage_path, exist_ok=True)
+        
+    def add_message(self, role: str, content: str, message_type: str = "general"):
+        """채팅 메시지 추가"""
+        message = {
+            "timestamp": datetime.now().isoformat(),
+            "role": role,
+            "content": content,
+            "type": message_type,  # "legal" or "general"
+            "session_id": self.session_id
+        }
+        self.current_chat.append(message)
+        self._save_to_file()
+    
+    def _save_to_file(self):
+        """채팅 이력을 파일로 저장"""
+        filename = f"{self.storage_path}/{self.session_id}_{datetime.now().strftime('%Y%m%d')}.json"
+        try:
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(self.current_chat, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.error(f"채팅 저장 중 오류: {str(e)}")
+
+    def get_recent_messages(self, limit: int = 5) -> List[Dict]:
+        """최근 메시지 조회"""
+        return self.current_chat[-limit:]
+
+    def get_context(self) -> str:
+        """대화 컨텍스트 생성"""
+        return "\n".join([f"{msg['role']}: {msg['content']}" 
+                         for msg in self.current_chat[-3:]])
 
 class ChatManager:
     def __init__(self, db_manager):

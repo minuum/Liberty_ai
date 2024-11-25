@@ -630,7 +630,7 @@ class LegalDataProcessor:
         use_pinecone: bool = True,
         use_hybrid: bool = False,  # 하이브리드 검색기 사용 여부
         cache_mode: str = 'load',
-        k: Optional[int] = 20,  # 하이브리드 검색기용 파라미터
+        k: Optional[int] = 10,  # 하이브리드 검색기용 파라미터
         dense_weight: Optional[float] = 0.7,
         sparse_weight: Optional[float] = 0.3
     ) -> Tuple[Dict[str, Any], Any]:

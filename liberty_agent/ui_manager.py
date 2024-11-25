@@ -4,7 +4,7 @@ import logging
 from typing import Callable, Dict, List
 import uuid
 from datetime import datetime
-    
+import json
 logger = logging.getLogger(__name__)
 
 class UIManager:
@@ -29,6 +29,7 @@ class UIManager:
             "부동산": ["매매", "임대차", "등기", "재개발"],
             "형사": ["고소/고발", "변호사 선임", "형사절차", "보석"]
             }
+            self.create_category_buttons()
             self._initialized = True
         
     def create_ui(self, chat_manager):
@@ -130,30 +131,33 @@ class UIManager:
 
 
     def create_category_buttons(self):
-        """자주 묻는 질문 카테고리 버튼 생성"""
-        st.markdown("### 💡 자주 묻는 법률 상담")
-        
-        selected_question = None
-        
-        # 탭으로 메인 카테고리 생성
-        tabs = st.tabs(list(self.categories.keys()))
-        
-        # 각 탭에 서브카테고리 버튼 배치
-        for tab, (category, subcategories) in zip(tabs, self.categories.items()):
-            with tab:
-                cols = st.columns(2)
-                for i, subcat in enumerate(subcategories):
-                    with cols[i % 2]:
-                        if st.button(
-                            f"📌 {subcat}",
-                            key=f"cat_{category}_{subcat}",
-                            use_container_width=True
-                        ):
-                            # 카테고리 선택 처리
-                            selected_question = self._handle_category_selection(category, subcat)
-                            break
-        
-        return selected_question
+        """카테고리 버튼 생성"""
+        categories = {
+            "이혼/가족": ["이혼 절차", "위자료", "양육권", "재산분할"],
+            "상속": ["상속 순위", "유류분", "상속포기", "유언장"],
+            "계약": ["계약서 작성", "계약 해지", "손해배상", "보증"],
+            "부동산": ["매매", "임대차", "등기", "재개발"],
+            "형사": ["고소/고발", "변호사 선임", "형사절차", "보석"]
+        }
+
+        st.markdown("💡 자주 묻는 법률 상담")
+
+        # 카테고리 버튼 생성
+        cols = st.columns(len(categories))
+        for idx, main_cat in enumerate(categories.keys()):
+            if cols[idx].button(main_cat, key=f"main_cat_{main_cat}"):
+                st.session_state.selected_category = main_cat
+                st.session_state.selected_subcategories = categories[main_cat]
+
+        # 서브카테고리 버튼 생성
+        if st.session_state.selected_category:
+            st.markdown(f"#### {st.session_state.selected_category} 관련 상담")
+            subcategories = st.session_state.selected_subcategories
+            sub_cols = st.columns(len(subcategories))
+            for idx, sub_cat in enumerate(subcategories):
+                if sub_cols[idx].button(f"📌 {sub_cat}", key=f"sub_cat_{st.session_state.selected_category}_{sub_cat}"):
+                    st.session_state.selected_question = (st.session_state.selected_category, sub_cat)
+                    st.session_state.is_ui_input = True
 
     def _load_css(self):
         """CSS 스타일 로드"""
@@ -359,11 +363,15 @@ class UIManager:
         st.error(error_messages.get(error_type, "알 수 없는 오류가 발생했습니다."))
 
 
+    
+
     def add_copy_button(self, text: str):
+        
         """답변 복사 버튼 추가"""
+        escaped_text = json.dumps(text)  # 이스케이프 처리
         st.markdown(f"""
             <div class="copy-button-container">
-                <button onclick="navigator.clipboard.writeText(`{text}`)" class="copy-button">
+                <button onclick="navigator.clipboard.writeText({escaped_text})" class="copy-button">
                     📋 답변 복사
                 </button>
             </div>

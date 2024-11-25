@@ -18,7 +18,7 @@ class CustomKiwiBM25Retriever(BaseRetriever):
 
     vectorizer: Any = Field(description="BM25 벡터라이저")
     docs: List[Document] = Field(repr=False, description="문서 리스트")
-    k: int = Field(default=4, description="반환할 문서 수")
+    k: int = Field(default=20, description="반환할 문서 수")
     
     class Config:
         arbitrary_types_allowed = True
@@ -88,7 +88,7 @@ class CustomKiwiBM25Retriever(BaseRetriever):
         self, 
         query: str, 
         *, 
-        run_manager: CallbackManagerForRetrieverRun
+        run_manager: Optional[CallbackManagerForRetrieverRun] = None
     ) -> List[Document]:
         """쿼리와 관련된 문서 검색"""
         try:

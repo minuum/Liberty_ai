@@ -102,7 +102,7 @@ def generate_suggestions(question: str) -> List[str]:
         return response.split("|")
     except Exception as e:
         logger.error(f"추천 질문 생성 중 오류: {str(e)}")
-        return _get_fallback_suggestions(question)
+        #return self_get_fallback_suggestions(question)
 
 def handle_user_input(prompt: str):
     """사용자 입력 처리"""

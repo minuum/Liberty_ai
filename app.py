@@ -17,10 +17,13 @@ from langgraph.prebuilt import ToolInvocation
 import pprint
 from langgraph.errors import GraphRecursionError
 from langchain_core.runnables import RunnableConfig
+<<<<<<< HEAD
 import streamlit as st
 from streamlit_ui.menu import menu
 
 
+=======
+>>>>>>> develop
 
 # 환경 변수 로드
 load_dotenv()
@@ -36,6 +39,7 @@ def setup_pdf_chain():
     pdf = pdf_chain.create_chain()
     return pdf.retriever, pdf.chain
 
+<<<<<<< HEAD
 #중간고사 이후 임베딩할 부분
 import json
 from langchain_community.document_loaders import JSONLoader
@@ -49,6 +53,8 @@ def json_load():
     data = loader.load()
     return data
 
+=======
+>>>>>>> develop
 pdf_retriever, pdf_chain = setup_pdf_chain()
 
 # GraphState 정의
@@ -58,10 +64,15 @@ class GraphState(TypedDict):
     answer: str
     rewrite_weight: float
     original_weight: float
+<<<<<<< HEAD
     previous_weight: float  # Add this
     previous_answer: str    # Add this
     rewrite_count: int
     combined_score: float
+=======
+    relevance: str
+    rewrite_count: int
+>>>>>>> develop
 
 # KoBERT 모델 및 토크나이저 로드
 @st.cache_resource
@@ -114,6 +125,7 @@ def retrieve_document(state: GraphState) -> GraphState:
 def llm_answer(state: GraphState) -> GraphState:
     question = state["question"]
     context = state["context"]
+<<<<<<< HEAD
     rewrite_count = state.get("rewrite_count", 0)
     rewrite_weight = state["rewrite_weight"]
     original_weight = state["original_weight"]
@@ -148,11 +160,24 @@ def llm_answer(state: GraphState) -> GraphState:
         "original_weight": original_weight,
         "previous_answer": state["answer"]
     })
+=======
+    #재작성 횟수
+    rewrite_count = state.get("rewrite_count", 0)
+    # 재작성 횟수에 따른 가중치 조정
+    rewrite_weight = state["rewrite_weight"]  # 최대 0.5까지 증가
+    original_weight =state["original_weight"]
+
+    response = pdf_chain.invoke({"question": question, "context": context, "rewrite_weight": rewrite_weight, "original_weight": original_weight})
+>>>>>>> develop
 
     return GraphState(answer=response, rewrite_count=rewrite_count)
 
 def rewrite(state):
+<<<<<<< HEAD
     previous_weight = state["rewrite_weight"]
+=======
+    
+>>>>>>> develop
     state["rewrite_count"] = (state.get("rewrite_count", 0) + 1)  # 카운터 증가
     print("rewrite_count : ", state["rewrite_count"])
 
@@ -166,6 +191,7 @@ def rewrite(state):
     context = state["context"]
     rewrite_weight = state["rewrite_weight"]
     
+<<<<<<< HEAD
     prompt = ChatPromptTemplate.from_messages([
         (
             "system",
@@ -189,6 +215,31 @@ def rewrite(state):
         )
     ])
     
+=======
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+            "system",
+            "You are a professional prompt rewriter. Your task is to generate questions to obtain additional information not shown in the given context. "
+            "Your generated questions will be used for web searches to find relevant information. "
+            "Consider the rewrite weight ({{rewrite_weight:.2f}}) to adjust the credibility of the previous answer. "
+            "The higher the weight, the more you should doubt the previous answer and focus on finding new information."
+            "The weight is calculated based on the number of times the question has been rewritten. "
+            "The higher the weight, the more you should doubt the previous answer and focus on finding new information."
+        ),
+        (
+            "human",
+            "Rewrite the question to obtain additional information for the answer. "
+            "\n\nInitial question:\n ------- \n{question}\n ------- \n"
+            "\n\nInitial context:\n ------- \n{context}\n ------- \n"
+            "\n\nInitial answer to the question:\n ------- \n{answer}\n ------- \n"
+            "\n\nRewrite weight: {{rewrite_weight:.2f}} (The higher this value, the more you should doubt the previous answer)"
+            "\n\nFormulate an improved question in Korean:"
+        ),
+    ]
+)
+
+>>>>>>> develop
     # Question rewriting model
     model = ChatOpenAI(temperature=0, model="gpt-4o-2024-08-06")
 
@@ -220,12 +271,17 @@ def kobert_relevance_check(context, answer):
     # 코사인 유사도 계산
     similarity = torch.nn.functional.cosine_similarity(context_embedding, answer_embedding)
     
+<<<<<<< HEAD
     # Convert the similarity value to a range between 0 and 1
+=======
+    # 유사도 값을 0과 1 사이로 변환
+>>>>>>> develop
     relevance_score = (similarity.item() + 1) / 2
     
     return relevance_score
 
 def relevance_check(state: GraphState) -> GraphState:
+<<<<<<< HEAD
     print(f"""
     Weight Progress:
     - Iteration: {state['rewrite_count']}
@@ -233,6 +289,8 @@ def relevance_check(state: GraphState) -> GraphState:
     - Current Weight: {state['rewrite_weight']:.2f}
     - Answer Evolution: {'Significant' if state['rewrite_weight'] > 0.3 else 'Minor'} changes expected
     """)
+=======
+>>>>>>> develop
     #print("relevance_check", state)
     print("relevance_check")
     # 기존 upstage_ground_checker 실행
@@ -276,7 +334,11 @@ def relevance_check(state: GraphState) -> GraphState:
         print("final_relevance (upstage only) : ", final_relevance)
     
     return GraphState(
+<<<<<<< HEAD
         relevance=final_relevance, question=state["question"], answer=state["answer"], combined_score=combined_score
+=======
+        relevance=final_relevance, question=state["question"], answer=state["answer"]
+>>>>>>> develop
     )
 
 
@@ -290,6 +352,7 @@ def final_output(state: GraphState) -> str:
 
 # Streamlit 앱 시작
 st.title("Liberty LangGraph QA 챗봇")
+<<<<<<< HEAD
 # 세션 상태 초기화
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -314,6 +377,8 @@ else:
 
 # 메뉴 호출
 menu()
+=======
+>>>>>>> develop
 
 # 세션 상태 초기화
 if "messages" not in st.session_state:
@@ -388,6 +453,7 @@ if prompt := st.chat_input("질문을 입력하세요:"):
             final_output = outputs[-1]
             final_answer = final_output.get('relevance_check', {}).get('answer', "답변을 찾을 수 없습니다.")
             rewrite_count = final_output.get('relevance_check', {}).get('rewrite_count', 0)
+<<<<<<< HEAD
             combined_score = final_output.get('relevance_check', {}).get('combined_score', 0)  # combined_score 확인
             
             full_response = f"{final_answer}\n\n총 질문 재작성 횟수: {rewrite_count}\n결합 점수: {combined_score}"
@@ -396,6 +462,16 @@ if prompt := st.chat_input("질문을 입력하세요:"):
         except GraphRecursionError as e:
             full_response = f"재귀 한도에 도달했습니다: {e}\n최종 답변: {outputs[-1] if outputs else '답변을 생성하지 못했습니다.'}"
             message_placeholder.markdown(full_response)
+=======
+            
+            full_response = f"{final_answer}\n\n총 질문 재작성 횟수: {rewrite_count}"
+            message_placeholder.markdown(full_response)
+
+        except GraphRecursionError as e:
+            error_message = f"Recursion limit reached: {e}\n최종 답변: {outputs[-1] if outputs else '답변을 생성하지 못했습니다.'}"
+            message_placeholder.error(error_message)
+            full_response = error_message
+>>>>>>> develop
 
         st.session_state.messages.append({"role": "assistant", "content": full_response})
 

@@ -9,7 +9,10 @@ from abc import ABC, abstractmethod
 from operator import itemgetter
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> develop
 class RetrievalChain(ABC):
     def __init__(self):
         self.source_uri = None
@@ -45,7 +48,11 @@ class RetrievalChain(ABC):
         return dense_retriever
 
     def create_model(self):
+<<<<<<< HEAD
         return ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+=======
+        return ChatOpenAI(model_name="gpt-4-turbo", temperature=0)
+>>>>>>> develop
 
     def create_prompt(self):
         return hub.pull("minuum/liberty-rag")

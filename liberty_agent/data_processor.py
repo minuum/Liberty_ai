@@ -65,8 +65,8 @@ class LegalDataProcessor:
         self.pc = Pinecone(api_key=pinecone_api_key)
         self.index_name = index_name
         self.pinecone_index = self.pc.Index(index_name)
-        self.namespace = "liberty-db-namespace-legal-agent"
-    
+        #self.namespace = "liberty-db-namespace-legal-agent"
+        self.namespace = "liberty-db-namespace-legal-agent-241122"
         # 캐시 설정
         self.cache_dir = Path(cache_dir)
         self.cache_mode = cache_mode
@@ -189,7 +189,7 @@ class LegalDataProcessor:
                             # 3. 질의/응답 정보 추가
                             if data['jdgmnInfo']:
                                 for qa in data['jdgmnInfo']:
-                                    content_parts.append(f"���문: {qa['question']}")
+                                    content_parts.append(f"질문: {qa['question']}")
                                     content_parts.append(f"답변: {qa['answer']}")
                             
                                     # Document 생성
@@ -278,6 +278,7 @@ class LegalDataProcessor:
         self, 
         documents: List[Document],
         start_batch: int = 0,
+        end_batch: Optional[int] = None,  # end_batch 파라미터 추가
         batch_size: int = 100,  # 배치 크기 증가
         max_workers: int = 30,  # 워커 수 증가
         show_progress: bool = True
@@ -285,10 +286,17 @@ class LegalDataProcessor:
         """멀티스레딩을 사용한 임베딩 생성 및 Pinecone 업로드"""
         try:
             start_idx = start_batch * batch_size
-            documents_subset = documents[start_idx:]
+            
+            # end_batch가 지정된 경우 해당 배치까지만 처리
+            if end_batch is not None:
+                end_idx = min(end_batch * batch_size, len(documents))
+                documents_subset = documents[start_idx:end_idx]
+            else:
+                documents_subset = documents[start_idx:]
+                
             total_docs = len(documents_subset)
             
-            logger.info(f"임베딩 생성 시작: 총 {total_docs}개 문서 (인덱스 {start_idx}부터)")
+            logger.info(f"임베딩 생성 시작: 총 {total_docs}개 문서 (배치 {start_batch}부터 {end_batch if end_batch else '끝'}까지)")
             
             # 초기 상태 확인
             initial_stats = self.pinecone_index.describe_index_stats()
@@ -620,7 +628,11 @@ class LegalDataProcessor:
         use_faiss: bool = True,
         use_kiwi: bool = True,
         use_pinecone: bool = True,
-        cache_mode: str = 'load'
+        use_hybrid: bool = False,  # 하이브리드 검색기 사용 여부
+        cache_mode: str = 'load',
+        k: Optional[int] = 10,  # 하이브리드 검색기용 파라미터
+        dense_weight: Optional[float] = 0.7,
+        sparse_weight: Optional[float] = 0.3
     ) -> Tuple[Dict[str, Any], Any]:
         """통합 검색기 생성"""
         try:
@@ -630,32 +642,33 @@ class LegalDataProcessor:
             
             # FAISS 검색기
             if use_faiss:
-                faiss_dir = os.path.join(self.retriever_cache_dir, "faiss")
+                faiss_dir = self.retriever_cache_dir / "faiss" 
                 if cache_mode == 'load':
-                    if os.path.exists(os.path.join(faiss_dir, "index.faiss")):
-                        #logger.info(f"FAISS 인덱스 로드 중... ({faiss_dir})")
+                    faiss_index_path = faiss_dir / "index.faiss"
+                    if faiss_index_path.exists():
                         retrievers['faiss'] = FAISS.load_local(
-                            faiss_dir,
+                            str(faiss_dir),
                             self.dense_embedder,
                             allow_dangerous_deserialization=True
                         )
                         logger.info(f"FAISS 인덱스 로드 완료 ({faiss_dir})")
                     else:
-                        logger.warning("저장된 FAISS 인덱스를 찾을 수 없습니다.")
+                        logger.warning(f"저장된 FAISS 인덱스를 찾을 수 없습니다.{faiss_index_path}")
         
             # KiwiBM25 검색기
             if use_kiwi:
-                kiwi_dir = os.path.join(self.retriever_cache_dir, "kiwi")
+                kiwi_dir = self.retriever_cache_dir / "kiwi"
                 if cache_mode == 'load':
-                    if os.path.exists(os.path.join(kiwi_dir, "legal_kiwi_vectorizer.pkl")):
-                        #logger.info(f"KiwiBM25 검색기 로드 중... ({kiwi_dir})")
+                    kiwi_vectorizer_path = kiwi_dir / "legal_kiwi_vectorizer.pkl"
+                    if kiwi_vectorizer_path.exists():
+
                         retrievers['kiwi'] = CustomKiwiBM25Retriever.load_local(
-                            kiwi_dir, 
+                            str(kiwi_dir), 
                             "legal_kiwi"
                         )
                         logger.info(f"KiwiBM25 검색기 로드 완료 ({kiwi_dir})")
                     else:
-                        logger.warning("저장된 KiwiBM25 검색기를 찾을 수 없습니다.")
+                        logger.warning(f"저장된 KiwiBM25 검색기를 찾을 수 없습니다.{kiwi_vectorizer_path}")
         
             # Pinecone 하이브리드 검색기
             if use_pinecone and sparse_encoder is not None:
@@ -667,6 +680,23 @@ class LegalDataProcessor:
                 }
                 retrievers['pinecone'] = PineconeKiwiHybridRetriever(**pinecone_params)
                 logger.info("Pinecone KiwiBM25 하이브리드 검색기 초기화 완료")
+
+            # FAISS-Kiwi 하이브리드 검색기 추가
+            if use_hybrid and 'faiss' in retrievers and 'kiwi' in retrievers:
+                dense_retriever = retrievers['faiss'].as_retriever(
+                    search_type="similarity",
+                    search_kwargs={"k": k}
+                )
+                
+                hybrid = HybridRetriever(
+                    dense_retriever=dense_retriever,
+                    sparse_retriever=retrievers['kiwi'],
+                    k=k,
+                    dense_weight=dense_weight,
+                    sparse_weight=sparse_weight
+                )
+                retrievers['hybrid'] = hybrid
+                logger.info("FAISS-Kiwi 하이브리드 검색기 생성 완료")
         
             return retrievers, sparse_encoder
             

@@ -3,7 +3,7 @@ from pinecone import Pinecone
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain import hub
-from typing import Dict, List, Optional, Union, TypedDict
+from typing import Dict, List, Optional, Union, TypedDict,Any
 import re  # 정규표현식 모듈 임포트
 from langchain.schema import Document
 import logging
@@ -18,18 +18,19 @@ from langchain_core.output_parsers import StrOutputParser
 from datetime import datetime
 from langchain.schema.runnable import RunnableConfig
 import re
+from langchain.callbacks.base import BaseCallbackHandler
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.checkpoint.sqlite import SqliteSaver
 from datetime import datetime
 import json
 from pathlib import Path
-
+import streamlit as st
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
 logger = logging.getLogger(__name__)
-
+from ui_manager import UIManager
 class AgentState(TypedDict):
     """에이전트 상태 정의"""
     question: str
@@ -53,13 +54,13 @@ class LegalAgent:
             cls._instance = super(LegalAgent, cls).__new__(cls)
         return cls._instance
     
-    def __init__(self, cache_mode: bool = False):
+    def __init__(self, cache_mode: bool = False,chat_manager = None):
         """법률 에이전트 초기화"""
         if not self._initialized:
             try:
                 # 기본 컴포넌트 초기화
                 self._initialize_components(cache_mode)
-                
+                self.chat_manager = chat_manager
                 # 메모리 저장소 초기화
                 self.memory_saver = MemorySaver()
                 
@@ -118,7 +119,6 @@ class LegalAgent:
                 cache_dir="./cached_vectors/search_engine"
             )
             logger.info("검색 엔진 초기화 완료")
-            
             # 세션 종료 시 저장
             if cache_mode:
                 import atexit
@@ -129,12 +129,18 @@ class LegalAgent:
             
             # LLM 초기화
             self.llm = ChatOpenAI(
-                model="gpt-4o-2024-08-06",
+                model="gpt-4o-2024-11-20",
                 temperature=0.1,
                 api_key=OPENAI_API_KEY
             )
             logger.info("LLM 초기화 완료")
-            
+            # 일반 대화용 LLM 추가
+            self.general_llm = ChatOpenAI(
+                model="gpt-4o-2024-11-20",
+                temperature=0.7,  # 일반 대화용으로 온도 조절
+                api_key=OPENAI_API_KEY
+            )
+            logger.info("일반 대화용 LLM 초기화 완료")
             # 프롬프트 로드
             self.answer_prompt = hub.pull("minuum/liberty-rag")
             self.rewrite_prompt = self._create_rewrite_prompt()
@@ -148,10 +154,30 @@ class LegalAgent:
         try:
             workflow = StateGraph(AgentState)
             
+            # 상태 업데이트를 위한 메시지 매핑
+            status_messages = {
+                "classify_question": ("질문 분석", "법률 질문 여부를 판단하고 있습니다..."),
+                "retrieve": ("문서 검색", "관련 법률 정보를 검색하고 있습니다..."),
+                "quick_filter": ("관련성 검사", "검색 결과의 관련성을 확인하고 있습니다..."),
+                "llm_answer": ("답변 생성", "법률 정보를 기반으로 답변을 작성하고 있습니다..."),
+                "general_chat": ("일반 대화", "일반적인 답변을 생성하고 있습니다..."),
+                "quality_check": ("품질 검증", "답변의 품질을 검증하고 있습니다..."),
+                "rewrite_query": ("질문 최적화", "검색 질문을 개선하고 있습니다..."),
+                "rewrite_answer": ("답변 개선", "답변을 개선하고 있습니다...")
+            }
+            
             # 노드 래핑 함수
             def wrap_node(node_func, node_name):
                 def wrapped(state):
                     start_time = time.time()
+                    
+                    # 상태 메시지 업데이트
+                    if node_name in status_messages:
+                        title, detail = status_messages[node_name]
+                        if hasattr(st, 'session_state') and 'status_container' in st.session_state:
+                            st.session_state.status_container.info(f"🔄 {title}\n{detail}")
+                    
+                    # 노드 실행
                     result = node_func(state)
                     execution_time = time.time() - start_time
                     
@@ -174,36 +200,49 @@ class LegalAgent:
                         "timestamp": datetime.now().isoformat(),
                         "node_name": node_name,
                         "execution_time": execution_time,
-                        "node_type": "legal" if self._is_legal_query(state.get("question", "")) else "general"
+                        "node_type": "legal" if self._is_legal_query(state.get("question", "")) else "general",
+                        "question": state.get("question", ""),
+                        "answer": result.get("answer", "")
                     }
                     
                     self.memory_saver.put(config, checkpoint, metadata)
                     return result
                 return wrapped
-            
-            # 노드 추가
+                
+            # 노드 추가 (이전과 동일)
             workflow.add_node("classify_question", wrap_node(self._classify_question, "classify_question"))
             workflow.add_node("retrieve", wrap_node(self._retrieve, "retrieve"))
             workflow.add_node("quick_filter", wrap_node(self._quick_relevance_check, "quick_filter"))
             workflow.add_node("llm_answer", wrap_node(self._llm_answer, "llm_answer"))
+            workflow.add_node("general_chat", wrap_node(self._general_chat, "general_chat"))
             workflow.add_node("quality_check", wrap_node(self._detailed_quality_check, "quality_check"))
             workflow.add_node("rewrite_query", wrap_node(self._rewrite, "rewrite_query"))
             workflow.add_node("rewrite_answer", wrap_node(self._rewrite_answer, "rewrite_answer"))
             
-            # 시작점 설정
+            # 엣지 설정 (이전과 동일)
             workflow.set_entry_point("classify_question")
             
-            # 3. 기본 플로우 연결
-            workflow.add_edge("classify_question", "retrieve")
+            def classify_condition(state):
+                return "general" if state["question_type"] == "general" else "legal"
+                
+            workflow.add_conditional_edges(
+                "classify_question",
+                classify_condition,
+                {
+                    "legal": "retrieve",
+                    "general": "general_chat"
+                }
+            )
+            
             workflow.add_edge("retrieve", "quick_filter")
             workflow.add_edge("llm_answer", "quality_check")
-            # 4. 조건부 엣지 설정
+            
             workflow.add_conditional_edges(
                 "quick_filter",
                 self._should_proceed,
                 {
                     "proceed": "llm_answer",
-                    "rewrite": "rewrite_query"  # 검색 쿼리 재작성
+                    "rewrite": "rewrite_query"
                 }
             )
             
@@ -212,31 +251,16 @@ class LegalAgent:
                 self._route_by_quality,
                 {
                     "proceed": END,
-                    "rewrite": "rewrite_answer",  # 답변 재작성
+                    "rewrite": "rewrite_answer",
                     "re_retrieve": "retrieve"
                 }
             )
             
-            # 5. 재작성 노드 연결
-            workflow.add_edge("rewrite_query", "retrieve")  # 쿼리 재작성 후 검색
-            workflow.add_edge("rewrite_answer", "llm_answer")  # 답변 재작성 후 LLM
+            workflow.add_edge("rewrite_query", "retrieve")
+            workflow.add_edge("rewrite_answer", "llm_answer")
+            workflow.add_edge("general_chat", END)
             
-            logger.info("""
-            === 워크플로우 생성 완료 ===
-            노드:
-            - retrieve (시작)
-            - quick_filter
-            - llm_answer
-            - quality_check
-            - rewrite_query (검색 쿼리 재작성)
-            - rewrite_answer (답변 재작성)
-            
-            주요 경로:
-            1. retrieve -> quick_filter -> llm_answer -> quality_check -> END
-            2. retrieve -> quick_filter -> rewrite_query -> retrieve
-            3. retrieve -> quick_filter -> llm_answer -> quality_check -> rewrite_answer -> llm_answer
-            """)
-            
+            logger.info("워크플로우 생성 완료")
             return workflow.compile()
             
         except Exception as e:
@@ -251,7 +275,42 @@ class LegalAgent:
             )
         except Exception as e:
             logger.error(f"SQLite 저장 중 오류: {str(e)}")
+    def _general_chat(self, state: AgentState) -> AgentState:
+        """일반 대화 처리"""
+        try:
+            logger.info(f"=== GENERAL_CHAT NODE 진입 ===\n질문: {state['question']}")
+            self.current_step = "일반 대화 처리 중"
 
+            # 이전 대화 내용 가져오기
+            chat_history = state.get('chat_history', [])
+
+            # LLM 호출을 위한 메시지 구성
+            messages = [
+                {"role": "system", "content": "당신은 친절한 AI 어시스턴트입니다."}
+            ]
+            
+            # 채팅 기록 추가
+            if chat_history:
+                messages.extend(chat_history)
+
+            # 현재 질문 추가
+            messages.append({'role': 'user', 'content': state['question']})
+            logger.info(f"일반 대화 메시지: {messages}")
+
+            # 일반 대화용 LLM 호출
+            response = self.llm.invoke(messages).content.strip()
+            logger.info(f"일반 대화 답변: {response}")
+
+            # 상태 업데이트
+            state["answer"] = response
+
+            logger.info(f"=== GENERAL_CHAT NODE 완료 ===\n답변: {response}")
+
+            return state
+
+        except Exception as e:
+            logger.error(f"일반 대화 처리 중 오류: {str(e)}")
+            return self._create_error_state(state)
     def get_chat_history(self, session_id: str):
         """채팅 이력 조회"""
         try:
@@ -269,20 +328,23 @@ class LegalAgent:
                 checkpoints,
                 key=lambda x: x.metadata["timestamp"]
             )
-            
-            return [
-                {
-                    "timestamp": cp.metadata["timestamp"],
-                    "question": cp.metadata["question"],
-                    "answer": cp.checkpoint["data"].get("answer", ""),
-                    "confidence": cp.checkpoint["data"].get("combined_score", 0.0)
-                }
-                for cp in sorted_checkpoints
-            ]
+            logger.info(f"채팅 이력 조회: {sorted_checkpoints}")
+            messages = []
+            for cp in sorted_checkpoints:
+                question = cp.metadata.get("question", "")
+                answer = cp.checkpoint["data"].get("answer", "")
+                if question:
+                    messages.append({"role": "user", "content": question})
+                if answer:
+                    messages.append({"role": "assistant", "content": answer})
+                    
+            return messages
             
         except Exception as e:
             logger.error(f"채팅 이력 조회 중 오류: {str(e)}")
             return []
+            
+
     def _classify_question(self, state: AgentState) -> AgentState:
         """LLM을 사용하여 질문을 분류"""
         try:
@@ -589,6 +651,7 @@ class LegalAgent:
         try:
             logger.info(f"=== LLM_ANSWER NODE 진입 ===\n질문: {state['question']}\n질문 유형: {state.get('question_type', 'unknown')}")
             self.current_step = "LLM을 사용하여 답변 생성 중"
+
             if not state.get("context"):
                 logger.warning("컨텍스트 없음 - 폴백 응답 생성")
                 return self._create_fallback_response(state)
@@ -618,27 +681,25 @@ class LegalAgent:
                     else:
                         cleaned_chat_history.append(msg)
 
-            chat_history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in cleaned_chat_history])
+            # 컨텍스트를 시스템 메시지에 추가
+            system_prompt += f"\n\n다음은 참고할 수 있는 법률 정보입니다:\n{context_text}"
 
-            prompt_template = ChatPromptTemplate.from_messages([
-                ("system", system_prompt),
-                ("user", chat_history_text + f"\n사용자: {state['question']}")
-            ])
+            # 메시지 구성
+            messages = [
+                {"role": "system", "content": system_prompt}
+            ] + cleaned_chat_history + [{"role": "user", "content": state["question"]}]
 
-            chain = prompt_template | self.llm | StrOutputParser()
-            raw_answer = chain.invoke({
-                "context": context_text,
-                "question": state["question"]
-            })
+            # LLM 호출
+            response = self.llm.invoke(messages).content.strip()
 
-            formatted_answer = self.format_answer(raw_answer)
+            formatted_answer = self.format_answer(response)
             logger.info(f"formatted_answer: {formatted_answer}")
             updated_state = state.copy()
             updated_state["answer"] = formatted_answer
 
             logger.info(f"=== LLM_ANSWER NODE 완료 ===\n답변 길이: {len(formatted_answer)}\n컨텍스트 활용: {len(context)} documents")
 
-            return AgentState(**updated_state)
+            return updated_state
 
         except Exception as e:
             logger.error(f"답변 생성 중 오류: {str(e)}")
@@ -875,9 +936,26 @@ class LegalAgent:
         # 법률 키워드가 있고 일상적 대화가 아닌 경우만 법률 질문으로 처리
         return has_legal_keyword and not is_casual
 
-    def process_query(self, question: str, session_id: str = None) -> Dict:
+    def process_query(self, question: str, session_id: str = None, user_id: str = None,status_container: Any = None) -> Dict:
         start_time = time.time()
         try:
+            status_container = st.empty()
+            status_tracker = WorkflowStatusTracker(container=status_container)
+                        # 세션 및 메시지 저장
+            if user_id is not None and session_id is not None:
+                self.chat_manager.save_session(
+                    user_id=user_id,
+                    session_id=session_id,
+                    messages=st.session_state.messages
+                )
+            # 사용자 메시지 저장
+            if user_id is not None:
+                self.chat_manager.save_message(
+                    user_id=user_id,
+                    session_id=session_id,
+                    message_type="user",
+                    content=question
+                )
             chat_history = self.get_chat_history(session_id) if session_id else []
             state = AgentState(
                 question=question,
@@ -891,51 +969,132 @@ class LegalAgent:
                 original_weight=1.0,
                 combined_score=0.0,
                 question_type="unknown",
-                chat_history=chat_history  # 추가된 부분
-            )
-                
-            config = RunnableConfig(
-                configurable={
-                    "thread_id": session_id
-                }
+                chat_history=chat_history
             )
 
             # 워크플로우 실행
-            result = self.workflow.invoke(state, config=config)
+            result = self.workflow.invoke(
+                state,
+                config=RunnableConfig(
+                    callbacks=[status_tracker],
+                    configurable={"thread_id": session_id}
+                )
+            )
+
+            # 답변 생성
             answer = result.get("answer", "답변을 생성할 수 없습니다.")
+            clean_answer = re.sub(r'<[^>]*>', '', answer)
+            clean_answer = re.sub(r'\)" class="copy-button">[^<]+', '', clean_answer)
             confidence = result.get("combined_score", 0.0)
             execution_time = time.time() - start_time
-            
             # 실행 결과 저장
             checkpoint = {
                 "id": str(uuid.uuid4()),
                 "data": result
             }
-            
+        
             metadata = {
                 "timestamp": datetime.now().isoformat(),
                 "execution_time": execution_time,
                 "question": question,
                 "question_type": state.get("question_type", "unknown")
             }
-            
-  
+            # 워크플로우 설정
+            config = RunnableConfig(
+                configurable={
+                    "thread_id": session_id,
+                    "callbacks": [status_tracker]
+                }
+            )
             self.memory_saver.put(config, checkpoint, metadata)
-            
+
+
+            # 추천 질문 생성
+            suggestions = self.generate_suggestions(answer)
+
+            # UI 관련 코드 제거
+
             return {
                 "answer": answer,
                 "confidence": confidence,
+                "suggestions": suggestions,
                 "session_id": session_id
             }
-            
+
         except Exception as e:
             logger.error(f"질문 처리 중 오류: {str(e)}")
             return {
                 "answer": "죄송합니다. 질문을 처리하는 중에 오류가 발생했습니다.",
                 "confidence": 0.0,
+                "suggestions": [],
                 "session_id": session_id
             }
 
+
+    def generate_suggestions(self, answer: str, num_suggestions: int = 3) -> List[str]:
+        import re
+        """LLM을 사용하여 답변과 관련된 추천 질문 생성"""
+        try:
+            prompt = f"""
+            다음 답변을 읽고, 사용자가 추가로 궁금해할 만한 관련 질문을 {num_suggestions}개 생성해주세요.
+            
+            답변:
+            \"\"\"
+            {answer}
+            \"\"\"
+            
+            추천 질문:
+            1.
+            """
+            
+            # LLM 호출
+            response = self.llm.invoke(prompt).content.strip()
+            
+            # 추천 질문 파싱
+            suggestions = []
+            for line in response.split('\n'):
+                line = line.strip()
+                if line and re.match(r'\d+\.', line):
+                    question = line[line.find('.')+1:].strip()
+                    if question:
+                        suggestions.append(question)
+                elif line:
+                    suggestions.append(line)
+            
+            # 최대 num_suggestions 개수만큼 반환
+            return suggestions[:num_suggestions]
+            
+        except Exception as e:
+            logger.error(f"추천 질문 생성 중 오류: {str(e)}")
+            # 오류 발생 시 기본 추천 질문 반환
+            return [
+                "관련된 다른 법률 조항은 무엇인가요?",
+                "비슷한 사례에 대한 판례가 있나요?",
+                "추가로 알아야 할 사항이 있나요?"
+            ]     
+    # def add_copy_button(self, text: str):
+    #     """복사 버튼 추가"""
+    #     st.button(
+    #         "📋 답변 복사",
+    #         key=f"copy_{hash(text)}",
+    #         on_click=lambda: st.write(text)
+    #     )
+
+    # def display_confidence_score(self, score: float):
+    #     """신뢰도 점수 표시"""
+    #     color = "green" if score > 0.8 else "orange" if score > 0.6 else "red"
+    #     st.markdown(f"""
+    #         <div style='text-align: right; color: {color}'>
+    #             신뢰도: {score:.2f}
+    #         </div>
+    #     """, unsafe_allow_html=True)
+
+    # def _handle_suggestion_click(self, suggestion: str):
+    #     """추천 질문 클릭 처리"""
+    #     if 'messages' not in st.session_state:
+    #         st.session_state.messages = []
+    #     st.session_state.messages.append({"role": "user", "content": suggestion})
+    #     st.rerun()
     def _format_answer(self, answer: str, context: List[Document | str]) -> str:
         """답변 포맷팅 - 참고 자료 포함"""
         references = []
@@ -1668,8 +1827,48 @@ class DocumentWrapper:
         return str(self.content)
 
 
+from langchain.callbacks.base import BaseCallbackHandler
 
+from langchain.callbacks.base import BaseCallbackHandler
 
+class WorkflowStatusTracker(BaseCallbackHandler):
+    """워크플로우 상태 추적 핸들러"""
+    def __init__(self, container=None):
+        self.container = container
+        # 노드별 상태 메시지
+        self.status_map = {
+            "classify_question": "질문 분석 중...",
+            "retrieve": "관련 법률 정보 검색 중...",
+            "quick_filter": "검색 결과 필터링 중...",
+            "llm_answer": "답변 생성 중...",
+            "quality_check": "답변 품질 검증 중...",
+            "rewrite_query": "검색어 최적화 중...",
+            "rewrite_answer": "답변 개선 중..."
+        }
 
+    def on_chain_start(self, serialized: dict = None, inputs: dict = None, **kwargs):
+        """체인 시작 시 호출"""
+        try:
+            # 현재 노드 이름 추출
+            node_name = ''
+            if serialized and isinstance(serialized, dict):
+                node_name = serialized.get('name', '') or serialized.get('id', '')
+            # 상태 메시지 업데이트
+            if node_name in self.status_map:
+                message = f"🔄 {self.status_map[node_name]}"
+                self.container.info(message)
+        except Exception as e:
+            logger.warning(f"상태 업데이트 중 오류 발생: {e}")
+
+    def on_chain_end(self, outputs: dict = None, **kwargs):
+        """체인 종료 시 호출"""
+        pass
+
+    def on_chain_error(self, error: Exception = None, **kwargs):
+        """체인 오류 시 호출"""
+        if self.container:
+            self.container.error(f"❌ 처리 중 오류 발생: {str(error)}")
+        else:
+            logger.error(f"❌ 처리 중 오류 발생: {str(error)}")
 
 

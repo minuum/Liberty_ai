@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 import json
 logger = logging.getLogger(__name__)
-
+from langchain_openai import ChatOpenAI
 class UIManager:
     _instance = None
     _initialized = False
@@ -29,16 +29,57 @@ class UIManager:
             "부동산": ["매매", "임대차", "등기", "재개발"],
             "형사": ["고소/고발", "변호사 선임", "형사절차", "보석"]
             }
+            #self.llm=chatOpenAI(model="gpt-4o-mini-2024-07-18", temperature=0.0)
             self.create_category_buttons()
             self._initialized = True
-        
+    def generate_suggestions(self, answer: str, num_suggestions: int = 3) -> List[str]:
+        import re
+        """LLM을 사용하여 답변과 관련된 추천 질문 생성"""
+        try:
+            prompt = f"""
+            다음 답변을 읽고, 사용자가 추가로 궁금해할 만한 관련 질문을 {num_suggestions}개 생성해주세요.
+            
+            답변:
+            \"\"\"
+            {answer}
+            \"\"\"
+            
+            추천 질문:
+            1.
+            """
+            
+            # LLM 호출
+            response = self.legal_agent.llm.invoke(prompt).content.strip()
+            
+            # 추천 질문 파싱
+            suggestions = []
+            for line in response.split('\n'):
+                line = line.strip()
+                if line and re.match(r'\d+\.', line):
+                    question = line[line.find('.')+1:].strip()
+                    if question:
+                        suggestions.append(question)
+                elif line:
+                    suggestions.append(line)
+            
+            # 최대 num_suggestions 개수만큼 반환
+            return suggestions[:num_suggestions]
+            
+        except Exception as e:
+            logger.error(f"추천 질문 생성 중 오류: {str(e)}")
+            # 오류 발생 시 기본 추천 질문 반환
+            return [
+                "관련된 다른 법률 조항은 무엇인가요?",
+                "비슷한 사례에 대한 판례가 있나요?",
+                "추가로 알아야 할 사항이 있나요?"
+            ]
     def create_ui(self, chat_manager):
         """UI 생성"""
         try:
             # CSS 로드 및 헤더 생성
             self._load_css()
             self._create_header()
-            
+            self._initialize_session_state()
             # 세션 상태 확인 및 초기화
             if 'messages' not in st.session_state:
                 st.session_state.messages = []
@@ -88,13 +129,20 @@ class UIManager:
                 # 자주 묻는 질문 카테고리
                 self.create_category_buttons()
                 
-                # 채팅 히스토리 표시
-                for message in st.session_state.messages:
-                    with st.chat_message(message["role"]):
-                        st.markdown(message["content"])
-                        if message["role"] == "assistant":
-                            self.add_copy_button(message["content"])
-                            self.show_save_options(message)
+            # 채팅 히스토리 표시
+            for message in st.session_state.messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+                    if message["role"] == "assistant":
+                        self.add_copy_button(message["content"])
+                        self.show_save_options(message)
+                        # 추천 질문 표시
+                        suggestions = self.generate_suggestions(message["content"])
+                        if suggestions:
+                            st.markdown("#### 🤔 관련 질문을 클릭해보세요:")
+                            for suggestion in suggestions:
+                                if st.button(f"🔹 {suggestion}", key=f"suggestion_{suggestion}"):
+                                    self._handle_suggestion_click(suggestion)
                 
                 # # 채팅 입력창 (하나만 생성)
                 # if prompt := st.chat_input("질문을 입력하세요", key="chat_input"):
@@ -104,7 +152,7 @@ class UIManager:
         except Exception as e:
             logger.error(f"UI 생성 중 오류: {str(e)}")
             st.error("UI를 생성하는 중 오류가 발생했습니다.")
-
+    
     def _create_sidebar(self, chat_manager):
         """사이드바 생성"""
         with st.sidebar:
@@ -140,24 +188,32 @@ class UIManager:
             "형사": ["고소/고발", "변호사 선임", "형사절차", "보석"]
         }
 
-        st.markdown("💡 자주 묻는 법률 상담")
-
-        # 카테고리 버튼 생성
-        cols = st.columns(len(categories))
-        for idx, main_cat in enumerate(categories.keys()):
-            if cols[idx].button(main_cat, key=f"main_cat_{main_cat}"):
-                st.session_state.selected_category = main_cat
-                st.session_state.selected_subcategories = categories[main_cat]
-
-        # 서브카테고리 버튼 생성
-        if st.session_state.selected_category:
-            st.markdown(f"#### {st.session_state.selected_category} 관련 상담")
-            subcategories = st.session_state.selected_subcategories
-            sub_cols = st.columns(len(subcategories))
-            for idx, sub_cat in enumerate(subcategories):
-                if sub_cols[idx].button(f"📌 {sub_cat}", key=f"sub_cat_{st.session_state.selected_category}_{sub_cat}"):
-                    st.session_state.selected_question = (st.session_state.selected_category, sub_cat)
-                    st.session_state.is_ui_input = True
+def create_category_buttons(self):
+    """카테고리 버튼 생성"""
+    st.markdown("### 💡 자주 묻는 법률 상담")
+    cols = st.columns(len(self.categories))
+    
+    for idx, (main_cat, subcategories) in enumerate(self.categories.items()):
+        # 고유한 키 생성
+        button_key = f"main_cat_{main_cat}_{idx}"
+        if cols[idx].button(main_cat, key=button_key):
+            st.session_state.selected_category = main_cat
+            st.session_state.selected_subcategories = subcategories
+    
+    if st.session_state.selected_category:
+        st.markdown(f"#### {st.session_state.selected_category}")
+        subcategories = st.session_state.selected_subcategories
+        sub_cols = st.columns(len(subcategories))
+        for idx, sub_cat in enumerate(subcategories):
+            # 서브카테고리 버튼에도 고유한 키 생성
+            sub_button_key = f"sub_cat_{st.session_state.selected_category}_{sub_cat}_{idx}"
+            if sub_cols[idx].button(f"📌 {sub_cat}", key=sub_button_key):
+                self._handle_category_selection(
+                    st.session_state.selected_category,
+                    sub_cat,
+                        st.session_state.user_id,
+                        st.session_state.current_session_id
+                    )
 
     def _load_css(self):
         """CSS 스타일 로드"""
@@ -328,29 +384,16 @@ class UIManager:
 
     def _handle_suggestion_click(self, question: str):
         """추천 질문 클릭 처리"""
-        # 카테고리와 서브카테고리 추출
-        for category, subcategories in self.categories.items():
-            if any(subcat in question for subcat in subcategories):
-                selected_category = category
-                selected_subcategory = next(
-                    subcat for subcat in subcategories if subcat in question
-                )
-                logger.info(f"선택된 카테고리: {selected_category}, 서브카테고리: {selected_subcategory}")
-                # 최적화된 프롬프트 사용
-                optimized_prompt = self.legal_agent.selected_category_prompt(
-                    selected_category, 
-                    selected_subcategory
-                )
-                st.session_state.messages.append({
-                    "role": "system",
-                    "content": optimized_prompt
-                })
-                break
-                
-        st.session_state.messages.append({
-            "role": "user", 
-            "content": question
-        })
+        # 사용자 메시지로 추가
+        st.session_state.messages.append({"role": "user", "content": question})
+        # 챗봇 응답 생성
+        response = self.legal_agent.process_query(
+            question=question,
+            session_id=st.session_state.current_session_id,
+            user_id=st.session_state.user_id
+        )
+        # 어시스턴트 메시지로 추가
+        st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
         st.rerun()
 
     def show_error_message(self, error_type: str):
@@ -494,17 +537,13 @@ class UIManager:
             smtp.send_message(msg)
 
     def _initialize_session_state(self):
-        """UI 관련 세션 상태 초기화"""
-        if "messages" not in st.session_state:
+        """세션 상태 초기화"""
+        if 'messages' not in st.session_state:
             st.session_state.messages = []
-        if "current_session_id" not in st.session_state:
-            st.session_state.current_session_id = str(uuid.uuid4())
-        if "selected_category" not in st.session_state:
-            st.session_state.selected_category = None
-        if "processing" not in st.session_state:
-            st.session_state.processing = False
-        if "user_id" not in st.session_state:
+        if 'user_id' not in st.session_state:
             st.session_state.user_id = str(uuid.uuid4())
+        if 'current_session_id' not in st.session_state:
+            st.session_state.current_session_id = str(uuid.uuid4())
 
     def show_save_options(self, message: dict):
         """저장 옵션 표시 - 3열 레이아웃"""
@@ -694,42 +733,52 @@ class UIManager:
             logger.error(f"이메일 전송 중 오류: {str(e)}")
             raise
 
-    def _handle_category_selection(self, category: str, subcategory: str):
+    def _handle_category_selection(self, category: str, subcategory: str, user_id: str, session_id: str):
         """카테고리 선택 처리"""
         try:
-            # 1. 기본 프롬프트 가져오기
-            optimized_prompt = self.legal_agent.selected_category_prompt(category, subcategory)
+            # 스트리밍을 위한 placeholder 생성
+            response_placeholder = st.empty()
             
-            # 2. 시스템 메시지로 프롬프트 추가
-            st.session_state.messages.extend([
-                {
-                    "role": "system",
-                    "content": f"다음 질문에 대해 상세히 답변해주세요: {subcategory}"
-                }
-            ])
-            
-            # 3. 질문을 legal_agent의 process_query로 전달
-            response = self.legal_agent.process_query(optimized_prompt)
-            
-            # 4. 사용자 질문과 응답을 세션에 추가
-            st.session_state.messages.extend([
-                {
-                    "role": "user",
-                    "content": f"{subcategory}에 대해 자세히 설명해주세요."
-                },
-                {
-                    "role": "assistant",
-                    "content": response["answer"],
-                    "metadata": {
-                        "confidence": response["confidence"],
-                        "category": category,
-                        "subcategory": subcategory
-                    }
-                }
-            ])
-            
-            st.session_state.processing = True
-            return optimized_prompt
+            with st.spinner("답변을 생성하고 있습니다..."):
+                # 프롬프트 가져오기
+                optimized_prompt = self.legal_agent.selected_category_prompt(category, subcategory)
+                
+                # 메시지 저장
+                self.chat_manager.save_message(
+                    user_id=user_id,
+                    session_id=session_id,
+                    message_type="user",
+                    content=optimized_prompt
+                )
+                
+                # 스트리밍 응답 처리
+                with response_placeholder.container():
+                    response = self.legal_agent.process_query(
+                        optimized_prompt,
+                        session_id=session_id,
+                        user_id=user_id,
+                        assistant_placeholder=response_placeholder
+                    )
+                
+                # 응답 저장
+                if response and "answer" in response:
+                    st.session_state.messages.extend([
+                        {
+                            "role": "user",
+                            "content": f"{subcategory}에 대해 자세히 설명해주세요."
+                        },
+                        {
+                            "role": "assistant",
+                            "content": response["answer"],
+                            "metadata": {
+                                "confidence": response["confidence"],
+                                "category": category,
+                                "subcategory": subcategory
+                            }
+                        }
+                    ])
+                
+                return optimized_prompt
 
         except Exception as e:
             logger.error(f"카테고리 선택 처리 중 오류: {str(e)}")

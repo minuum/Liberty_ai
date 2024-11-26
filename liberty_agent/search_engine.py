@@ -461,7 +461,7 @@ class LegalSearchEngine:
             context_embedding = context_outputs.last_hidden_state.mean(dim=1)
             answer_embedding = answer_outputs.last_hidden_state.mean(dim=1)
             
-            # 코사인 유사도 계산
+            # 코사인 유사도 계산ㅋ
             similarity = torch.nn.functional.cosine_similarity(
                 context_embedding,
                 answer_embedding

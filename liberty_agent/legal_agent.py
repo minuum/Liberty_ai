@@ -1,8 +1,10 @@
+import uuid
 from pinecone import Pinecone
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain import hub
-from typing import Dict, List, Union, TypedDict
+from typing import Dict, List, Optional, Union, TypedDict,Any
+import re  # 정규표현식 모듈 임포트
 from langchain.schema import Document
 import logging
 import time
@@ -11,14 +13,24 @@ import os
 from data_processor import LegalDataProcessor
 from search_engine import LegalSearchEngine
 from langgraph.graph import StateGraph, END
+#from chat_saver import SqliteSaver
 from langchain_core.output_parsers import StrOutputParser
-
+from datetime import datetime
+from langchain.schema.runnable import RunnableConfig
+import re
+from langchain.callbacks.base import BaseCallbackHandler
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.sqlite import SqliteSaver
+from datetime import datetime
+import json
+from pathlib import Path
+import streamlit as st
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
 logger = logging.getLogger(__name__)
-
+from ui_manager import UIManager
 class AgentState(TypedDict):
     """에이전트 상태 정의"""
     question: str
@@ -30,17 +42,54 @@ class AgentState(TypedDict):
     previous_weight: float
     original_weight: float
     combined_score: float
+    question_type: str
+    chat_history: List[Dict[str, str]]  # 추가된 필드
 
 class LegalAgent:
-    def __init__(self, cache_mode: bool = False):
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(LegalAgent, cls).__new__(cls)
+        return cls._instance
+    
+    def __init__(self, cache_mode: bool = False,chat_manager = None):
         """법률 에이전트 초기화"""
+        if not self._initialized:
+            try:
+                # 기본 컴포넌트 초기화
+                self._initialize_components(cache_mode)
+                self.chat_manager = chat_manager
+                # 메모리 저장소 초기화
+                self.memory_saver = MemorySaver()
+                
+                # SQLite 저장소 초기화
+                db_path = Path("./chat_logs/chat_history.db")
+                db_path.parent.mkdir(parents=True, exist_ok=True)
+                self.sqlite_saver = SqliteSaver(str(db_path))
+                
+                # 워크플로우 초기화
+                self.workflow = self._create_workflow()
+                logger.info("워크플로우 초기화 완료")
+                self.current_step = "초기화 중"
+                self._initialized = True
+                
+            except Exception as e:
+                logger.error(f"에이전트 초기화 중 오류 발생: {str(e)}")
+                raise
+    def get_current_step(self):
+            """현재 진행 단계 반환"""
+            return self.current_step if hasattr(self, 'current_step') else "처리 중"
+    def _initialize_components(self, cache_mode: bool):
+        """기본 컴포넌트 초기화"""
         try:
             # Pinecone 초기화
             pc = Pinecone(api_key=PINECONE_API_KEY)
             self.pinecone_index = pc.Index(PINECONE_INDEX_NAME)
             logger.info("Pinecone 인덱스 초기화 완료")
             stats = self.pinecone_index.describe_index_stats()
-            logger.info(f"인덱스 통계: {stats}")
+            #logger.info(f"인덱스 통계: {stats}")
             
             # 데이터 프로세서 초기화
             self.data_processor = LegalDataProcessor(
@@ -66,11 +115,10 @@ class LegalAgent:
                 retrievers=retrievers,
                 sparse_encoder=sparse_encoder,
                 pinecone_index=self.pinecone_index,
-                namespace="liberty-db-namespace-legal-agent",
+                namespace="liberty-db-namespace-legal-agent-241122",
                 cache_dir="./cached_vectors/search_engine"
             )
             logger.info("검색 엔진 초기화 완료")
-            
             # 세션 종료 시 저장
             if cache_mode:
                 import atexit
@@ -81,16 +129,18 @@ class LegalAgent:
             
             # LLM 초기화
             self.llm = ChatOpenAI(
-                model="gpt-4o-2024-08-06",
+                model="gpt-4o-2024-11-20",
                 temperature=0.1,
                 api_key=OPENAI_API_KEY
             )
             logger.info("LLM 초기화 완료")
-            
-            # 워크플로우 초기화
-            self.workflow = self._create_workflow()
-            logger.info("워크플로우 초기화 완료")
-            
+            # 일반 대화용 LLM 추가
+            self.general_llm = ChatOpenAI(
+                model="gpt-4o-2024-11-20",
+                temperature=0.7,  # 일반 대화용으로 온도 조절
+                api_key=OPENAI_API_KEY
+            )
+            logger.info("일반 대화용 LLM 초기화 완료")
             # 프롬프트 로드
             self.answer_prompt = hub.pull("minuum/liberty-rag")
             self.rewrite_prompt = self._create_rewrite_prompt()
@@ -99,34 +149,248 @@ class LegalAgent:
             logger.error(f"에이전트 초기화 중 오류 발생: {str(e)}")
             raise
 
-    def _create_workflow(self) -> StateGraph:
-        """워크플로우 그래프 생성"""
-        workflow = StateGraph(AgentState)
-        
-        # 노드 추가
-        workflow.add_node("retrieve", self._retrieve)
-        workflow.add_node("llm_answer", self._llm_answer)
-        workflow.add_node("rewrite", self._rewrite)
-        workflow.add_node("relevance_check", self._relevance_check)
-        
-        # 엣지 설정
-        workflow.set_entry_point("retrieve")
-        workflow.add_edge("retrieve", "llm_answer")
-        workflow.add_edge("llm_answer", "relevance_check")
-        workflow.add_conditional_edges(
-            "relevance_check",
-            self._is_relevant,
-            {
-                "grounded": END,
-                "notGrounded": "rewrite",
-                "notSure": "rewrite"
+    def _create_workflow(self):
+        """워크플로우 생성"""
+        try:
+            workflow = StateGraph(AgentState)
+            
+            # 상태 업데이트를 위한 메시지 매핑
+            status_messages = {
+                "classify_question": ("질문 분석", "법률 질문 여부를 판단하고 있습니다..."),
+                "retrieve": ("문서 검색", "관련 법률 정보를 검색하고 있습니다..."),
+                "quick_filter": ("관련성 검사", "검색 결과의 관련성을 확인하고 있습니다..."),
+                "llm_answer": ("답변 생성", "법률 정보를 기반으로 답변을 작성하고 있습니다..."),
+                "general_chat": ("일반 대화", "일반적인 답변을 생성하고 있습니다..."),
+                "quality_check": ("품질 검증", "답변의 품질을 검증하고 있습니다..."),
+                "rewrite_query": ("질문 최적화", "검색 질문을 개선하고 있습니다..."),
+                "rewrite_answer": ("답변 개선", "답변을 개선하고 있습니다...")
             }
-        )
-        workflow.add_edge("rewrite", "retrieve")
-        
-        return workflow.compile()
+            
+            # 노드 래핑 함수
+            def wrap_node(node_func, node_name):
+                def wrapped(state):
+                    start_time = time.time()
+                    
+                    # 상태 메시지 업데이트
+                    if node_name in status_messages:
+                        title, detail = status_messages[node_name]
+                        if hasattr(st, 'session_state') and 'status_container' in st.session_state:
+                            st.session_state.status_container.info(f"🔄 {title}\n{detail}")
+                    
+                    # 노드 실행
+                    result = node_func(state)
+                    execution_time = time.time() - start_time
+                    
+                    # 노드 실행 결과 저장
+                    config = RunnableConfig(
+                        configurable={
+                            "thread_id": state.get("session_id", "unknown")
+                        }
+                    )
+                    
+                    checkpoint = {
+                        "id": f"{state.get('session_id', 'unknown')}_{node_name}_{int(time.time())}",
+                        "data": {
+                            "input": state,
+                            "output": result
+                        }
+                    }
+                    
+                    metadata = {
+                        "timestamp": datetime.now().isoformat(),
+                        "node_name": node_name,
+                        "execution_time": execution_time,
+                        "node_type": "legal" if self._is_legal_query(state.get("question", "")) else "general",
+                        "question": state.get("question", ""),
+                        "answer": result.get("answer", "")
+                    }
+                    
+                    self.memory_saver.put(config, checkpoint, metadata)
+                    return result
+                return wrapped
+                
+            # 노드 추가 (이전과 동일)
+            workflow.add_node("classify_question", wrap_node(self._classify_question, "classify_question"))
+            workflow.add_node("retrieve", wrap_node(self._retrieve, "retrieve"))
+            workflow.add_node("quick_filter", wrap_node(self._quick_relevance_check, "quick_filter"))
+            workflow.add_node("llm_answer", wrap_node(self._llm_answer, "llm_answer"))
+            workflow.add_node("general_chat", wrap_node(self._general_chat, "general_chat"))
+            workflow.add_node("quality_check", wrap_node(self._detailed_quality_check, "quality_check"))
+            workflow.add_node("rewrite_query", wrap_node(self._rewrite, "rewrite_query"))
+            workflow.add_node("rewrite_answer", wrap_node(self._rewrite_answer, "rewrite_answer"))
+            
+            # 엣지 설정 (이전과 동일)
+            workflow.set_entry_point("classify_question")
+            
+            def classify_condition(state):
+                return "general" if state["question_type"] == "general" else "legal"
+                
+            workflow.add_conditional_edges(
+                "classify_question",
+                classify_condition,
+                {
+                    "legal": "retrieve",
+                    "general": "general_chat"
+                }
+            )
+            
+            workflow.add_edge("retrieve", "quick_filter")
+            workflow.add_edge("llm_answer", "quality_check")
+            
+            workflow.add_conditional_edges(
+                "quick_filter",
+                self._should_proceed,
+                {
+                    "proceed": "llm_answer",
+                    "rewrite": "rewrite_query"
+                }
+            )
+            
+            workflow.add_conditional_edges(
+                "quality_check",
+                self._route_by_quality,
+                {
+                    "proceed": END,
+                    "rewrite": "rewrite_answer",
+                    "re_retrieve": "retrieve"
+                }
+            )
+            
+            workflow.add_edge("rewrite_query", "retrieve")
+            workflow.add_edge("rewrite_answer", "llm_answer")
+            workflow.add_edge("general_chat", END)
+            
+            logger.info("워크플로우 생성 완료")
+            return workflow.compile()
+            
+        except Exception as e:
+            logger.error(f"워크플로우 생성 중 오류: {str(e)}")
+            raise
+    def _save_to_sqlite(self, checkpoint_data: dict):
+        """영구 저장을 위해 SQLite에 저장"""
+        try:
+            self.sqlite_saver.save(
+                key=f"{checkpoint_data['session_id']}_{checkpoint_data['node_name']}",
+                value=json.dumps(checkpoint_data, ensure_ascii=False)
+            )
+        except Exception as e:
+            logger.error(f"SQLite 저장 중 오류: {str(e)}")
+    def _general_chat(self, state: AgentState) -> AgentState:
+        """일반 대화 처리"""
+        try:
+            logger.info(f"=== GENERAL_CHAT NODE 진입 ===\n질문: {state['question']}")
+            self.current_step = "일반 대화 처리 중"
 
-    
+            # 이전 대화 내용 가져오기
+            chat_history = state.get('chat_history', [])
+
+            # LLM 호출을 위한 메시지 구성
+            messages = [
+                {"role": "system", "content": "당신은 친절한 AI 어시스턴트입니다."}
+            ]
+            
+            # 채팅 기록 추가
+            if chat_history:
+                messages.extend(chat_history)
+
+            # 현재 질문 추가
+            messages.append({'role': 'user', 'content': state['question']})
+            logger.info(f"일반 대화 메시지: {messages}")
+
+            # 일반 대화용 LLM 호출
+            response = self.llm.invoke(messages).content.strip()
+            logger.info(f"일반 대화 답변: {response}")
+
+            # 상태 업데이트
+            state["answer"] = response
+
+            logger.info(f"=== GENERAL_CHAT NODE 완료 ===\n답변: {response}")
+
+            return state
+
+        except Exception as e:
+            logger.error(f"일반 대화 처리 중 오류: {str(e)}")
+            return self._create_error_state(state)
+    def get_chat_history(self, session_id: str):
+        """채팅 이력 조회"""
+        try:
+            config = RunnableConfig(
+                configurable={
+                    "thread_id": session_id
+                }
+            )
+            
+            # 세션의 모든 체크포인트 조회
+            checkpoints = list(self.memory_saver.list(config))
+            
+            # 시간순 정렬
+            sorted_checkpoints = sorted(
+                checkpoints,
+                key=lambda x: x.metadata["timestamp"]
+            )
+            logger.info(f"채팅 이력 조회: {sorted_checkpoints}")
+            messages = []
+            for cp in sorted_checkpoints:
+                question = cp.metadata.get("question", "")
+                answer = cp.checkpoint["data"].get("answer", "")
+                if question:
+                    messages.append({"role": "user", "content": question})
+                if answer:
+                    messages.append({"role": "assistant", "content": answer})
+                    
+            return messages
+            
+        except Exception as e:
+            logger.error(f"채팅 이력 조회 중 오류: {str(e)}")
+            return []
+            
+
+    def _classify_question(self, state: AgentState) -> AgentState:
+        """LLM을 사용하여 질문을 분류"""
+        try:
+            logger.info(f"=== CLASSIFY_QUESTION NODE 진입 ===\n질문: {state['question']}")
+            
+            prompt = f"""
+            다음 사용자 질문이 법률 상담인지 일반적인 대화인지 분류해주세요.
+
+            질문: "{state['question']}"
+
+            답변 형식:
+            - "legal": 법률 상담인 경우
+            - "general": 일반 대화인 경우
+
+            답변:
+            """
+
+            response = self.llm.invoke(prompt).content.strip().lower()
+
+            if "legal" in response:
+                question_type = "legal"
+            else:
+                question_type = "general"
+
+            state["question_type"] = question_type
+
+            logger.info(f"질문 분류 결과: {question_type}")
+
+            return state
+
+        except Exception as e:
+            logger.error(f"질문 분류 중 오류: {str(e)}")
+            state["question_type"] = "unknown"
+            return state
+    def _route_by_relevance(self, state: AgentState) -> str:
+        """라우팅 로직"""
+        if state["rewrite_count"] >= 3:  # 재작성 횟수 제한
+            return "grounded"  # 강제 종료
+        
+        if state["combined_score"] > 0.7:
+            return "grounded"
+        elif state["combined_score"] < 0.3:
+            return "notGrounded"
+        else:
+            return "notSure"
+
     def _safe_retrieve(self, state: AgentState, max_retries: int = 3) -> AgentState:
         """검색 실패 시 복구 전략"""
         for attempt in range(max_retries):
@@ -142,127 +406,321 @@ class LegalAgent:
         """문서 검색"""
         try:
             logger.info(f"""
-            === RETRIEVE NODE 디버깅 ===
-            검색 쿼리: {state["question"]}
-            하이브리드 검색기 상태: {hasattr(self.search_engine, 'hybrid_retriever')}
-            네임스페이스: {self.search_engine.namespace}
+            === RETRIEVE 시작 ===
+            질문: {state["question"]}
+            재시도 횟수: {state.get("rewrite_count", 0)}
             """)
+            self.current_step = "문서 검색 중"
+            # 재시도 횟수 너무 많으면 기본 응답 반환
+            if state.get("rewrite_count", 0) >= 3:
+                logger.warning("재시도 횟수 초과로 폴백 응답 반환")
+                return self._create_fallback_response(state)
             
             # 검색 실행
-            results = self.search_engine.hybrid_search(state["question"])
+            results = self.search_engine.search(state["question"])
             
-            # 결과를 Document 객체로 변환
-            processed_results = []
+            # 검색 결과 로깅
+            logger.info(f"""
+            === 검색 결과 ===
+            결과 개수: {len(results)}
+            첫 번째 결과 스코어: {results[0].metadata.get('adjusted_score') if results else 'N/A'}
+            """)
             
-            # 딕셔너리 형태로 반환된 경우 처리
-            if isinstance(results, dict):
-                for category, docs in results.items():
-                    for doc in docs:
-                        if isinstance(doc, str):
-                            processed_results.append(Document(
-                                page_content=doc,
-                                metadata={"category": category}
-                            ))
-                        elif isinstance(doc, Document):
-                            processed_results.append(doc)
-                        else:
-                            logger.warning(f"Unexpected document type: {type(doc)}")
-                            
-            # 리스트 형태로 반환된 경우 처리
-            elif isinstance(results, list):
-                for doc in results:
-                    if isinstance(doc, str):
-                        processed_results.append(Document(
-                            page_content=doc,
-                            metadata={"category": "general"}
-                        ))
-                    elif isinstance(doc, Document):
-                        processed_results.append(doc)
-                    else:
-                        logger.warning(f"Unexpected document type: {type(doc)}")
-            
-            # 검색 결과가 없는 경우 폴백 메커니즘 실행
-            if not processed_results:
-                logger.warning("검색 결과 없음 - 폴백 메커니즘 실행")
-                fallback_results = self.search_engine._get_fallback_results(
-                    state["question"],
-                    self.search_engine._analyze_query_intent(state["question"])
-                )
-                processed_results = [
-                    Document(
-                        page_content=doc if isinstance(doc, str) else str(doc),
-                        metadata={"category": "fallback"}
-                    ) for doc in fallback_results
-                ]
+            # 검색 결과가 없거나 빈 경우 폴백 메커니즘 실행
+            if not results:
+                logger.warning("검색 결과 없음 - 폴백 응답 생성")
+                return self._create_fallback_response(state)
             
             # 상태 업데이트
             updated_state = state.copy()
-            updated_state["context"] = processed_results
+            updated_state["context"] = results
             
             logger.info(f"""
-            === RETRIEVE NODE 종료 ===
-            검색된 문서 수: {len(processed_results)}
-            다음 노드: llm_answer
+            === RETRIEVE 완료 ===
+            컨텍스트 길이: {len(results)}
             """)
             
             return AgentState(**updated_state)
             
         except Exception as e:
-            logger.error(f"문서 검색 중 오류: {str(e)}")
-            # 에러 발생 시에도 기본 컨텍스트 제공
-            fallback_doc = Document(
-                page_content="검색 시스템에 일시적인 문제가 발생했습니다. 일반적인 법률 정보를 제공합니다.",
-                metadata={"source": "fallback", "reliability": "low"}
-            )
-            return AgentState(
-                question=state["question"],
-                context=[fallback_doc],
-                answer="",
-                previous_answer="",
-                rewrite_count=state.get("rewrite_count", 0),
-                rewrite_weight=state.get("rewrite_weight", 0.0),
-                previous_weight=state.get("previous_weight", 0.0),
-                original_weight=state.get("original_weight", 1.0),
-                combined_score=0.0
-            )
-    def _retrieve(self, state: AgentState) -> AgentState:
-        """문서 검색"""
-        try:
-            results = self.search_engine.hybrid_search(state["question"])
-            processed_results = self._process_search_results(results)
-            
-            updated_state = state.copy()
-            updated_state["context"] = processed_results
-            
-            return AgentState(**updated_state)
-            
-        except Exception as e:
-            logger.error(f"문서 검색 중 오류: {str(e)}")
-            return self._create_error_state(state)
+            logger.error(f"""
+            === RETRIEVE 오류 ===
+            오류 메시지: {str(e)}
+            상태: {state}
+            """)
+            return self._create_fallback_response(state)
+
+    def _create_fallback_response(self, state: AgentState) -> AgentState:
+        """폴백 응답 생성"""
+        # 질문 유형에 따른 기본 응답 선택
+        basic_responses = {
+            # 이혼/가족 관련 세부 응답
+            "이혼 절차": """
+            이혼 절차에 대한 기본 정보를 안내해드립니다:
+            1. 협의이혼 절차
+            2. 재판이혼 절차
+            3. 필요 서류 안내
+            4. 이혼 숙려기간
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "위자료": """
+            위자료에 대한 기본 정보를 안내해드립니다:
+            1. 위자료 청구 요건
+            2. 위자료 산정 기준
+            3. 청구 절차
+            4. 지급 방법
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "양육권": """
+            양육권에 대한 기본 정보를 안내해드립니다:
+            1. 양육권자 결정 기준
+            2. 양육비 산정
+            3. 면접교섭권
+            4. 양육권 변경
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "재산분할": """
+            재산분할에 대한 기본 정보를 안내해드립니다:
+            1. 분할대상 재산 범위
+            2. 분할 비율
+            3. 청구 절차
+            4. 시효
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+
+            # 상속 관련 세부 응답
+            "상속 순위": """
+            상속 순위에 대한 기본 정보를 안내해드립니다:
+            1. 법정상속인의 순위
+            2. 상속분 산정
+            3. 대습상속
+            4. 상속인 결격사유
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "유류분": """
+            유류분에 대한 기본 정보를 안내해드립니다:
+            1. 유류분 권리자
+            2. 유류분 산정방법
+            3. 청구 절차
+            4. 시효
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "상속포기": """
+            상속포기에 대한 기본 정보를 안내해드립니다:
+            1. 포기 절차
+            2. 제출 서류
+            3. 기간 제한
+            4. 효력
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "유언장": """
+            유언장에 대한 기본 정보를 안내해드립니다:
+            1. 유언의 방식
+            2. 필수 요건
+            3. 효력 발생
+            4. 검인 절차
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+
+            # 계약 관련 세부 응답
+            "계약서 작성": """
+            계약서 작성에 대한 기본 정보를 안내해드립니다:
+            1. 필수 기재사항
+            2. 계약조항 검토
+            3. 특약사항 작성
+            4. 서명 날인
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "계약 해지": """
+            계약 해지에 대한 기본 정보를 안내해드립니다:
+            1. 해지 사유
+            2. 해지 통보
+            3. 위약금
+            4. 손해배상
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "손해배상": """
+            손해배상에 대한 기본 정보를 안내해드립니다:
+            1. 배상 범위
+            2. 청구 절차
+            3. 입증 방법
+            4. 시효
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "보증": """
+            보증에 대한 기본 정보를 안내해드립니다:
+            1. 보증의 종류
+            2. 보증인의 책임
+            3. 보증계약 체결
+            4. 구상권
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+
+            # 부동산 관련 세부 응답
+            "매매": """
+            부동산 매매에 대한 기본 정보를 안내해드립니다:
+            1. 계약 절차
+            2. 중도금 지급
+            3. 소유권 이전
+            4. 등기 절차
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "임대차": """
+            임대차에 대한 기본 정보를 안내해드립니다:
+            1. 계약 체결
+            2. 임차인 보호
+            3. 보증금 반환
+            4. 계약 갱신
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "등기": """
+            등기에 대한 기본 정보를 안내해드립니다:
+            1. 등기 종류
+            2. 신청 절차
+            3. 구비서류
+            4. 등기비용
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "재개발": """
+            재개발에 대한 기본 정보를 안내해드립니다:
+            1. 사업 절차
+            2. 조합 설립
+            3. 권리산정
+            4. 이주대책
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+
+            # 형사 관련 세부 응답
+            "고소/고발": """
+            고소/고발에 대한 기본 정보를 안내해드립니다:
+            1. 소/고발 방법
+            2. 처리 절차
+            3. 취하 방법
+            4. 불기소 불복
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "변호사 선임": """
+            변호사 선임에 대한 기본 정보를 안내해드립니다:
+            1. 국선변호인
+            2. 사선변호인
+            3. 선임 시기
+            4. 비용
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "형사절차": """
+            형사절차에 대한 기본 정보를 안내해드립니다:
+            1. 수사 절차
+            2. 기소 여부
+            3. 재판 진행
+            4. 형 집행
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """,
+            "보석": """
+            보석에 대한 기본 정보를 안내해드립니다:
+            1. 신청 요건
+            2. 절차
+            3. 보증금
+            4. 준수사항
+            자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+            """
+        }
+        
+        # 질문 분석하여 적절한 응답 선택
+        response = None
+        for category, resp in basic_responses.items():
+            if category in state["question"]:
+                response = resp
+                break
+        
+        if not response:
+            response = "죄송합니다. 현재 해당 질문에 대한 정확한 답변을 제공하기 어렵습니다. 가까운 법률구조공단이나 변호사와 상담하시기를 권장드립니다."
+        
+        return AgentState(
+            question=state["question"],
+            context=[Document(page_content=response, metadata={"source": "fallback"})],
+            answer=response,
+            previous_answer=state.get("previous_answer", ""),
+            rewrite_count=state.get("rewrite_count", 0),
+            rewrite_weight=state.get("rewrite_weight", 0.0),
+            previous_weight=state.get("previous_weight", 0.0),
+            original_weight=state.get("original_weight", 1.0),
+            combined_score=0.5  # 기본 응답의 신뢰도 점수
+        )
 
     def _llm_answer(self, state: AgentState) -> AgentState:
-        """LLM 사용한 답변 생성"""
         try:
+            logger.info(f"=== LLM_ANSWER NODE 진입 ===\n질문: {state['question']}\n질문 유형: {state.get('question_type', 'unknown')}")
+            self.current_step = "LLM을 사용하여 답변 생성 중"
+
+            if not state.get("context"):
+                logger.warning("컨텍스트 없음 - 폴백 응답 생성")
+                return self._create_fallback_response(state)
+
             context = self._normalize_context(state["context"])
             context_text = "\n\n".join(self._safe_get_content(doc) for doc in context)
-            
-            chain = self.answer_prompt | self.llm | StrOutputParser()
-            raw_answer = chain.invoke({
-                "context": context_text,
-                "question": state["question"]
-            })
-            
-            formatted_answer = self._format_answer(raw_answer, state["context"])
-            
+
+            # 질문 유형에 따라 프롬프트 조정
+            if state.get('question_type') == 'legal':
+                system_prompt = "당신은 전문적인 법률 상담 어시스턴트입니다. 사용자에게 정확하고 신뢰할 수 있는 법률 정보를 제공합니다."
+            else:
+                system_prompt = "당신은 친절한 대화형 AI 어시스턴트입니다. 사용자와 자연스럽게 대화합니다."
+
+            # 어시스턴트의 메시지를 정제
+            cleaned_chat_history = []
+            for msg in state.get('chat_history', []):
+                if msg['role'] == 'assistant':
+                    # HTML 태그와 복사 버튼 코드 제거
+                    clean_content = re.sub(r'<[^>]+>', '', msg['content'])
+                    clean_content = re.sub(r'\)" class="copy-button">[^<]+', '', clean_content)
+                    cleaned_chat_history.append({'role': msg['role'], 'content': clean_content})
+                elif msg['role'] == 'user':
+                    # 사용자의 메시지가 UI 요소인지 판단
+                    if self._is_ui_input(msg['content']):
+                        # UI 요소에 해당하는 메시지는 무시
+                        continue
+                    else:
+                        cleaned_chat_history.append(msg)
+
+            # 컨텍스트를 시스템 메시지에 추가
+            system_prompt += f"\n\n다음은 참고할 수 있는 법률 정보입니다:\n{context_text}"
+
+            # 메시지 구성
+            messages = [
+                {"role": "system", "content": system_prompt}
+            ] + cleaned_chat_history + [{"role": "user", "content": state["question"]}]
+
+            # LLM 호출
+            response = self.llm.invoke(messages).content.strip()
+
+            formatted_answer = self.format_answer(response)
+            logger.info(f"formatted_answer: {formatted_answer}")
             updated_state = state.copy()
             updated_state["answer"] = formatted_answer
-            
-            return AgentState(**updated_state)
-            
+
+            logger.info(f"=== LLM_ANSWER NODE 완료 ===\n답변 길이: {len(formatted_answer)}\n컨텍스트 활용: {len(context)} documents")
+
+            return updated_state
+
         except Exception as e:
             logger.error(f"답변 생성 중 오류: {str(e)}")
             return self._create_error_state(state)
 
+    def _is_ui_input(self, user_input: str) -> bool:
+        """사용자 입력이 UI 요소인지 판단"""
+        ui_elements = [
+            "💡 자주 묻는 법률 상담",
+            "이혼/가족",
+            "상속",
+            "계약",
+            "부동산",
+            "형사",
+            "📌 이혼 절차",
+            "📌 양육권",
+            "📌 위자료",
+            "📌 재산분할"
+            # 필요에 따라 추가
+        ]
+        return user_input.strip() in ui_elements
     def _format_answer(self, answer: str, context: List[Document | str]) -> str:
         """답변 포맷팅"""
         references = []
@@ -392,79 +850,61 @@ class LegalAgent:
                 logger.info(f"""
                 === RELEVANCE_CHECK NODE 진입 ===
                 재작성 횟수: {state.get("rewrite_count", 0)}
-                답변 길이: {len(state["answer"])}
+                컨텍스트 수: {len(state.get("context", []))}
+                답변 길이: {len(state.get("answer", ""))}
                 """)
                 
-                # context를 문자열로 변환
-                context_str = "\n\n".join([
-                    f"문서 {i+1}:\n{doc.page_content}" 
-                    for i, doc in enumerate(state["context"])
-                ]) if state["context"] else ""
+                # 컨텍스트 검증
+                if not state.get("context"):
+                    logger.warning("컨텍스트 없음 - notGrounded 반환")
+                    return self._update_state_score(state, 0.0, "notGrounded")
                 
-                # Upstage 검사
-                upstage_response = self.search_engine.upstage_checker.run({
-                    "context": context_str,
-                    "answer": state["answer"]
-                })
-                
-                # KoBERT 검사
-                kobert_score = self.search_engine.validate_answer(
-                    context=context_str,
-                    answer=state["answer"]
+                # 신뢰도 계산
+                combined_score = self.search_engine.validate_answer(
+                    context=state.get("context", ""),
+                    answer=state.get("answer", "")
                 )
                 
-                # 결합 점수 계산
-                combined_score = self._calculate_combined_score(
-                    upstage_response, 
-                    kobert_score
-                )
-                
-                # state 복사 후 업데이트
-                updated_state = state.copy()
-                updated_state["relevance"] = self._get_relevance_status(combined_score)
-                updated_state["combined_score"] = combined_score
-                
-                logger.info(f"""
-                === RELEVANCE_CHECK NODE 종료 ===
-                결합 점수: {combined_score:.2f}
-                관련성 상태: {updated_state["relevance"]}
-                다음 노드: {updated_state["relevance"]}
-                """)
-                
-                return AgentState(**updated_state)
-                
+                # 결과 결정
+                if combined_score >= 0.7:
+                    return self._update_state_score(state, combined_score, "grounded")
+                elif combined_score <= 0.3:
+                    return self._update_state_score(state, combined_score, "notGrounded")
+                else:
+                    return self._update_state_score(state, combined_score, "notSure")
+                    
             except Exception as e:
                 logger.error(f"관련성 검사 중 오류: {str(e)}")
-                raise
+                return self._create_error_state(state)
 
     def _is_relevant(self, state: AgentState) -> str:
         """관련성 상태 반환"""
         return state["relevance"]
 
-    def _calculate_combined_score(
-        self, 
-        upstage_response: str, 
-        kobert_score: float
-    ) -> float:
-        """결합 점수 계산"""
-        upstage_weight = 0.6
-        kobert_weight = 0.4
+    # def _calculate_combined_score(
+    #     self, 
+    #     upstage_response: str, 
+    #     kobert_score: float
+    # ) -> float:
+    #     """결합 점수 계산"""
+    #     upstage_weight = 0.6
+    #     kobert_weight = 0.4
         
-        # upstage_response가 딕셔너리인 경우를 처리
-        if isinstance(upstage_response, dict):
-            # upstage_response에서 실제 응답 값을 추출
-            upstage_result = upstage_response.get('result', 'notSure')
-        else:
-            upstage_result = upstage_response
+    #     # upstage_response가 딕셔너리인 경우를 처리
+    #     if isinstance(upstage_response, dict):
+    #         # upstage_response에서 실제 응답 값을 추출
+    #         upstage_result = upstage_response.get('result', 'notSure')
+    #     else:
+    #         upstage_result = upstage_response
         
-        # 점수 매핑
-        upstage_score = {
-            "grounded": 1.0,
-            "notGrounded": 0.0,
-            "notSure": 0.33
-        }.get(upstage_result, 0.0)
+    #     # 점수 매핑
+    #     upstage_score = {
+    #         "grounded": 1.0,
+    #         "notGrounded": 0.0,
+    #         "notSure": 0.33
+    #     }.get(upstage_result, 0.0)
         
-        return (upstage_weight * upstage_score) + (kobert_weight * kobert_score)
+    #     return (upstage_weight * upstage_score) + (kobert_weight * kobert_score)
 
     def _get_relevance_status(self, score: float) -> str:
         """점수 기반 관련성 상태 결정"""
@@ -473,13 +913,53 @@ class LegalAgent:
         elif score <= 0.2:
             return "notGrounded"
         return "notSure"
+    def _is_legal_query(self, question: str) -> bool:
+        """법률 관련 질문인지 확인"""
+        # 법률 관련 키워드 리스트
+        legal_keywords = [
+            '법률', '소송', '계약', '이혼', '상속', '형사', '민사', 
+            '고소', '고발', '재판', '변호사', '법원', '합의', '보상',
+            '피해', '손해배상', '채권', '채무', '임대차', '부동산'
+        ]
+        
+        # 개인 정보 공유나 일상적 대화 패턴
+        casual_patterns = [
+            '나는', '저는', '제가', '안녕하세요', '반갑습니다',
+            '살', '나이', '학생', '직장', '취미', '좋아', '싫어'
+        ]
+        
+        # 법률 키워드 포함 여부 확인
+        has_legal_keyword = any(keyword in question for keyword in legal_keywords)
+        # 일상적 대화 패턴 포함 여부 확인
+        is_casual = any(pattern in question for pattern in casual_patterns)
+        
+        # 법률 키워드가 있고 일상적 대화가 아닌 경우만 법률 질문으로 처리
+        return has_legal_keyword and not is_casual
 
-    def process_query(self, query: str) -> Dict:
-        """쿼리 처리 메인 함수"""
+    def process_query(self, question: str, session_id: str = None, user_id: str = None,status_container: Any = None) -> Dict:
+        start_time = time.time()
         try:
-            # 초기 상태 설정
-            initial_state = AgentState(
-                question=query,
+            status_container = st.empty()
+            status_tracker = WorkflowStatusTracker(container=status_container)
+                        # 세션 및 메시지 저장
+            if user_id is not None and session_id is not None:
+                self.chat_manager.save_session(
+                    user_id=user_id,
+                    session_id=session_id,
+                    messages=st.session_state.messages
+                )
+            # 사용자 메시지 저장
+            if user_id is not None:
+                self.chat_manager.save_message(
+                    user_id=user_id,
+                    session_id=session_id,
+                    message_type="user",
+                    content=question
+                )
+            chat_history = self.get_chat_history(session_id) if session_id else []
+            state = AgentState(
+                question=question,
+                session_id=session_id,
                 context=[],
                 answer="",
                 previous_answer="",
@@ -487,27 +967,134 @@ class LegalAgent:
                 rewrite_weight=0.0,
                 previous_weight=0.0,
                 original_weight=1.0,
-                combined_score=0.0
+                combined_score=0.0,
+                question_type="unknown",
+                chat_history=chat_history
             )
-            
-            # 그래프 실행
-            final_state = self.workflow.invoke(initial_state)
-            
-            return {
-                "answer": final_state["answer"],
-                "confidence": final_state.get("combined_score", 0.0),
-                "rewrites": final_state.get("rewrite_count", 0)
+
+            # 워크플로우 실행
+            result = self.workflow.invoke(
+                state,
+                config=RunnableConfig(
+                    callbacks=[status_tracker],
+                    configurable={"thread_id": session_id}
+                )
+            )
+
+            # 답변 생성
+            answer = result.get("answer", "답변을 생성할 수 없습니다.")
+            clean_answer = re.sub(r'<[^>]*>', '', answer)
+            clean_answer = re.sub(r'\)" class="copy-button">[^<]+', '', clean_answer)
+            confidence = result.get("combined_score", 0.0)
+            execution_time = time.time() - start_time
+            # 실행 결과 저장
+            checkpoint = {
+                "id": str(uuid.uuid4()),
+                "data": result
             }
-            
-        except Exception as e:
-            logger.error(f"Error in process_query: {str(e)}")
-            logger.error(f"State at error: {initial_state}")
+        
+            metadata = {
+                "timestamp": datetime.now().isoformat(),
+                "execution_time": execution_time,
+                "question": question,
+                "question_type": state.get("question_type", "unknown")
+            }
+            # 워크플로우 설정
+            config = RunnableConfig(
+                configurable={
+                    "thread_id": session_id,
+                    "callbacks": [status_tracker]
+                }
+            )
+            self.memory_saver.put(config, checkpoint, metadata)
+
+
+            # 추천 질문 생성
+            suggestions = self.generate_suggestions(answer)
+
+            # UI 관련 코드 제거
+
             return {
-                "error": "죄송합니다. 답변을 생성하는 중에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.",
-                "confidence": 0.0,
-                "rewrites": 0
+                "answer": answer,
+                "confidence": confidence,
+                "suggestions": suggestions,
+                "session_id": session_id
             }
 
+        except Exception as e:
+            logger.error(f"질문 처리 중 오류: {str(e)}")
+            return {
+                "answer": "죄송합니다. 질문을 처리하는 중에 오류가 발생했습니다.",
+                "confidence": 0.0,
+                "suggestions": [],
+                "session_id": session_id
+            }
+
+
+    def generate_suggestions(self, answer: str, num_suggestions: int = 3) -> List[str]:
+        import re
+        """LLM을 사용하여 답변과 관련된 추천 질문 생성"""
+        try:
+            prompt = f"""
+            다음 답변을 읽고, 사용자가 추가로 궁금해할 만한 관련 질문을 {num_suggestions}개 생성해주세요.
+            
+            답변:
+            \"\"\"
+            {answer}
+            \"\"\"
+            
+            추천 질문:
+            1.
+            """
+            
+            # LLM 호출
+            response = self.llm.invoke(prompt).content.strip()
+            
+            # 추천 질문 파싱
+            suggestions = []
+            for line in response.split('\n'):
+                line = line.strip()
+                if line and re.match(r'\d+\.', line):
+                    question = line[line.find('.')+1:].strip()
+                    if question:
+                        suggestions.append(question)
+                elif line:
+                    suggestions.append(line)
+            
+            # 최대 num_suggestions 개수만큼 반환
+            return suggestions[:num_suggestions]
+            
+        except Exception as e:
+            logger.error(f"추천 질문 생성 중 오류: {str(e)}")
+            # 오류 발생 시 기본 추천 질문 반환
+            return [
+                "관련된 다른 법률 조항은 무엇인가요?",
+                "비슷한 사례에 대한 판례가 있나요?",
+                "추가로 알아야 할 사항이 있나요?"
+            ]     
+    # def add_copy_button(self, text: str):
+    #     """복사 버튼 추가"""
+    #     st.button(
+    #         "📋 답변 복사",
+    #         key=f"copy_{hash(text)}",
+    #         on_click=lambda: st.write(text)
+    #     )
+
+    # def display_confidence_score(self, score: float):
+    #     """신뢰도 점수 표시"""
+    #     color = "green" if score > 0.8 else "orange" if score > 0.6 else "red"
+    #     st.markdown(f"""
+    #         <div style='text-align: right; color: {color}'>
+    #             신뢰도: {score:.2f}
+    #         </div>
+    #     """, unsafe_allow_html=True)
+
+    # def _handle_suggestion_click(self, suggestion: str):
+    #     """추천 질문 클릭 처리"""
+    #     if 'messages' not in st.session_state:
+    #         st.session_state.messages = []
+    #     st.session_state.messages.append({"role": "user", "content": suggestion})
+    #     st.rerun()
     def _format_answer(self, answer: str, context: List[Document | str]) -> str:
         """답변 포맷팅 - 참고 자료 포함"""
         references = []
@@ -571,7 +1158,646 @@ class LegalAgent:
             logger.error(f"컨텍스트 정규화 중 오류: {str(e)}")
             return []
 
+    def _should_continue_rewrite(self, state: AgentState) -> bool:
+        """재작성 계속 여부 결정"""
+        # 최대 재작성 횟수 제한
+        if state.get("rewrite_count", 0) >= 3:
+            return False
+        
+        # 이미 충분한 신뢰도를 얻은 경우
+        if state.get("combined_score", 0) >= 0.6:
+            return False
+        
+        # 컨텍스트가 충분한 경우
+        if state.get("context") and len(state.get("context", [])) >= 2:
+            return False
+        
+        return True
 
+    def _safe_get_content(self, doc: Union[Document, str]) -> str:
+        """문서 내용 안전하게 가져오기"""
+        try:
+            if isinstance(doc, Document):
+                return doc.page_content
+            return str(doc)
+        except Exception as e:
+            logger.error(f"문서 내용 가져오기 실패: {str(e)}")
+            return ""
+
+    def _analyze_query_intent(self, query: str) -> str:
+        """쿼리 의도 분석"""
+        try:
+            prompt = f"""
+            다음 법률 상담 질문의 의도를 분석하여 간단한 제목을 생성해주세요:
+            질문: {query}
+
+            규칙:
+            1. 최대 20자 이내
+            2. 핵심 법률 용어 포함
+            3. 명사형으로 끝내기
+
+            출력 형식:
+            [제목만 출력]
+            """
+            
+            response = self.llm.invoke(prompt).content
+            return response.strip()
+        except Exception as e:
+            logger.error(f"쿼리 의도 해석 중 오류: {str(e)}")
+            return f"법률상담_{datetime.now().strftime('%Y%m%d_%H%M')}"
+
+    def _generate_answer(self, query: str, search_results: List[Document]) -> str:
+        """검색 결과를 기반으로 답변 생성"""
+        try:
+            # 컨텍스트 준비
+            contexts = []
+            for doc in search_results[:3]:  # 상위 3개 문서만 사용
+                if hasattr(doc, 'page_content'):
+                    contexts.append(doc.page_content)
+                elif isinstance(doc, str):
+                    contexts.append(doc)
+                
+            context_text = "\n\n".join(contexts)
+            
+            # 프롬프트 템플릿 생성
+            prompt = f"""다음 법률 질문에 대해, 제공된 컨텍스트를 기반으로 답변해주세요.
+
+질문: {query}
+
+컨텍스트:
+{context_text}
+
+답변 작성 규칙:
+1. 정확한 법적 근거를 인용하세요
+2. 이해하기 쉬운 용어를 사용하세요
+3. 필요한 경우 단계별로 설명하세요
+4. 주의사항이나 예외사항을 명시하세요
+5. 추가 상담이 필요한 경우 이를 언급하세요
+
+답변:"""
+
+            # LLM을 사용하여 답변 생성
+            response = self.llm.invoke(prompt).content
+            
+            # 답변 품질 검증
+            if len(response.split()) < 10:  # 답변이 너무 짧은 경우
+                return "죄송합니다. 충분한 정보를 찾지 못했습니다. 더 자세한 상담이 필요합니다."
+            
+            return response.strip()
+        
+        except Exception as e:
+            logger.error(f"답변 생성 중 오류 발생: {str(e)}")
+            return "죄송합니다. 답변을 생성하는 중에 문제가 발생했습니다."
+
+    def _answer_check(self, state: AgentState) -> AgentState:
+        """답변 품질 검증"""
+        try:
+            answer = state.get("answer", "")
+            logger.info(f"""
+                === ANSWER_CHECK NODE 진입 ===
+                답변 길이: {len(answer)}
+            """)
+            
+            # 답변 품질 검증
+            quality_score = self._evaluate_answer_quality(answer, state["question"])
+            
+            # 상태 업데이트
+            state["answer_quality"] = quality_score
+            state["answer_status"] = "valid" if quality_score >= 0.7 else "invalid"
+            
+            logger.info(f"""
+                === ANSWER_CHECK NODE 완료 ===
+                품질 점수: {quality_score}
+                상태: {state["answer_status"]}
+            """)
+            
+            return state
+            
+        except Exception as e:
+            logger.error(f"답변 검증 중 오류: {str(e)}")
+            state["answer_status"] = "invalid"
+            return state
+
+    def _route_by_answer_quality(self, state: AgentState) -> str:
+        """답변 품질에 따른 라우팅"""
+        return state.get("answer_status", "invalid")
+
+    def _evaluate_answer_quality(self, answer: str, question: str) -> float:
+        """답변 품질 평가"""
+        try:
+            # 기본 품질 체크
+            if len(answer.split()) < 20:
+                return 0.3
+            
+            # 관련성 검사
+            relevance_score = self.search_engine.validate_answer(
+                context=answer,
+                question=question
+            )
+            
+            # 구조 검사
+            structure_score = self._check_answer_structure(answer)
+            
+            # 최종 점수 계산
+            return (relevance_score * 0.7 + structure_score * 0.3)
+            
+        except Exception as e:
+            logger.error(f"답변 품질 평가 중 오류: {str(e)}")
+            return 0.0
+
+    def _check_answer_structure(self, answer: str) -> float:
+        """답변 구조 검사"""
+        try:
+            score = 0.0
+            
+            # 법적 근거 포함 여부
+            if "법" in answer or "조항" in answer:
+                score += 0.3
+            
+            # 단계별 설명 포함 여부
+            if "먼저" in answer or "다음" in answer:
+                score += 0.3
+            
+            # 주의사항 포함 여부
+            if "주의" in answer or "유의" in answer:
+                score += 0.4
+            
+            return score
+            
+        except Exception as e:
+            logger.error(f"답변 구조 검사 중 오류: {str(e)}")
+            return 0.0
+
+    def _detailed_quality_check(self, state: AgentState) -> AgentState:
+        """답변 품질 상세 평가"""
+        try:
+            answer = state["answer"]
+            context = state["context"]
+            
+            # Upstage + KoBERT 검증
+            combined_score = self.search_engine.validate_answer(
+                context=context,
+                answer=answer,
+                upstage_weight=0.2,  # Upstage 가중치
+                kobert_weight=0.8    # KoBERT 가중치
+            )
+            
+            # 상태 업데이트
+            state["combined_score"] = combined_score
+            
+            logger.info(f"""
+            === 상세 품질 검사 완료 ===
+            결합 점수: {combined_score:.3f}
+            기준:
+            - 높음 (≥ 0.7): 진행
+            - 중간 (0.3-0.7): 재작성
+            - 낮음 (< 0.3): 재검색
+            """)
+            
+            return state
+            
+        except Exception as e:
+            logger.error(f"품질 검사 중 오류: {str(e)}")
+            state["combined_score"] = 0.0
+            return state
+    def create_prompt_template(self):
+        return hub.pull("minuum/liberty-rag")
+        
+    def _quick_relevance_check(self, state: AgentState) -> AgentState:
+        """빠른 관련성 검사"""
+        try:
+            logger.info("""
+            === QUICK_FILTER NODE 진입 ===
+            컨텍스트 수: %d
+            """, len(state["context"]))
+            
+            # 검색엔진의 evaluate_context_quality 활용
+            context_quality = self.search_engine.evaluate_context_quality(
+                state["context"], 
+                state["question"]
+            )
+            
+            # 빠른 필터링 점수 계산
+            state["quick_filter_score"] = context_quality
+            
+            logger.info("""
+            === QUICK_FILTER NODE 완료 ===
+            필터링 점수: %.3f
+            """, context_quality)
+            
+            return state
+            
+        except Exception as e:
+            logger.error(f"빠른 필터링 중 오류: {str(e)}")
+            return self._create_error_state(state)
+        
+    def _should_proceed(self, state: AgentState) -> str:
+        quick_score = state.get("quick_filter_score", 0.0)
+        
+        if quick_score >= 0.3:  # 임계값 하향 조정
+            return "proceed"
+        elif state["rewrite_count"] >= 3:
+            return "proceed"
+        else:
+            return "rewrite"
+        
+    def _route_by_quality(self, state: AgentState) -> str:
+        """품질 점수에 따른 라우팅 결정"""
+        try:
+            score = state.get("combined_score", 0.0)
+            rewrite_count = state.get("rewrite_count", 0)
+            
+            logger.info(f"""
+            === 품질 기반 라우팅 ===
+            품질 점수: {score:.3f}
+            재작성 횟수: {rewrite_count}
+            """)
+            
+            if score >= 0.7:
+                return "proceed"
+            elif score < 0.3:
+                return "re_retrieve"
+            else:
+                return "rewrite"
+                
+        except Exception as e:
+            logger.error(f"라우팅 결정 중 오류: {str(e)}")
+            return "proceed"  # 오류 시 안전하게 진행
+    def format_answer(self, answer: str) -> str:
+        """답변 포맷팅"""
+        # HTML 태그 제거
+        answer = re.sub(r'<[^>]+>', '', answer)
+        # 복사 버튼 태그 제거
+        answer = re.sub(r'<button.*?class="copy-button".*?>.*?</button>', '', answer, flags=re.DOTALL)
+        return answer
+
+    def selected_category_prompt(self, category: str, subcategory: str) -> str:
+        """카테고리별 최적화된 프롬프트 반환"""
+        
+        category_prompts = {
+            "이혼/가족": {
+                "이혼 절차": """
+                    이혼 절차에 대해 다음 내용을 포함하여 상세히 설명해주세요:
+                    1. 협의이혼과 재판이혼의 차이점과 각각의 진행 절차
+                    2. 필요한 서류와 준비사항 목록
+                    3. 소요 기간과 비용 상세 내역
+                    4. 법원 조정 절차와 진행 방법
+                    5. 이혼 후 조치사항과 주의점
+                    
+                    답변 형식:
+                    - 단계별 구분하여 설명
+                    - 필요 서류 체크리스트 포함
+                    - 구체적인 비용과 기간 명시
+                    - 민법 제834조~제843조 관련 내용 인용
+                    """,
+                
+                "위자료": """
+                    위자료 청구와 관련하여 다음 내용을 포함하여 설명해주세요:
+                    1. 위자료 청구권의 법적 근거와 성립 요건
+                    2. 위자료 산정 기준과 일반적인 금액 범위
+                    3. 위자료 청구 절차와 필요 서류
+                    4. 위자료 증액/감액 사유와 판례
+                    5. 위자료 지급 방식과 강제집행 방법
+                    
+                    답변 형식:
+                    - 청구권자별 설명
+                    - 계산 사례 포함
+                    - 판례 기준 설명
+                    - 민법 제843조, 제806조 관련 내용 인용
+                    """,
+                
+                "양육권": """
+                    양육권 관련하여 다음 내용을 포함하여 설명해주세요:
+                    1. 양육권과 친권의 차이점
+                    2. 양육권 결정 기준과 고려사항
+                    3. 양육권 변경 사유와 절차
+                    4. 면접간섭권의 내용과 행사방법
+                    5. 양육비 산정과 청구 방법
+                    
+                    답변 형식:
+                    - 양육권/친권 개념 명확히 구분
+                    - 구체적인 사례 제시
+                    - 법원 판단 기준 설명
+                    - 민법 제837조, 제837조의2 관련 내용 인용
+                    """,
+                
+                "재산분할": """
+                    재산분할과 관련하여 다음 내용을 포함하여 설명해주세요:
+                    1. 재산분할의 대상과 범위
+                    2. 분할 비율 결정 기준과 고려사항
+                    3. 재산분할 청구 절차와 시효
+                    4. 숨긴 재산 발견시 대응방법
+                    5. 재산분할 협의와 조정 방법
+                    
+                    답변 형식:
+                    - 재산 유형별 분류 설명
+                    - 구체적 산정 방식 제시
+                    - 실제 판례 사례 포함
+                    - 민법 제839조의2 관련 내용 인용
+                    """
+            },
+            
+            "상속": {
+                "상속 순위": """
+                    상속 순위에 대해 다음 내용을 포함하여 설명해주세요:
+                    1. 법정상속인의 순위와 상속분
+                    2. 대습상속의 요건과 효과
+                    3. 상속인 결격사유와 효과
+                    4. 상속인 확인 방법과 절차
+                    5. 상속순위 관련 분쟁 해결방법
+                    
+                    답변 형식:
+                    - 상속순위 도표 형식 설명
+                    - 구체적 사례로 설명
+                    - 상속분 계산 예시 포함
+                    - 민법 제1000조~제1003조 관련 내용 인용
+                    """,
+                
+                "유류분": """
+                    유류분에 대해 다음 내용을 포함하여 설명해주세요:
+                    1. 유류분의 법적 의미와 청구권자
+                    2. 유류분 산정 방법과 범위
+                    3. 유류분 청구 절차와 시효
+                    4. 유류분 반환 방법과 범위
+                    5. 유류분 포기와 합의 방법
+                    
+                    답변 형식:
+                    - 청구권자별 설명
+                    - 계산 사례 포함
+                    - 판례 기준 설명
+                    - 민법 제1112조~제1118조 관련 내용 인용
+                    """,
+                
+                "상속포기": """
+                    상속포기에 대해 다음 내용을 포함하여 설명해주세요:
+                    1. 상속포기의 요건과 효과
+                    2. 포기 신고 절차와 필요서류
+                    3. 포기 기간과 철회 가능성
+                    4. 한정승인과의 차이점
+                    5. 포기 후 법적 효과
+                    
+                    답변 형식:
+                    - 절차별 상세 설명
+                    - 필요 서류 목록 제시
+                    - 주의사항 강조
+                    - 민법 제1041조~제1044조 관련 내용 인용
+                    """,
+                
+                "유언장": """
+                    유언장 작성과 관련하여 다음 내용을 포함하여 설명해주세요:
+                    1. 유언장의 종류와 효력
+                    2. 유언장 작성 방법과 요건
+                    3. 유언 집행 절차
+                    4. 유언장 보관과 공개 방법
+                    5. 유언 무효 사유와 대응
+                    
+                    답변 형식:
+                    - 유언 종류별 설명
+                    - 작성 요령 상세 안내
+                    - 구체적 사례 포함
+                    - 민법 제1060조~제1072조 관련 내용 인용
+                    """
+            },
+            
+            "계약": {
+                "계약서 작성": """
+                    계약서 작성에 대해 다음 내용을 포함하여 설명해주세요:
+                    1. 계약서 필수 기재사항
+                    2. 계약 조항별 주의사항
+                    3. 특약 조항 작성 방법
+                    4. 계약서 검토 포인트
+                    5. 공증 절차와 효과
+                    
+                    답변 형식:
+                    - 항목별 체크리스트
+                    - 조항별 예시문구
+                    - 일반적 실수사례
+                    - 민법 제527조~제535조 관련 내용 인용
+                    """,
+                
+                "계약 해지": """
+                    계약 해지에 대한 기본 정보를 안내해드립니다:
+                    1. 해지 사유
+                    2. 해지 통보
+                    3. 위약금
+                    4. 손해배상
+                    자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+                    """,
+                
+                "손해배상": """
+                    손해배상에 대한 기본 정보를 안내해드립니다:
+                    1. 배상 범위
+                    2. 청구 절차
+                    3. 입증 방법
+                    4. 시효
+                    자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+                    """,
+                
+                "보증": """
+                    보증계약에 대해 다음 내용을 포함하여 설명해주세요:
+                    1. 보증의 종류와 효력
+                    2. 보증인의 권리와 의무
+                    3. 보증 책임의 범위
+                    4. 보증인 보호 제도
+                    5. 구상권 행사 방법
+                    
+                    답변 형식:
+                    - 보증 유형별 설명
+                    - 책임 범위 명확화
+                    - 구체적 사례 포함
+                    - 민법 제428조~제448조 관련 내용 인용
+                    """
+            },
+            
+            "부동산": {
+                "매매": """
+                    부동산 매매와 관련하여 다음 내용을 포함하여 설명해주세요:
+                    1. 매매계약 절차와 필수사항
+                    2. 계약금/중도금/잔금 지급
+                    3. 소유권 이전 등기 절차
+                    4. 하자담보책임과 분쟁해결
+                    5. 취득세 등 세금 문제
+                    
+                    답변 형식:
+                    - 단계별 절차 설명
+                    - 체크리스트 제시
+                    - 구체적 사례 포함
+                    - 민법 제568조~제584조 관련 내용 인용
+                    """,
+                
+                "임대차": """
+                    부동산 임대차에 대해 다음 내용을 포함하여 설명해주세요:
+                    1. 주택임대차보호법의 주요 내용
+                    2. 계약 체결시 주의사항
+                    3. 임차인의 권리보호 방법
+                    4. 보증금 반환 절차
+                    5. 분쟁 해결 방법
+                    
+                    답변 형식:
+                    - 임차인 보호제도 설명
+                    - 구체적 사례 제시
+                    - 계약시 체크포인트
+                    - 주택임대차보호법 관련 조항 인용
+                    """,
+                
+                "등기": """
+                    부동산 등기에 대해 다음 내용을 포함하여 설명해주세요:
+                    1. 등기의 종류와 효력
+                    2. 등기 신청 절차와 서류
+                    3. 등기 비용과 기간
+                    4. 등기부 확인사항
+                    5. 등기 관련 분쟁해결
+                    
+                    답변 형식:
+                    - 등기 종류별 설명
+                    - 절차 체크리스트
+                    - 비용 상세 안내
+                    - 부동산등기법 관련 조항 인용
+                    """,
+                
+                "재개발": """
+                    재개발/재건축에 대해 다음 내용을 포함하여 설명해주세요:
+                    1. 재개발과 재건축의 차이
+                    2. 사업 진행 절차와 기간
+                    3. 조합원의 권리와 의무
+                    4. 분담금 산정 방식
+                    5. 이주와 보상 문제
+                    
+                    답변 형식:
+                    - 단계별 진행과정 설명
+                    - 권리변동 설명
+                    - 구체적 사례 포함
+                    - 도시정비법 관련 조항 인용
+                    """
+            },
+            
+            "형사": {
+                "고소/고발": """
+                    고소/고발에 대한 기본 정보를 안내해드립니다:
+                    1. 고소와 고발의 차이점
+                    2. 고소장/고발장 작성 방법
+                    3. 처리 절차
+                    4. 불기소 불복
+                    자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+                    """,
+                
+                "변호사 선임": """
+                    변호사 선임에 대한 기본 정보를 안내해드립니다:
+                    1. 국선변호인
+                    2. 사선변호인
+                    3. 선임 시기
+                    4. 비용
+                    자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+                    """,
+                
+                "형사절차": """
+                    형사절차에 대한 기본 정보를 안내해드립니다:
+                    1. 수사 절차
+                    2. 기소 여부
+                    3. 재판 진행
+                    4. 형 집행
+                    자세한 상담은 법률전문가와 상담하시기를 권장드립니다.
+                    """,
+                
+                "보석": """
+                    보석제도에 대해 다음 내용을 포함하여 설명해주세요:
+                    1. 보석의 요건과 제한사유
+                    2. 보석 신청 절차와 서류
+                    3. 보석보증금 산정기준
+                    4. 보석 후 준수사항
+                    5. 보석 취소 사유
+                    
+                    답변 형식:
+                    - 신청 절차 설명
+                    - 보증금 기준 안내
+                    - 구체적 사례 포함
+                    - 형사소송법 제94조~제100조 관련 내용 인용
+                    """
+            }
+        }
+        
+        # 기본 프롬프트
+        default_prompt = f"""
+            {subcategory}에 대해 다음과 같이 설명해주세요:
+            1. 법적 정의와 의미
+            2. 관련 절차와 방법
+            3. 주의사항과 팁
+            4. 관련 법률과 판례
+            
+            답변 형식:
+            - 객관적 사실 중심
+            - 단계별 설명
+            - 구체적 예시 포함
+            - 관련 법률 조항 인용
+        """
+        
+        try:
+            return category_prompts[category][subcategory].strip()
+        except KeyError:
+            return default_prompt.strip()       
+
+
+
+
+
+    def _rewrite_answer(self, state: AgentState) -> AgentState:
+        """답변 재작성"""
+        try:
+            logger.info(f"""
+            === REWRITE_ANSWER NODE 진입 ===
+            이전 답변 길이: {len(state.get("answer", ""))}
+            재작성 횟수: {state.get("rewrite_count", 0)}
+            """)
+            
+            # 재작성 횟수 제한 확인
+            rewrite_count = state.get("rewrite_count", 0) + 1
+            if rewrite_count >= 3:
+                logger.warning("재작성 횟수 초과")
+                return state
+            
+            # 답변 재작성 프롬프트
+            prompt = f"""
+            다음 법률 답변을 더 정확하고 구체적으로 개선해주세요:
+
+            질문: {state["question"]}
+            
+            현재 답변:
+            {state["answer"]}
+            
+            개선 방향:
+            1. 법적 근거를 더 명확히 제시
+            2. 구체적인 예시 추가
+            3. 실무적 조언 보완
+            4. 전문 용어 설명 보강
+            
+            개선된 답변을 작성해주세요.
+            """
+            
+            # LLM으로 답변 재작성
+            new_answer = self.llm.invoke(prompt).content
+            
+            # HTML 태그 및 중복 답변 제거
+            new_answer = re.sub(r'<[^>]+>', '', new_answer)
+            new_answer = re.sub(r'\)" class="copy-button">[^<]+', '', new_answer)
+            new_answer = new_answer.replace(state["answer"], "")
+            
+            # 상태 업데이트
+            updated_state = state.copy()
+            updated_state["previous_answer"] = state["answer"]
+            updated_state["answer"] = new_answer
+            updated_state["rewrite_count"] = rewrite_count
+            
+            logger.info(f"""
+            === REWRITE_ANSWER NODE 완료 ===
+            새로운 답변 길이: {len(new_answer)}
+            재작성 횟수: {rewrite_count}
+            """)
+            
+            return AgentState(**updated_state)
+            
+        except Exception as e:
+            logger.error(f"답변 재작성 중 오류: {str(e)}")
+            return state
 
 
 def safe_get_content(doc: Union[Document, str]) -> str:
@@ -599,3 +1825,50 @@ class DocumentWrapper:
         if isinstance(self.content, Document):
             return self.content.page_content
         return str(self.content)
+
+
+from langchain.callbacks.base import BaseCallbackHandler
+
+from langchain.callbacks.base import BaseCallbackHandler
+
+class WorkflowStatusTracker(BaseCallbackHandler):
+    """워크플로우 상태 추적 핸들러"""
+    def __init__(self, container=None):
+        self.container = container
+        # 노드별 상태 메시지
+        self.status_map = {
+            "classify_question": "질문 분석 중...",
+            "retrieve": "관련 법률 정보 검색 중...",
+            "quick_filter": "검색 결과 필터링 중...",
+            "llm_answer": "답변 생성 중...",
+            "quality_check": "답변 품질 검증 중...",
+            "rewrite_query": "검색어 최적화 중...",
+            "rewrite_answer": "답변 개선 중..."
+        }
+
+    def on_chain_start(self, serialized: dict = None, inputs: dict = None, **kwargs):
+        """체인 시작 시 호출"""
+        try:
+            # 현재 노드 이름 추출
+            node_name = ''
+            if serialized and isinstance(serialized, dict):
+                node_name = serialized.get('name', '') or serialized.get('id', '')
+            # 상태 메시지 업데이트
+            if node_name in self.status_map:
+                message = f"🔄 {self.status_map[node_name]}"
+                self.container.info(message)
+        except Exception as e:
+            logger.warning(f"상태 업데이트 중 오류 발생: {e}")
+
+    def on_chain_end(self, outputs: dict = None, **kwargs):
+        """체인 종료 시 호출"""
+        pass
+
+    def on_chain_error(self, error: Exception = None, **kwargs):
+        """체인 오류 시 호출"""
+        if self.container:
+            self.container.error(f"❌ 처리 중 오류 발생: {str(error)}")
+        else:
+            logger.error(f"❌ 처리 중 오류 발생: {str(error)}")
+
+

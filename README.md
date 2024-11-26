@@ -16,25 +16,24 @@
 - **프레임워크**: Streamlit, LangChain
 
 ## 🌟 Key Features
-1. **하이브리드 검색 시스템**
-   - Dense + Sparse 임베딩 결합
-   - 컨텍스트 기반 동적 가중치 조정
-   - 폴백 메커니즘
+1. **최적화된 검색 시스템**
+   - 컨텍스트 품질 기반 동적 가중치
+   - 개선된 폴백 메커니즘
 
-2. **신뢰도 검증 시스템**
-   - Upstage 기반 검증
-   - KoBERT 유사도 분석
-   - 다중 검증 점수 결합
+2. **강화된 신뢰도 검증**
+   - Upstage 검증 (가중치: 0.3)
+   - KoBERT 유사도 (가중치: 0.7)
+   - 결합 점수 시스템
 
-3. **질문 최적화**
-   - 질문 재작성
-   - 의도 분석
-   - 컨텍스트 기반 가중치
+3. **카테고리별 최적화**
+   - 전문화된 프롬프트 템플릿
+   - 법률 분야별 컨텍스트
+   - 동적 질문 생성
 
-4. **데이터 처리**
-   - 멀티스레딩 처리
-   - 배치 프로세싱
-   - 캐싱 시스템
+4. **개선된 워크플로우**
+   - 재시도 횟수 최적화
+   - 품질 검사 체크포인트
+   - 실시간 성능 모니터링
 
 ## 📊 Project Status
 - 전체 진행률: 85%
@@ -42,15 +41,22 @@
 - UI/UX: 70%
 - 테스트 커버리지: 60%
 
-## 🔄 Agent Flow
+## 🔄 Updated Agent Flow
 ```mermaid
 graph TD
     A[Entry] --> B[Retrieve]
-    B --> C[LLM Answer]
-    C --> D[Relevance Check]
-    D -->|Grounded| E[End]
-    D -->|Not Grounded| F[Rewrite]
-    F --> B
+    B --> C[Quick Filter]
+    C --> D[LLM Answer]
+    D --> E[Quality Check]
+    E -->|Score >= 0.3| F[Final Answer]
+    E -->|Score < 0.3| G[Rewrite]
+    G --> B
+    
+    subgraph "Quality Metrics"
+    H[Upstage: 0.3]
+    I[KoBERT: 0.7]
+    J[Combined Score]
+    end
 ```
 
 ## 📋 Installation & Setup
@@ -61,16 +67,27 @@ streamlit run app.py
 
 ## 🔧 Configuration
 ```yaml
-PINECONE_API_KEY: your_api_key
-OPENAI_API_KEY: your_api_key
-MODEL_NAME: gpt-4o
+UPSTAGE_WEIGHT: 0.3
+KOBERT_WEIGHT: 0.7
+QUALITY_THRESHOLD: 0.2
+MAX_RETRIES: 3
 ```
 
-## 🚀 Next Steps
-1. 컨텍스트 처리 개선
-2. 에러 핸들링 강화
-3. UI/UX 개선
-4. 테스트 자동화
+## 🚀 Improvement Plans
+1. 검색 엔진 최적화
+   - 초기 검색 품질 향상
+   - 카테고리별 가중치 조정
+   - 컨텍스트 필터링 강화
+
+2. 재작성 전략 개선
+   - 점진적 구체화 방식
+   - 템플릿 기반 최적화
+   - 피드백 루프 구현
+
+3. 성능 모니터링
+   - 실시간 품질 추적
+   - 실패 케이스 분석
+   - 자동화된 보고 시스템
 ```
 
 ### 📌 주요 기술 스택 상세

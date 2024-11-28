@@ -23,6 +23,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8501/"]
       interval: 30s

@@ -881,31 +881,6 @@ class LegalAgent:
         """관련성 상태 반환"""
         return state["relevance"]
 
-    # def _calculate_combined_score(
-    #     self, 
-    #     upstage_response: str, 
-    #     kobert_score: float
-    # ) -> float:
-    #     """결합 점수 계산"""
-    #     upstage_weight = 0.6
-    #     kobert_weight = 0.4
-        
-    #     # upstage_response가 딕셔너리인 경우를 처리
-    #     if isinstance(upstage_response, dict):
-    #         # upstage_response에서 실제 응답 값을 추출
-    #         upstage_result = upstage_response.get('result', 'notSure')
-    #     else:
-    #         upstage_result = upstage_response
-        
-    #     # 점수 매핑
-    #     upstage_score = {
-    #         "grounded": 1.0,
-    #         "notGrounded": 0.0,
-    #         "notSure": 0.33
-    #     }.get(upstage_result, 0.0)
-        
-    #     return (upstage_weight * upstage_score) + (kobert_weight * kobert_score)
-
     def _get_relevance_status(self, score: float) -> str:
         """점수 기반 관련성 상태 결정"""
         if score >= 0.6:

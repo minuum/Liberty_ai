@@ -1,0 +1,17 @@
+version: '3'
+services:
+  liberty-agent:
+    image: liberty-agent
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env.prod
+    environment:
+      - OPENAI_API_KEY
+      - PINECONE_API_KEY
+      - PINECONE_INDEX_NAME
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2'

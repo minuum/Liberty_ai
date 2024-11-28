@@ -10,6 +10,9 @@ services:
       - OPENAI_API_KEY
       - PINECONE_API_KEY
       - PINECONE_INDEX_NAME
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_ENABLE_CORS=false
     deploy:
       resources:
         limits:

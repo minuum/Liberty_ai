@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   liberty-agent:
     image: liberty-container.kr.ncr.ntruss.com/liberty-agent:latest
@@ -15,3 +15,13 @@ services:
         limits:
           memory: 4G
           cpus: '2'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

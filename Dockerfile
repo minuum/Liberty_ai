@@ -1,5 +1,5 @@
-# ARM64/AMD64 호환성을 위한 플랫폼 지정
-FROM --platform=$TARGETPLATFORM python:3.11-slim
+# Dockerfile
+FROM --platform=linux/amd64 python:3.11-slim
 
 # 작업 디렉토리 설정
 WORKDIR /app

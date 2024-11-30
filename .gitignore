@@ -16,3 +16,4 @@ liberty_agent/cached_vectors/retrievers/embeddings
 liberty_agent/cached_vectors/retrievers/emdebackup
 liberty_agent/cached_vectors/retrievers/faiss
 chat_history.db
+liberty_agent/cached_vectors/retrievers/embeddings_legal_terms-2020

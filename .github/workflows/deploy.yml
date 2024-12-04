@@ -42,6 +42,12 @@ jobs:
       - name: Set environment variable
         run: |
           echo "UPSTAGE_API_KEY=${{ secrets.UPSTAGE_API_KEY }}" >> .env.prod
+          echo "PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }}" >> .env.prod
+          echo "PINECONE_INDEX_NAME=${{ secrets.PINECONE_INDEX_NAME }}" >> .env.prod
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env.prod
+          echo "LANGCHAIN_API_KEY=${{ secrets.LANGCHAIN_API_KEY }}" >> .env.prod
+          echo "LANGCHAIN_ENDPOINT=${{ secrets.LANGCHAIN_ENDPOINT }}" >> .env.prod
+          echo "LANGCHAIN_PROJECT=${{ secrets.LANGCHAIN_PROJECT }}" >> .env.prod
       - name: Build and push
         uses: docker/build-push-action@v3
         with:

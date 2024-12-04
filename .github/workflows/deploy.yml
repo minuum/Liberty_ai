@@ -19,6 +19,7 @@ jobs:
           
       - name: Run Streamlit Test
         run: |
+          pip install -r requirements.txt
           python test_streamlit.py
   build:
     needs: test

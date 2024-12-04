@@ -40,7 +40,9 @@ jobs:
           registry: liberty-container.kr.ncr.ntruss.com
           username: ${{ secrets.NCR_ACCESS_KEY }}
           password: ${{ secrets.NCR_SECRET_KEY }}
-      
+      - name: Set environment variable
+        run: |
+          echo "UPSTAGE_API_KEY=${{ secrets.UPSTAGE_API_KEY }}" >> .env.prod
       - name: Build and push
         uses: docker/build-push-action@v2
         with:

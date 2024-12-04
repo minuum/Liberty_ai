@@ -24,6 +24,12 @@ RUN chmod +x /app/liberty_agent/app_agent_sim.py
 ENV STREAMLIT_SERVER_PORT=8501
 ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
 
+
+# build-args로 추가
+ARG UPSTAGE_API_KEY
+ENV UPSTAGE_API_KEY=${UPSTAGE_API_KEY}
+
+
 # 포트 노출
 EXPOSE 8501
 

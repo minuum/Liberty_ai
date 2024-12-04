@@ -13,6 +13,7 @@ services:
       - STREAMLIT_SERVER_ADDRESS=0.0.0.0
       - STREAMLIT_SERVER_PORT=8501
       - STREAMLIT_ENABLE_CORS=false
+      - UPSTAGE_API_KEY
     deploy:
       resources:
         limits:

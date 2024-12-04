@@ -13,6 +13,7 @@ rag/__pycache__
 liberty_agent/cached_vectors/retrievers/embeddings
 liberty_agent/cached_vectors/retrievers/emdebackup
 liberty_agent/cached_vectors/retrievers/faiss
+liberty_agent/cached_vectors/retrievers/embeddings_legal_terms-2020
 chat_history.db
 .DS_Store
 >>>>>>> develop

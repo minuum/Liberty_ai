@@ -5,9 +5,10 @@ description = "Ultimate LangChain Tutorial written in Korean by TeddyNote."
 authors = ["teddy <teddylee777@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11.10"
+python = ">=3.11.10,<3.12"
 # 언어 및 자연어 처리 관련 패키지
 langchain = "^0.2.5"
 langchain-openai = "^0.1"
@@ -94,6 +95,8 @@ protoc-gen-openapiv2 = "^0.0.1"
 pinecone-text = "^0.9.0"
 reportlab = "^4.2.5"
 streamlit-extras = "^0.5.0"
+pytest = "^7.4.2"   
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

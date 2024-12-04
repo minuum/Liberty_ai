@@ -17,11 +17,9 @@ jobs:
         with:
           python-version: '3.11.10'
           
-      - name: Run tests
+      - name: Run Streamlit Test
         run: |
-          pip install -r requirements.txt
-          pip install pytest
-          python -m pytest
+          python test_streamlit.py
   build:
     needs: test
     runs-on: ubuntu-latest

@@ -26,13 +26,15 @@ jobs:
         run: |
           echo "NCR_ACCESS_KEY=${{ secrets.NCR_ACCESS_KEY }}" >> $GITHUB_ENV
           echo "NCR_SECRET_KEY=${{ secrets.NCR_SECRET_KEY }}" >> $GITHUB_ENV
+          echo "UPSTAGE_API_KEY=${{ secrets.UPSTAGE_API_KEY }}" >> $GITHUB_ENV
+          echo "AAAA=${{ secrets.AAAA }}" >> $GITHUB_ENV
 
       - name: Check Secrets
         run: |
           echo "NCR_ACCESS_KEY=${NCR_ACCESS_KEY:0:4}***"
           echo "NCR_SECRET_KEY=${NCR_SECRET_KEY:0:4}***"
           echo "UPSTAGE_API_KEY=${UPSTAGE_API_KEY:0:4}***"
-
+          echo "AAAA=${AAAA:0:4}***"
       - name: Test NCR Login
         run: |
           docker login liberty-container.kr.ncr.ntruss.com \

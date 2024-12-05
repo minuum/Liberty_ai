@@ -52,6 +52,7 @@ jobs:
         run: |
           echo "NCR_ACCESS_KEY=${NCR_ACCESS_KEY:0:4}***"
           echo "NCR_SECRET_KEY=${NCR_SECRET_KEY:0:4}***"
+          echo "UPSTAGE_API_KEY=${{ secrets.UPSTAGE_API_KEY:0:4 }}***"
 
       - name: Set Environment Variables
         run: |

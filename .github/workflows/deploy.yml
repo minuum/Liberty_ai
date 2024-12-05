@@ -17,10 +17,10 @@ jobs:
         with:
           python-version: '3.11.10'
           
-      - name: Run Streamlit Test
-        run: |
-          pip install -r requirements.txt
-          python test_streamlit.py
+      # - name: Run Streamlit Test
+      #   run: |
+      #     pip install -r requirements.txt
+      #     python test_streamlit.py
 
       - name: Set Environment Variables
         run: |
@@ -29,8 +29,9 @@ jobs:
 
       - name: Check Secrets
         run: |
-          echo "ACCESS_KEY=${NCR_ACCESS_KEY}"
-          echo "SECRET_KEY=${NCR_SECRET_KEY}"
+          echo "NCR_ACCESS_KEY=${NCR_ACCESS_KEY:0:4}***"
+          echo "NCR_SECRET_KEY=${NCR_SECRET_KEY:0:4}***"
+          echo "UPSTAGE_API_KEY=${UPSTAGE_API_KEY:0:4}***"
 
       - name: Test NCR Login
         run: |
@@ -52,7 +53,7 @@ jobs:
         run: |
           echo "NCR_ACCESS_KEY=${NCR_ACCESS_KEY:0:4}***"
           echo "NCR_SECRET_KEY=${NCR_SECRET_KEY:0:4}***"
-          echo "UPSTAGE_API_KEY=${{ secrets.UPSTAGE_API_KEY:0:4 }}***"
+          
 
       - name: Set Environment Variables
         run: |

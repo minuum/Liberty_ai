@@ -50,8 +50,8 @@ jobs:
         uses: docker/setup-buildx-action@v2
       - name: Check Secrets
         run: |
-          echo "ACCESS_KEY=${{ secrets.NCR_ACCESS_KEY }}"
-          echo "SECRET_KEY=${{ secrets.NCR_SECRET_KEY }}"
+          echo "NCR_ACCESS_KEY=${NCR_ACCESS_KEY:0:4}***"
+          echo "NCR_SECRET_KEY=${NCR_SECRET_KEY:0:4}***"
 
       - name: Set Environment Variables
         run: |

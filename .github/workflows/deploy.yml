@@ -52,12 +52,12 @@ jobs:
           echo "NCR_ACCESS_KEY=${NCR_ACCESS_KEY:0:4}***"
           echo "NCR_SECRET_KEY=${NCR_SECRET_KEY:0:4}***"
 
-      - name: Test NCR Login Using docker/login-action
-        uses: docker/login-action@v2
-        with:
-          registry: liberty-container.kr.ncr.ntruss.com
-          username: ${{ secrets.NCR_ACCESS_KEY }}
-          password: ${{ secrets.NCR_SECRET_KEY }}
+      # - name: Test NCR Login Using docker/login-action
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: liberty-container.kr.ncr.ntruss.com
+      #     username: ${{ secrets.NCR_ACCESS_KEY }}
+      #     password: ${{ secrets.NCR_SECRET_KEY }}
 
       - name: Set Environment Variables in .env.prod
         run: |
@@ -69,10 +69,21 @@ jobs:
           echo "LANGCHAIN_ENDPOINT=${{ secrets.LANGCHAIN_ENDPOINT }}" >> .env.prod
           echo "LANGCHAIN_PROJECT=${{ secrets.LANGCHAIN_PROJECT }}" >> .env.prod
 
+      - name: Login to NCR
+        uses: docker/login-action@v2
+        with:
+          registry: liberty-container.kr.ncr.ntruss.com
+          username: ${{ secrets.NCR_ACCESS_KEY }}
+          password: ${{ secrets.NCR_SECRET_KEY }}
+
+      - name: Docker Login
+        run: |
+          echo $NCR_SECRET_KEY | docker login liberty-container.kr.ncr.ntruss.com \
+            --username $NCR_ACCESS_KEY --password-stdin
+        
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v3
         with:
-          context: .
           platforms: linux/amd64,linux/arm64
           push: true
           tags: liberty-container.kr.ncr.ntruss.com/liberty-agent:latest

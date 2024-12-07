@@ -11,32 +11,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.11.10'
 
-      - name: Set Environment Variables
-        run: |
-          echo "NCR_ACCESS_KEY=${{ secrets.NCR_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo "NCR_SECRET_KEY=${{ secrets.NCR_SECRET_KEY }}" >> $GITHUB_ENV
-          echo "UPSTAGE_API_KEY=${{ secrets.UPSTAGE_API_KEY }}" >> $GITHUB_ENV
-          echo "AAAA=${{ secrets.AAAA }}" >> $GITHUB_ENV
-
-      - name: Check Secrets
+      - name: Export Secrets as Environment Variables
+        env:
+          NCR_ACCESS_KEY: ${{ secrets.NCR_ACCESS_KEY }}
+          NCR_SECRET_KEY: ${{ secrets.NCR_SECRET_KEY }}
+          UPSTAGE_API_KEY: ${{ secrets.UPSTAGE_API_KEY }}
         run: |
           echo "NCR_ACCESS_KEY=${NCR_ACCESS_KEY:0:4}***"
           echo "NCR_SECRET_KEY=${NCR_SECRET_KEY:0:4}***"
           echo "UPSTAGE_API_KEY=${UPSTAGE_API_KEY:0:4}***"
-          echo "AAAA=${AAAA:0:4}***"
 
       - name: Test NCR Login with Password Stdin
+        env:
+          NCR_ACCESS_KEY: ${{ secrets.NCR_ACCESS_KEY }}
+          NCR_SECRET_KEY: ${{ secrets.NCR_SECRET_KEY }}
         run: |
           echo "$NCR_SECRET_KEY" | docker login liberty-container.kr.ncr.ntruss.com \
             --username "$NCR_ACCESS_KEY" \
             --password-stdin
-
   build:
     needs: test
     runs-on: ubuntu-latest

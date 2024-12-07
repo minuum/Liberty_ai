@@ -16,11 +16,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.11.10'
-          
-      # - name: Run Streamlit Test
-      #   run: |
-      #     pip install -r requirements.txt
-      #     python test_streamlit.py
 
       - name: Set Environment Variables
         run: |
@@ -35,11 +30,12 @@ jobs:
           echo "NCR_SECRET_KEY=${NCR_SECRET_KEY:0:4}***"
           echo "UPSTAGE_API_KEY=${UPSTAGE_API_KEY:0:4}***"
           echo "AAAA=${AAAA:0:4}***"
-      - name: Test NCR Login
+
+      - name: Test NCR Login with Password Stdin
         run: |
-          docker login liberty-container.kr.ncr.ntruss.com \
-            -u $NCR_ACCESS_KEY \
-            -p $NCR_SECRET_KEY
+          echo "$NCR_SECRET_KEY" | docker login liberty-container.kr.ncr.ntruss.com \
+          -u "$NCR_ACCESS_KEY" --password-stdin
+
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -51,27 +47,20 @@ jobs:
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Check Secrets
+
+      - name: Check Secrets Again
         run: |
           echo "NCR_ACCESS_KEY=${NCR_ACCESS_KEY:0:4}***"
           echo "NCR_SECRET_KEY=${NCR_SECRET_KEY:0:4}***"
-          
 
-      - name: Set Environment Variables
-        run: |
-          echo "NCR_ACCESS_KEY=${{ secrets.NCR_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo "NCR_SECRET_KEY=${{ secrets.NCR_SECRET_KEY }}" >> $GITHUB_ENV
-      - name: Test NCR Login
-        run: |
-          echo "$NCR_ACCESS_KEY" | docker login liberty-container.kr.ncr.ntruss.com -u $NCR_ACCESS_KEY --password-stdin    
-      - name: Login to NCR
+      - name: Test NCR Login Using docker/login-action
         uses: docker/login-action@v2
         with:
           registry: liberty-container.kr.ncr.ntruss.com
           username: ${{ secrets.NCR_ACCESS_KEY }}
           password: ${{ secrets.NCR_SECRET_KEY }}
 
-      - name: Set environment variable
+      - name: Set Environment Variables in .env.prod
         run: |
           echo "UPSTAGE_API_KEY=${{ secrets.UPSTAGE_API_KEY }}" >> .env.prod
           echo "PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }}" >> .env.prod
@@ -80,10 +69,11 @@ jobs:
           echo "LANGCHAIN_API_KEY=${{ secrets.LANGCHAIN_API_KEY }}" >> .env.prod
           echo "LANGCHAIN_ENDPOINT=${{ secrets.LANGCHAIN_ENDPOINT }}" >> .env.prod
           echo "LANGCHAIN_PROJECT=${{ secrets.LANGCHAIN_PROJECT }}" >> .env.prod
-      - name: Build and push
+
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v3
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: liberty-container.kr.ncr.ntruss.com/liberty-agent:latest 
+          tags: liberty-container.kr.ncr.ntruss.com/liberty-agent:latest

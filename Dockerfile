@@ -1,5 +1,6 @@
-# Dockerfile
-FROM --platform=linux/amd64 python:3.11-slim
+# Dockerfile 수정 후:
+ARG PLATFORM=linux/amd64
+FROM --platform=$PLATFORM python:3.11
 
 # 작업 디렉토리 설정
 WORKDIR /app
@@ -23,11 +24,6 @@ RUN chmod +x /app/liberty_agent/app_agent_sim.py
 # 환경 변수 설정
 ENV STREAMLIT_SERVER_PORT=8501
 ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
-
-
-# build-args로 추가
-ARG UPSTAGE_API_KEY
-ENV UPSTAGE_API_KEY=${UPSTAGE_API_KEY}
 
 
 # 포트 노출

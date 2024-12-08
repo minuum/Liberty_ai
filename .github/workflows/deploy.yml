@@ -36,7 +36,9 @@ jobs:
 
       - name: Debug env.prod file
         run: cat env.prod
-
+      - name: Copy env.prod to Server
+        run: |
+          scp -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} env.prod ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/path/to/Liberty_ai/
       # 4. NCR 레지스트리 로그인
       - name: Login to NCR Registry
         run: |

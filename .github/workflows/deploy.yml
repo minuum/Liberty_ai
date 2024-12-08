@@ -8,6 +8,7 @@ on:
 
 jobs:
   build-and-deploy:
+    environment: liberty-NCP-streamlit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository

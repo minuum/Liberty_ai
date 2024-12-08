@@ -32,6 +32,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: liberty.Dockerfile
+          file: Dockerfile
           push: true
           tags: liberty-container.kr.ncr.ntruss.com/liberty-agent:latest

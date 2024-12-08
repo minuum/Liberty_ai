@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   liberty-agent:
     image: liberty-container.kr.ncr.ntruss.com/liberty-agent:latest

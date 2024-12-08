@@ -4,26 +4,30 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build-and-deploy:
-    environment: liberty-NCP-streamlit
     runs-on: ubuntu-latest
     steps:
+      # 1. 레포지토리 체크아웃
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.11'
+      # 2. Docker Buildx 설정
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      - name: Login to NCR
+      # 3. NCR 레지스트리 로그인
+      - name: Login to NCR Registry
         run: |
           echo "${{ secrets.NCR_SECRET_KEY }}" | docker login liberty-container.kr.ncr.ntruss.com \
             --username "${{ secrets.NCR_ACCESS_KEY }}" --password-stdin
 
-      - name: Build and Push Docker Image
+      # 4. NCR로 Docker 이미지 빌드 및 푸시
+      - name: Build and Push Docker Image to NCR
         uses: docker/build-push-action@v3
         with:
           context: .

@@ -12,8 +12,8 @@ jobs:
     steps:
       - name: Test GitHub Secrets
         run: |
-          echo "DOCKER_USERNAME=${{ secrets.DOCKER_UERNAME:0:4 }}****"
-          echo "DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD:0:4 }}****"
+          echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}"
+          echo "DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD }}"
 
       - name: Checkout Repository
         uses: actions/checkout@v2

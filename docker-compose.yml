@@ -1,20 +1,14 @@
 version: '3.8'
-
 services:
   liberty-agent:
     image: liberty-container.kr.ncr.ntruss.com/liberty-agent:latest
     ports:
       - "8501:8501"
     env_file:
-      - .env.prod
+      - /root/Liberty_ai/env.prod
     environment:
-      - OPENAI_API_KEY
-      - PINECONE_API_KEY
-      - PINECONE_INDEX_NAME
       - STREAMLIT_SERVER_ADDRESS=0.0.0.0
       - STREAMLIT_SERVER_PORT=8501
-      - STREAMLIT_ENABLE_CORS=false
-      - UPSTAGE_API_KEY
     deploy:
       resources:
         limits:

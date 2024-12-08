@@ -10,6 +10,7 @@ on:
 
 jobs:
   build-and-deploy:
+    environment: liberty-NCP-streamlit
     runs-on: ubuntu-latest
     steps:
       # 1. 레포지토리 체크아웃

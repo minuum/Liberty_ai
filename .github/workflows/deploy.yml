@@ -1,4 +1,4 @@
-name: Deploy to NCR
+name: Deploy to Docker Hub
 
 on:
   push:
@@ -15,55 +15,34 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11.10'
+          python-version: '3.11'
 
-      - name: Export Secrets as Environment Variables
-        env:
-          NCR_ACCESS_KEY: ${{ secrets.NCR_ACCESS_KEY }}
-          NCR_SECRET_KEY: ${{ secrets.NCR_SECRET_KEY }}
-          UPSTAGE_API_KEY: ${{ secrets.UPSTAGE_API_KEY }}
+      - name: Validate Secrets
         run: |
-          echo "NCR_ACCESS_KEY=${NCR_ACCESS_KEY:0:4}***"
-          echo "NCR_SECRET_KEY=${NCR_SECRET_KEY:0:4}***"
-          echo "UPSTAGE_API_KEY=${UPSTAGE_API_KEY:0:4}***"
+          echo "Validating secrets..."
+          echo "DOCKER_USERNAME=${{ secrets.DOCKER_HUB_USERNAME}}"
+          echo "DOCKER_PASSWORD=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
 
   build:
     needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Check Secrets Again
-        run: |
-          echo "NCR_ACCESS_KEY=${NCR_ACCESS_KEY:0:4}***"
-          echo "NCR_SECRET_KEY=${NCR_SECRET_KEY:0:4}***"
-
-
-      - name: Set Environment Variables in .env.prod
-        run: |
-          echo "UPSTAGE_API_KEY=${{ secrets.UPSTAGE_API_KEY }}" >> .env.prod
-          echo "PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }}" >> .env.prod
-          echo "PINECONE_INDEX_NAME=${{ secrets.PINECONE_INDEX_NAME }}" >> .env.prod
-          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env.prod
-          echo "LANGCHAIN_API_KEY=${{ secrets.LANGCHAIN_API_KEY }}" >> .env.prod
-          echo "LANGCHAIN_ENDPOINT=${{ secrets.LANGCHAIN_ENDPOINT }}" >> .env.prod
-          echo "LANGCHAIN_PROJECT=${{ secrets.LANGCHAIN_PROJECT }}" >> .env.prod
-
-
       - name: Docker Login
         run: |
-          echo "${{ secrets.NCR_SECRET_KEY }}" | docker login liberty-container.kr.ncr.ntruss.com \
-            --username "${{ secrets.NCR_ACCESS_KEY }}" --password-stdin
-              
+          echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login --username "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v3
         with:
+          context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: liberty-container.kr.ncr.ntruss.com/liberty-agent:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/liberty-agent:latest

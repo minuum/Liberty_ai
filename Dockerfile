@@ -1,4 +1,4 @@
-# Dockerfile 수정 후:
+# Dockerfile
 ARG PLATFORM=linux/amd64
 FROM --platform=$PLATFORM python:3.11
 
@@ -25,7 +25,6 @@ RUN chmod +x /app/liberty_agent/app_agent_sim.py
 ENV STREAMLIT_SERVER_PORT=8501
 ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
 
-
 # 포트 노출
 EXPOSE 8501
 
@@ -34,4 +33,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8501/ || exit 1
 
 # Streamlit 실행
-CMD ["streamlit", "run", "liberty_agent/app_agent_sim.py"] 
+CMD ["streamlit", "run", "liberty_agent/app_agent_sim.py"]

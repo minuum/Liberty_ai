@@ -10,6 +10,11 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Test GitHub Secrets
+        run: |
+          echo "DOCKER_USERNAME=${{ secrets.DOCKER_UERNAME:0:4 }}****"
+          echo "DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD:0:4 }}****"
+
       - name: Checkout Repository
         uses: actions/checkout@v2
 

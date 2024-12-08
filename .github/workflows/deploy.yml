@@ -21,13 +21,31 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # 3. NCR 레지스트리 로그인
+      # 3. `env.prod` 파일 생성
+      - name: Create env.prod file
+        run: |
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> env.prod
+          echo "PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }}" >> env.prod
+          echo "PINECONE_INDEX_NAME=${{ secrets.PINECONE_INDEX_NAME }}" >> env.prod
+          echo "PINECONE_ENVIRONMENT=${{ secrets.PINECONE_ENVIRONMENT }}" >> env.prod
+          echo "UPSTAGE_API_KEY=${{ secrets.UPSTAGE_API_KEY }}" >> env.prod
+          echo "LANGCHAIN_API_KEY=${{ secrets.LANGCHAIN_API_KEY }}" >> env.prod
+          echo "LANGCHAIN_ENDPOINT=${{ secrets.LANGCHAIN_ENDPOINT }}" >> env.prod
+          echo "LANGCHAIN_PROJECT=${{ secrets.LANGCHAIN_PROJECT }}" >> env.prod
+          echo "LANGCHAIN_TRACING_V2=${{ secrets.LANGCHAIN_TRACING_V2 }}" >> env.prod
+          echo "STREAMLIT_SERVER_ADDRESS=0.0.0.0" >> env.prod
+          echo "STREAMLIT_SERVER_PORT=8501" >> env.prod
+          echo "STREAMLIT_ENABLE_CORS=false" >> env.prod
+          echo "NCR_ACCESS_KEY=${{ secrets.NCR_ACCESS_KEY }}" >> env.prod
+          echo "NCR_SECRET_KEY=${{ secrets.NCR_SECRET_KEY }}" >> env.prod
+
+      # 4. NCR 레지스트리 로그인
       - name: Login to NCR Registry
         run: |
           echo "${{ secrets.NCR_SECRET_KEY }}" | docker login liberty-container.kr.ncr.ntruss.com \
             --username "${{ secrets.NCR_ACCESS_KEY }}" --password-stdin
 
-      # 4. NCR로 Docker 이미지 빌드 및 푸시
+      # 5. NCR로 Docker 이미지 빌드 및 푸시
       - name: Build and Push Docker Image to NCR
         uses: docker/build-push-action@v3
         with:

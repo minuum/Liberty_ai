@@ -1,48 +1,30 @@
-name: Deploy to Docker Hub
+name: Deploy to Docker Hub (Private Repository)
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  test:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      # 1. Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.11'
-
-      - name: Validate Secrets
-        run: |
-          echo "Validating secrets..."
-          echo "DOCKER_USERNAME=${{ secrets.DOCKER_HUB_USERNAME}}"
-          echo "DOCKER_PASSWORD=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
+      # 2. Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Docker Login
-        run: |
-          echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login --username "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+      # 3. Docker Hub Login
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login --username "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
+      # 4. Build and Push Docker Image to Docker Hub
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v3
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/liberty-agent:latest
+          tags: minuum/liberty-agent:latest

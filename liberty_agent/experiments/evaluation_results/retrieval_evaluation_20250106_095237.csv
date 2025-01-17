@@ -1,0 +1,109 @@
+weights,legal_area,query,evaluation_type,quality_score
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,임대차 계약 해지 요건은 무엇인가요?,keyword,0.1997142857142857
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,임대차 계약 해지 요건은 무엇인가요?,semantic,0.41035858481270926
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,임대차 계약 해지 요건은 무엇인가요?,metadata,0.3
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,임대차 계약 해지 요건은 무엇인가요?,hybrid,0.0
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,keyword,0.0036
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,semantic,0.4692193954467774
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,metadata,0.3
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,hybrid,0.0
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,부동산 매매계약 위약금 청구 요건은?,keyword,0.0036
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,부동산 매매계약 위약금 청구 요건은?,semantic,0.5523489921569824
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,부동산 매매계약 위약금 청구 요건은?,metadata,0.3
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",민사,부동산 매매계약 위약금 청구 요건은?,hybrid,0.0
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,특수폭행죄의 구성요건은 무엇인가요?,keyword,0.0036
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,특수폭행죄의 구성요건은 무엇인가요?,semantic,0.5122115581512452
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,특수폭행죄의 구성요건은 무엇인가요?,metadata,0.3
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,특수폭행죄의 구성요건은 무엇인가요?,hybrid,0.0
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,사기죄의 기수시기는 언제인가요?,keyword,0.0036
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,사기죄의 기수시기는 언제인가요?,semantic,0.5507645576477052
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,사기죄의 기수시기는 언제인가요?,metadata,0.3
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,사기죄의 기수시기는 언제인가요?,hybrid,0.0
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,정당방위의 성립요건은?,keyword,0.0036
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,정당방위의 성립요건은?,semantic,0.3890944211959839
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,정당방위의 성립요건은?,metadata,0.3
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",형사,정당방위의 성립요건은?,hybrid,0.0
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,행정처분 취소소송의 제소기간은?,keyword,0.14952380952380953
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,행정처분 취소소송의 제소기간은?,semantic,0.449730848357791
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,행정처분 취소소송의 제소기간은?,metadata,0.3
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,행정처분 취소소송의 제소기간은?,hybrid,0.0
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,영업정지처분 효력정지신청 요건은?,keyword,0.14872380952380954
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,영업정지처분 효력정지신청 요건은?,semantic,0.4258387266613189
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,영업정지처분 효력정지신청 요건은?,metadata,0.3
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,영업정지처분 효력정지신청 요건은?,hybrid,0.0
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,건축허가 거부처분 취소소송의 요건은?,keyword,0.162
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,건축허가 거부처분 취소소송의 요건은?,semantic,0.47427507972717287
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,건축허가 거부처분 취소소송의 요건은?,metadata,0.3
+"{'dense': 0.7, 'keyword': 0.3, 'metadata': 0.2}",행정,건축허가 거부처분 취소소송의 요건은?,hybrid,0.0
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,임대차 계약 해지 요건은 무엇인가요?,keyword,0.1997142857142857
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,임대차 계약 해지 요건은 무엇인가요?,semantic,0.41035858481270926
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,임대차 계약 해지 요건은 무엇인가요?,metadata,0.3
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,임대차 계약 해지 요건은 무엇인가요?,hybrid,0.0
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,keyword,0.0036
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,semantic,0.4692193954467774
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,metadata,0.3
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,hybrid,0.0
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,부동산 매매계약 위약금 청구 요건은?,keyword,0.0036
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,부동산 매매계약 위약금 청구 요건은?,semantic,0.5523489921569824
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,부동산 매매계약 위약금 청구 요건은?,metadata,0.3
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",민사,부동산 매매계약 위약금 청구 요건은?,hybrid,0.0
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,특수폭행죄의 구성요건은 무엇인가요?,keyword,0.0036
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,특수폭행죄의 구성요건은 무엇인가요?,semantic,0.5122115581512452
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,특수폭행죄의 구성요건은 무엇인가요?,metadata,0.3
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,특수폭행죄의 구성요건은 무엇인가요?,hybrid,0.0
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,사기죄의 기수시기는 언제인가요?,keyword,0.0036
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,사기죄의 기수시기는 언제인가요?,semantic,0.5507645576477052
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,사기죄의 기수시기는 언제인가요?,metadata,0.3
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,사기죄의 기수시기는 언제인가요?,hybrid,0.0
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,정당방위의 성립요건은?,keyword,0.0036
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,정당방위의 성립요건은?,semantic,0.3890944211959839
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,정당방위의 성립요건은?,metadata,0.3
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",형사,정당방위의 성립요건은?,hybrid,0.0
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,행정처분 취소소송의 제소기간은?,keyword,0.14952380952380953
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,행정처분 취소소송의 제소기간은?,semantic,0.449730848357791
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,행정처분 취소소송의 제소기간은?,metadata,0.3
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,행정처분 취소소송의 제소기간은?,hybrid,0.0
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,영업정지처분 효력정지신청 요건은?,keyword,0.14872380952380954
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,영업정지처분 효력정지신청 요건은?,semantic,0.4258387266613189
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,영업정지처분 효력정지신청 요건은?,metadata,0.3
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,영업정지처분 효력정지신청 요건은?,hybrid,0.0
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,건축허가 거부처분 취소소송의 요건은?,keyword,0.162
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,건축허가 거부처분 취소소송의 요건은?,semantic,0.47427507972717287
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,건축허가 거부처분 취소소송의 요건은?,metadata,0.3
+"{'dense': 0.8, 'keyword': 0.4, 'metadata': 0.3}",행정,건축허가 거부처분 취소소송의 요건은?,hybrid,0.0
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,임대차 계약 해지 요건은 무엇인가요?,keyword,0.1997142857142857
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,임대차 계약 해지 요건은 무엇인가요?,semantic,0.41035858481270926
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,임대차 계약 해지 요건은 무엇인가요?,metadata,0.3
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,임대차 계약 해지 요건은 무엇인가요?,hybrid,0.0
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,keyword,0.0036
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,semantic,0.4692193954467774
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,metadata,0.3
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,주택임대차보호법상 계약갱신요구권의 행사방법은?,hybrid,0.0
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,부동산 매매계약 위약금 청구 요건은?,keyword,0.0036
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,부동산 매매계약 위약금 청구 요건은?,semantic,0.5523489921569824
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,부동산 매매계약 위약금 청구 요건은?,metadata,0.3
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",민사,부동산 매매계약 위약금 청구 요건은?,hybrid,0.0
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,특수폭행죄의 구성요건은 무엇인가요?,keyword,0.0036
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,특수폭행죄의 구성요건은 무엇인가요?,semantic,0.5122115581512452
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,특수폭행죄의 구성요건은 무엇인가요?,metadata,0.3
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,특수폭행죄의 구성요건은 무엇인가요?,hybrid,0.0
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,사기죄의 기수시기는 언제인가요?,keyword,0.0036
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,사기죄의 기수시기는 언제인가요?,semantic,0.5507645576477052
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,사기죄의 기수시기는 언제인가요?,metadata,0.3
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,사기죄의 기수시기는 언제인가요?,hybrid,0.0
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,정당방위의 성립요건은?,keyword,0.0036
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,정당방위의 성립요건은?,semantic,0.3890944211959839
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,정당방위의 성립요건은?,metadata,0.3
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",형사,정당방위의 성립요건은?,hybrid,0.0
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,행정처분 취소소송의 제소기간은?,keyword,0.14952380952380953
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,행정처분 취소소송의 제소기간은?,semantic,0.449730848357791
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,행정처분 취소소송의 제소기간은?,metadata,0.3
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,행정처분 취소소송의 제소기간은?,hybrid,0.0
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,영업정지처분 효력정지신청 요건은?,keyword,0.14872380952380954
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,영업정지처분 효력정지신청 요건은?,semantic,0.4258387266613189
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,영업정지처분 효력정지신청 요건은?,metadata,0.3
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,영업정지처분 효력정지신청 요건은?,hybrid,0.0
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,건축허가 거부처분 취소소송의 요건은?,keyword,0.162
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,건축허가 거부처분 취소소송의 요건은?,semantic,0.47427507972717287
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,건축허가 거부처분 취소소송의 요건은?,metadata,0.3
+"{'dense': 0.6, 'keyword': 0.7, 'metadata': 0.4}",행정,건축허가 거부처분 취소소송의 요건은?,hybrid,0.0

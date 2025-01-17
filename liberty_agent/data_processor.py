@@ -15,9 +15,9 @@ from tqdm import tqdm
 import os
 from langchain_community.vectorstores import FAISS
 from langchain.schema import Document
-from retrievers.kiwi_bm25 import CustomKiwiBM25Retriever
+from liberty_agent.retrievers.kiwi_bm25 import CustomKiwiBM25Retriever
 from langchain_teddynote.community.pinecone import PineconeKiwiHybridRetriever
-from retrievers.hybrid import HybridRetriever
+from liberty_agent.retrievers.hybrid import HybridRetriever
 from langchain.storage import LocalFileStore
 from langchain.embeddings import CacheBackedEmbeddings
 import hashlib

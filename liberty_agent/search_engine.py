@@ -13,6 +13,9 @@ from langchain_teddynote.community.pinecone import PineconeKiwiHybridRetriever
 from pathlib import Path
 from langchain.schema import Document
 import re
+from langchain.vectorstores import FAISS
+import pickle
+from pathlib import Path
 # 로깅 설정
 logging.basicConfig(
     level=logging.INFO,
@@ -27,7 +30,7 @@ class LegalSearchEngine:
         sparse_encoder,
         pinecone_index,
         namespace: str = None,
-        cache_dir: Optional[str] = "./cached_vectors/search_engine"
+        cache_dir: Optional[str] = "./liberty_agent/cached_vectors"
     ):
         self.retrievers = retrievers
         self.sparse_encoder = sparse_encoder
@@ -40,10 +43,46 @@ class LegalSearchEngine:
         # 검증기 초기화
         self.upstage_checker = UpstageGroundednessCheck()
         self._setup_kobert()
-        
+        self.dense_embedder = UpstageEmbeddings(
+    model="solar-embedding-1-large-query"
+)
+        # FAISS 법률 용어 데이터 초기화
+        self.legal_terms_path = Path("./liberty_agent/cached_vectors/retrievers/faiss")
+        #self._initialize_legal_terms()
+
         # 검색 결과 캐시 초기화
-        self.result_cache = {}
         
+        self.result_cache = {}
+    def _initialize_legal_terms(self):
+        """법률 용어 FAISS 초기화"""
+        try:
+            faiss_path = self.legal_terms_path / "faiss_legal_terms_2020.faiss"
+            pkl_path = self.legal_terms_path / "faiss_legal_terms_2020.pkl"
+            
+            if not faiss_path.exists() or not pkl_path.exists():
+                logger.warning("법률 용어 FAISS 파일이 없습니다.")
+                self.legal_terms_index = None
+                self.legal_terms_data = {}
+                return
+                
+            # FAISS 인덱스 로드
+            self.legal_terms_index = FAISS.load_local(
+                folder_path=str(self.legal_terms_path),
+                index_name="faiss_legal_terms_2020",
+                embeddings=self.dense_embedder,
+                allow_dangerous_deserialization=True
+            )
+            
+            # 용어 데이터 로드
+            with open(pkl_path, 'rb') as f:
+                self.legal_terms_data = pickle.load(f)
+                
+            logger.info(f"법률 용어 FAISS 로드 완료 (용어 수: {len(self.legal_terms_data)})")
+            
+        except Exception as e:
+            logger.error(f"법률 용어 FAISS 초기화 중 오류: {str(e)}")
+            self.legal_terms_index = None
+            self.legal_terms_data = {}    
     def _setup_kobert(self):
         """KoBERT 모델 및 토크나이저 설정"""
         try:
@@ -1260,8 +1299,47 @@ class LegalSearchEngine:
             return 0.0
     def _get_legal_terms(self) -> Dict:
         """법률 전문 용어 사전 로드"""
-        # 법률 전문 용어 사전 로드 로직 구현
-        pass
+        try:
+            if not hasattr(self, 'legal_terms_index') or self.legal_terms_index is None:
+                return {}
+                
+            # 기본 용어 사전
+            basic_terms = {
+                "법원": {"weight": 0.3, "category": "기관"},
+                "판례": {"weight": 0.3, "category": "문서"},
+                "법률": {"weight": 0.2, "category": "일반"},
+                "조항": {"weight": 0.2, "category": "문서"},
+                "소송": {"weight": 0.2, "category": "절차"},
+                "계약": {"weight": 0.2, "category": "행위"},
+                "위반": {"weight": 0.2, "category": "행위"},
+                "책임": {"weight": 0.2, "category": "개념"}
+            }
+            
+            # FAISS를 이용한 유사 용어 검색
+            for term in list(basic_terms.keys()):
+                similar_docs = self.legal_terms_index.similarity_search_with_score(
+                    term,
+                    k=5
+                )
+                
+                if similar_docs:
+                    similar_terms = []
+                    for doc, score in similar_docs:
+                        term_info = {
+                            "term": doc.page_content,
+                            "similarity": float(score),
+                            "metadata": doc.metadata
+                        }
+                        similar_terms.append(term_info)
+                    
+                    basic_terms[term]["similar_terms"] = similar_terms
+            
+            logger.debug(f"법률 용어 사전 로드 완료 (기본 용어 수: {len(basic_terms)})")
+            return basic_terms
+            
+        except Exception as e:
+            logger.error(f"법률 용어 사전 로드 중 오류: {str(e)}")
+            return {}
     def _expand_keywords(self, question: str) -> List[str]:
         """동의어/유사어 확장"""
         try:
@@ -1366,24 +1444,26 @@ class LegalSearchEngine:
             
             context_text = [self._safe_get_content(doc) for doc in context]
             combined_context = " ".join(context_text)
+            query_embedding=self.dense_embedder.embed_query(question)
+            documents_embedding=self.dense_embedder.embed_documents(combined_context)
+
+            # # KoBERT 토크나이저 및 모델 사용
+            # inputs = self.kobert_tokenizer(
+            #     [question, combined_context],
+            #     return_tensors="pt",
+            #     padding=True,
+            #     truncation=True,
+            #     max_length=512
+            # )
             
-            # KoBERT 토크나이저 및 모델 사용
-            inputs = self.kobert_tokenizer(
-                [question, combined_context],
-                return_tensors="pt",
-                padding=True,
-                truncation=True,
-                max_length=512
-            )
-            
-            with torch.no_grad():
-                outputs = self.kobert_model(**inputs)
-                embeddings = outputs.last_hidden_state.mean(dim=1)
+            # with torch.no_grad():
+            #     outputs = self.kobert_model(**inputs)
+            #     embeddings = outputs.last_hidden_state.mean(dim=1)
             
             # 코사인 유사도 계산
             similarity = torch.nn.functional.cosine_similarity(
-                embeddings[0].unsqueeze(0),
-                embeddings[1].unsqueeze(0)
+                query_embedding.unsqueeze(0),
+                documents_embedding.unsqueeze(0)
             )
             
             return float(similarity)

@@ -452,15 +452,17 @@ class RAGEvaluator:
                             
                             # 결과 저장 - 수정된 부분
                             metrics_dict = {
-                                'context_recall': evaluation_result['context_recall'].mean(),
-                                'context_precision': evaluation_result['context_precision'].mean(),
-                                'context_entity_recall': evaluation_result['context_entity_recall'].mean()
+                                'context_recall': np.mean(evaluation_result['context_recall']),
+                                'context_precision': np.mean(evaluation_result['context_precision']),
+                                'context_entity_recall': np.mean(evaluation_result['context_entity_recall'])
                             }
                             
                             case_scores.append(metrics_dict)
                             
                     except Exception as e:
                         logger.error(f"평가 중 오류 발생: {str(e)}")
+                        logger.error(f"평가 결과 타입: {type(evaluation_result)}")
+                        logger.error(f"평가 결과 내용: {evaluation_result}")
                         continue
                 
                 # 평균 점수 계산
@@ -482,7 +484,6 @@ class RAGEvaluator:
                     logger.info(f"Context Entity Recall: {avg_scores['context_entity_recall']:.3f}")
         
         return pd.DataFrame(results)
-
     def visualize_topk_results(self, results_df: pd.DataFrame):
         """Top-k 실험 결과 시각화"""
         plt.figure(figsize=(15, 10))

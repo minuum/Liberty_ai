@@ -15,6 +15,11 @@ from tqdm import tqdm
 import os
 from langchain_community.vectorstores import FAISS
 from langchain.schema import Document
+import sys
+# liberty_agent 패키지 경로 추가
+project_root = Path.cwd().parent # experiments 폴더의 상위의 상위 디렉토리
+print(str(project_root))
+sys.path.append(str(project_root))
 from liberty_agent.retrievers.kiwi_bm25 import CustomKiwiBM25Retriever
 from langchain_teddynote.community.pinecone import PineconeKiwiHybridRetriever
 from liberty_agent.retrievers.hybrid import HybridRetriever

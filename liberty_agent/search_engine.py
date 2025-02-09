@@ -3,6 +3,7 @@ import traceback
 from langchain_upstage import UpstageEmbeddings, UpstageGroundednessCheck
 from transformers import AutoModel, AutoTokenizer
 import torch
+import numpy as np  # 이 줄 추가
 from typing import Dict, List, Any, Optional, Union
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import secrets
@@ -1444,30 +1445,29 @@ class LegalSearchEngine:
             
             context_text = [self._safe_get_content(doc) for doc in context]
             combined_context = " ".join(context_text)
-            query_embedding=self.dense_embedder.embed_query(question)
-            documents_embedding=self.dense_embedder.embed_documents(combined_context)
 
-            # # KoBERT 토크나이저 및 모델 사용
-            # inputs = self.kobert_tokenizer(
-            #     [question, combined_context],
-            #     return_tensors="pt",
-            #     padding=True,
-            #     truncation=True,
-            #     max_length=512
-            # )
-            
-            # with torch.no_grad():
-            #     outputs = self.kobert_model(**inputs)
-            #     embeddings = outputs.last_hidden_state.mean(dim=1)
-            
+            # 임베딩 생성
+            query_embedding = self.dense_embedder.embed_query(question)
+            documents_embedding = self.dense_embedder.embed_documents([combined_context])[0]
+
+            # 텐서로 변환 (clone().detach() 사용)
+            query_tensor = torch.from_numpy(np.array(query_embedding)).float()
+            doc_tensor = torch.from_numpy(np.array(documents_embedding)).float()
+
+            # 차원 확인 및 조정
+            if len(query_tensor.shape) == 1:
+                query_tensor = query_tensor.unsqueeze(0)
+            if len(doc_tensor.shape) == 1:
+                doc_tensor = doc_tensor.unsqueeze(0)
+
             # 코사인 유사도 계산
             similarity = torch.nn.functional.cosine_similarity(
-                query_embedding.unsqueeze(0),
-                documents_embedding.unsqueeze(0)
+                query_tensor,
+                doc_tensor
             )
             
-            return float(similarity)
-            
+            # 단일 스칼라 값으로 변환
+            return float(similarity.mean().item())
         except Exception as e:
             logger.error(f"의미적 유사도 계산 중 오류: {str(e)}")
             return 0.0

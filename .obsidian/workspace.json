@@ -1,0 +1,164 @@
+{
+  "main": {
+    "id": "76095f209bc8e3f7",
+    "type": "split",
+    "children": [
+      {
+        "id": "f29f198689208688",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "838db2f6463a1552",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "그래프 뷰"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "da0116bf7122f4ea",
+    "type": "split",
+    "children": [
+      {
+        "id": "3b0f8ffb3fceb361",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8c61b5f5a6e92c92",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-folder-closed",
+              "title": "파일 탐색기"
+            }
+          },
+          {
+            "id": "29c680e45355f37b",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "검색"
+            }
+          },
+          {
+            "id": "db90c4f0fd983f0e",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "4e5e0471415bcfa0",
+    "type": "split",
+    "children": [
+      {
+        "id": "966f9d09dc6fd95f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9030e3bcdbb22047",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "백링크"
+            }
+          },
+          {
+            "id": "b5d46a3bbe0c62af",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "나가는 링크"
+            }
+          },
+          {
+            "id": "aa5f4e791645d961",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "ef2296625baae678",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {},
+              "icon": "lucide-list",
+              "title": "개요"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:퀵 스위처 열기": false,
+      "graph:그래프 뷰 열기": false,
+      "canvas:새 캔버스 만들기": false,
+      "daily-notes:오늘의 데일리 노트 열기": false,
+      "templates:템플릿 삽입": false,
+      "command-palette:명령어 팔레트 열기": false
+    }
+  },
+  "active": "838db2f6463a1552",
+  "lastOpenFiles": [
+    "liberty_agent/experiments/evaluation_results/evaluation_results_20250203_134040.csv",
+    "liberty_agent/experiments/evaluation_results/sparse_dense_relationship_20250203_134040.png",
+    "liberty_agent/experiments/evaluation_results/evaluation_hybrid_score_20250203_134040.png",
+    "250203 논문 피드백.pdf"
+  ]
+}

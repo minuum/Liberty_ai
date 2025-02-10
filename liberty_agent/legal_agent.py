@@ -786,6 +786,23 @@ class LegalAgent:
                     "\n\nFormulate an improved question in Korean:"
                 )
             ])
+        #직전 검색 결과만 , 누적 검색 결과 이것도 실험의 여지가 있을듯
+        #rewrite_weight 가 없는 경우
+        #rewrite_weight 가 있는 경우
+        #few-shot을 하는 거
+        #검색 결과 - 프롬프트 => 재작성 쿼리
+        #검색 결과를 0.1씩 높이는게 맞는가?
+        #검색 결과가 떨어질 수도 있음
+        #어떤 프롬프트일 때는 점수가 떨어지고, 점수가 상승하고 하는 few-shot Learning의 의미가 있다
+        #rewrite_weight -> 반복 횟수로 변경
+        #만약에 이 간단한 아이디어로 결과가 좋아진다 -> 엄청난 발견이 될 수 있음
+        #weight를 프롬프트에 넣었을 때 성능이 좋아진다가 있어야 함
+        #prompt를 가공해서 더 정확한 prompt를 만드는거임
+        #Evolution Prompt
+
+        #Genetic Algorhitm(레퍼런스에 추가)
+        #이런 류의 아이디어가 꽤 있었음
+        #이런식으로 하면 좋을 것 같다
 
     def _rewrite(self, state: AgentState) -> AgentState:
         """질문 재작성"""

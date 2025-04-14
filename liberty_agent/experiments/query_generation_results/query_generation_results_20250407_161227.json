@@ -1,0 +1,861 @@
+{
+  "metadata": {
+    "timestamp": "20250407_161227",
+    "total_queries": 27,
+    "llms_used": [
+      "gemini",
+      "claude",
+      "gpt"
+    ],
+    "strategies_used": [
+      "legal_analysis",
+      "factual_analysis",
+      "legal_judgment"
+    ],
+    "difficulty_levels": [
+      "basic",
+      "intermediate",
+      "advanced"
+    ]
+  },
+  "overall_statistics": {
+    "average_scores": {
+      "legal_accuracy": 0.8481481481481481,
+      "relevance": 0.8185185185185188,
+      "difficulty_appropriateness": 0.7703703703703703,
+      "clarity": 0.7222222222222222,
+      "educational_value": 0.7259259259259259,
+      "overall_score": 0.7770370370370371,
+      "dense_similarity": 0.12802483720911872
+    },
+    "score_distributions": {
+      "legal_accuracy": {
+        "count": 27.0,
+        "mean": 0.8481481481481481,
+        "std": 0.19289369405964832,
+        "min": 0.3,
+        "25%": 0.8,
+        "50%": 0.9,
+        "75%": 1.0,
+        "max": 1.0
+      },
+      "relevance": {
+        "count": 27.0,
+        "mean": 0.8185185185185188,
+        "std": 0.1922279036757332,
+        "min": 0.3,
+        "25%": 0.7,
+        "50%": 0.8,
+        "75%": 1.0,
+        "max": 1.0
+      },
+      "difficulty_appropriateness": {
+        "count": 27.0,
+        "mean": 0.7703703703703703,
+        "std": 0.2283971150545518,
+        "min": 0.2,
+        "25%": 0.6,
+        "50%": 0.7,
+        "75%": 1.0,
+        "max": 1.0
+      },
+      "clarity": {
+        "count": 27.0,
+        "mean": 0.7222222222222222,
+        "std": 0.2577018750615843,
+        "min": 0.3,
+        "25%": 0.5,
+        "50%": 0.8,
+        "75%": 1.0,
+        "max": 1.0
+      },
+      "educational_value": {
+        "count": 27.0,
+        "mean": 0.7259259259259259,
+        "std": 0.14302391567790493,
+        "min": 0.3,
+        "25%": 0.7,
+        "50%": 0.7,
+        "75%": 0.8,
+        "max": 0.9
+      },
+      "overall_score": {
+        "count": 27.0,
+        "mean": 0.7770370370370371,
+        "std": 0.19388368469493036,
+        "min": 0.3,
+        "25%": 0.66,
+        "50%": 0.78,
+        "75%": 0.96,
+        "max": 0.98
+      },
+      "dense_similarity": {
+        "count": 27.0,
+        "mean": 0.12802483720911872,
+        "std": 0.031509152525867654,
+        "min": 0.08198847621679306,
+        "25%": 0.10057233273983002,
+        "50%": 0.12735113501548767,
+        "75%": 0.15418195724487305,
+        "max": 0.17008589208126068
+      }
+    },
+    "quality_levels": {
+      "high_quality": 11,
+      "medium_quality": 12,
+      "low_quality": 4
+    }
+  },
+  "detailed_analysis": {
+    "by_strategy": {
+      "legal_analysis": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.8666666666666667,
+          "relevance": 0.8555555555555555,
+          "difficulty_appropriateness": 0.8,
+          "clarity": 0.7333333333333333,
+          "educational_value": 0.7333333333333334,
+          "overall_score": 0.7977777777777777
+        },
+        "success_rate": 0.7777777777777778
+      },
+      "factual_analysis": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.8888888888888888,
+          "relevance": 0.8555555555555556,
+          "difficulty_appropriateness": 0.8222222222222222,
+          "clarity": 0.7666666666666667,
+          "educational_value": 0.7777777777777779,
+          "overall_score": 0.8222222222222223
+        },
+        "success_rate": 0.6666666666666666
+      },
+      "legal_judgment": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.7888888888888889,
+          "relevance": 0.7444444444444445,
+          "difficulty_appropriateness": 0.6888888888888888,
+          "clarity": 0.6666666666666666,
+          "educational_value": 0.6666666666666667,
+          "overall_score": 0.711111111111111
+        },
+        "success_rate": 0.6666666666666666
+      }
+    },
+    "by_difficulty": {
+      "basic": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.8555555555555556,
+          "relevance": 0.8555555555555556,
+          "difficulty_appropriateness": 0.8777777777777778,
+          "clarity": 0.788888888888889,
+          "educational_value": 0.7444444444444445,
+          "overall_score": 0.8244444444444444
+        },
+        "success_rate": 0.8888888888888888
+      },
+      "intermediate": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.8555555555555556,
+          "relevance": 0.8111111111111111,
+          "difficulty_appropriateness": 0.7333333333333334,
+          "clarity": 0.7222222222222222,
+          "educational_value": 0.711111111111111,
+          "overall_score": 0.7666666666666667
+        },
+        "success_rate": 0.6666666666666666
+      },
+      "advanced": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.8333333333333334,
+          "relevance": 0.788888888888889,
+          "difficulty_appropriateness": 0.6999999999999998,
+          "clarity": 0.6555555555555556,
+          "educational_value": 0.7222222222222223,
+          "overall_score": 0.74
+        },
+        "success_rate": 0.5555555555555556
+      }
+    },
+    "by_llm": {
+      "gemini": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 1.0,
+          "relevance": 1.0,
+          "difficulty_appropriateness": 1.0,
+          "clarity": 1.0,
+          "educational_value": 0.8333333333333335,
+          "overall_score": 0.9666666666666666
+        },
+        "success_rate": 1.0
+      },
+      "claude": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.6333333333333333,
+          "relevance": 0.6222222222222222,
+          "difficulty_appropriateness": 0.5777777777777778,
+          "clarity": 0.4444444444444444,
+          "educational_value": 0.5888888888888889,
+          "overall_score": 0.5733333333333333
+        },
+        "success_rate": 0.2222222222222222
+      },
+      "gpt": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.911111111111111,
+          "relevance": 0.8333333333333334,
+          "difficulty_appropriateness": 0.7333333333333333,
+          "clarity": 0.7222222222222222,
+          "educational_value": 0.7555555555555555,
+          "overall_score": 0.7911111111111111
+        },
+        "success_rate": 0.8888888888888888
+      }
+    },
+    "cross_analysis": {
+      "strategy_difficulty_matrix": {},
+      "llm_strategy_matrix": {}
+    }
+  },
+  "best_queries": {
+    "overall": {
+      "llm": "gemini",
+      "strategy": "factual_analysis",
+      "difficulty": "basic",
+      "question": "[기본 질문] factual_analysis-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "category": "상표법",
+      "document_type": "unknown",
+      "complexity_level": "중급",
+      "legal_accuracy": 1.0,
+      "relevance": 1.0,
+      "difficulty_appropriateness": 1.0,
+      "clarity": 1.0,
+      "educational_value": 0.9,
+      "overall_score": 0.98,
+      "feedback": "상표법 제57조의3의 핵심 요건을 정확하게 제시하고 있으며, 기본 질문에 적합합니다. 학습 가치도 높습니다.",
+      "quality_level": "high_quality",
+      "dense_similarity": 0.08587120473384857
+    },
+    "by_strategy": {
+      "legal_analysis": {
+        "llm": "gemini",
+        "strategy": "legal_analysis",
+        "difficulty": "basic",
+        "question": "[기본 질문] legal_analysis-basic",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.8,
+        "overall_score": 0.96,
+        "feedback": "상표법 제57조의3 요건을 정확하게 제시하고 있으며, 기본 질문에 적합합니다. 학습 가치도 높습니다.",
+        "quality_level": "high_quality",
+        "dense_similarity": 0.12673598527908325
+      },
+      "factual_analysis": {
+        "llm": "gemini",
+        "strategy": "factual_analysis",
+        "difficulty": "basic",
+        "question": "[기본 질문] factual_analysis-basic",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98,
+        "feedback": "상표법 제57조의3의 핵심 요건을 정확하게 제시하고 있으며, 기본 질문에 적합합니다. 학습 가치도 높습니다.",
+        "quality_level": "high_quality",
+        "dense_similarity": 0.08587120473384857
+      },
+      "legal_judgment": {
+        "llm": "gemini",
+        "strategy": "legal_judgment",
+        "difficulty": "advanced",
+        "question": "[기본 질문] legal_judgment-advanced",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98,
+        "feedback": "정확하고 관련성이 높으며, 난이도 또한 적절합니다. 선사용자 권리에 대한 이해를 돕는 교육적 가치도 높습니다.",
+        "quality_level": "high_quality",
+        "dense_similarity": 0.17008589208126068
+      }
+    },
+    "by_difficulty": {
+      "basic": {
+        "llm": "gemini",
+        "strategy": "factual_analysis",
+        "difficulty": "basic",
+        "question": "[기본 질문] factual_analysis-basic",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98,
+        "feedback": "상표법 제57조의3의 핵심 요건을 정확하게 제시하고 있으며, 기본 질문에 적합합니다. 학습 가치도 높습니다.",
+        "quality_level": "high_quality",
+        "dense_similarity": 0.08587120473384857
+      },
+      "intermediate": {
+        "llm": "gemini",
+        "strategy": "legal_analysis",
+        "difficulty": "intermediate",
+        "question": "[기본 질문] legal_analysis-intermediate",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.8,
+        "overall_score": 0.96,
+        "feedback": "상표법 제57조의3의 요건을 정확하게 반영하고 있으며, intermediate 난이도에 적절합니다. 법률 학습 가치도 높습니다.",
+        "quality_level": "high_quality",
+        "dense_similarity": 0.12735113501548767
+      },
+      "advanced": {
+        "llm": "gemini",
+        "strategy": "factual_analysis",
+        "difficulty": "advanced",
+        "question": "[기본 질문] factual_analysis-advanced",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98,
+        "feedback": "제시된 조건들이 명확하고 법률적으로 정확합니다. 교육적 가치도 높습니다. 난이도도 적절합니다.",
+        "quality_level": "high_quality",
+        "dense_similarity": 0.10057233273983002
+      }
+    },
+    "by_llm": {
+      "gemini": {
+        "llm": "gemini",
+        "strategy": "factual_analysis",
+        "difficulty": "basic",
+        "question": "[기본 질문] factual_analysis-basic",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98,
+        "feedback": "상표법 제57조의3의 핵심 요건을 정확하게 제시하고 있으며, 기본 질문에 적합합니다. 학습 가치도 높습니다.",
+        "quality_level": "high_quality",
+        "dense_similarity": 0.08587120473384857
+      },
+      "claude": {
+        "llm": "claude",
+        "strategy": "legal_analysis",
+        "difficulty": "basic",
+        "question": "[기본 질문] legal_analysis-basic",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "법령 해석",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.7,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.6,
+        "educational_value": 0.7,
+        "overall_score": 0.74,
+        "feedback": "기본적인 법률 분석을 요청하는 질문이나, 구체적인 분석 방향이나 초점이 불명확함. 더 구체적인 질문 설계 필요.",
+        "quality_level": "medium_quality",
+        "dense_similarity": 0.12673598527908325
+      },
+      "gpt": {
+        "llm": "gpt",
+        "strategy": "factual_analysis",
+        "difficulty": "basic",
+        "question": "[기본 질문] factual_analysis-basic",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98,
+        "feedback": "질문은 문서 내용과 정확히 부합하며 법률적 학습 가치가 높습니다.",
+        "quality_level": "high_quality",
+        "dense_similarity": 0.08585381507873535
+      }
+    }
+  },
+  "queries": [
+    {
+      "llm": "gemini",
+      "strategy": "legal_analysis",
+      "difficulty": "basic",
+      "question": "[기본 질문] legal_analysis-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.8,
+        "overall_score": 0.96
+      },
+      "feedback": "상표법 제57조의3 요건을 정확하게 제시하고 있으며, 기본 질문에 적합합니다. 학습 가치도 높습니다."
+    },
+    {
+      "llm": "gemini",
+      "strategy": "legal_analysis",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] legal_analysis-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.8,
+        "overall_score": 0.96
+      },
+      "feedback": "상표법 제57조의3의 요건을 정확하게 반영하고 있으며, intermediate 난이도에 적절합니다. 법률 학습 가치도 높습니다."
+    },
+    {
+      "llm": "gemini",
+      "strategy": "legal_analysis",
+      "difficulty": "advanced",
+      "question": "[기본 질문] legal_analysis-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.8,
+        "overall_score": 0.96
+      },
+      "feedback": "상표법 제57조의3 요건을 정확하게 제시하고 있으며, 난이도 또한 적절합니다. 학습 가치도 높습니다."
+    },
+    {
+      "llm": "gemini",
+      "strategy": "factual_analysis",
+      "difficulty": "basic",
+      "question": "[기본 질문] factual_analysis-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98
+      },
+      "feedback": "상표법 제57조의3의 핵심 요건을 정확하게 제시하고 있으며, 기본 질문에 적합합니다. 학습 가치도 높습니다."
+    },
+    {
+      "llm": "gemini",
+      "strategy": "factual_analysis",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] factual_analysis-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.8,
+        "overall_score": 0.96
+      },
+      "feedback": "상표법 제57조의3의 요건을 정확하게 제시하고 있으며, 질문의 의도에 부합합니다. 난이도 또한 적절합니다."
+    },
+    {
+      "llm": "gemini",
+      "strategy": "factual_analysis",
+      "difficulty": "advanced",
+      "question": "[기본 질문] factual_analysis-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98
+      },
+      "feedback": "제시된 조건들이 명확하고 법률적으로 정확합니다. 교육적 가치도 높습니다. 난이도도 적절합니다."
+    },
+    {
+      "llm": "gemini",
+      "strategy": "legal_judgment",
+      "difficulty": "basic",
+      "question": "[기본 질문] legal_judgment-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.8,
+        "overall_score": 0.96
+      },
+      "feedback": "상표법 제57조의3의 핵심 요건을 정확하게 제시하고 있으며, 난이도 또한 적절합니다. 학습 가치도 높습니다."
+    },
+    {
+      "llm": "gemini",
+      "strategy": "legal_judgment",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] legal_judgment-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.8,
+        "overall_score": 0.96
+      },
+      "feedback": "선사용자의 권리 요건을 명확하게 설명하고 있습니다. 난이도와 적절성, 법률 정확성 모두 우수합니다."
+    },
+    {
+      "llm": "gemini",
+      "strategy": "legal_judgment",
+      "difficulty": "advanced",
+      "question": "[기본 질문] legal_judgment-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98
+      },
+      "feedback": "정확하고 관련성이 높으며, 난이도 또한 적절합니다. 선사용자 권리에 대한 이해를 돕는 교육적 가치도 높습니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "legal_analysis",
+      "difficulty": "basic",
+      "question": "[기본 질문] legal_analysis-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.7,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.6,
+        "educational_value": 0.7,
+        "overall_score": 0.74
+      },
+      "feedback": "기본적인 법률 분석을 요청하는 질문이나, 구체적인 분석 방향이나 초점이 불명확함. 더 구체적인 질문 설계 필요."
+    },
+    {
+      "llm": "claude",
+      "strategy": "legal_analysis",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] legal_analysis-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.6,
+        "difficulty_appropriateness": 0.4,
+        "clarity": 0.3,
+        "educational_value": 0.5,
+        "overall_score": 0.46
+      },
+      "feedback": "질문이 너무 일반적이고 모호합니다. 선사용권의 구체적인 요건이나 특정 사례에 대한 분석을 요구하는 것이 좋겠습니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "legal_analysis",
+      "difficulty": "advanced",
+      "question": "[기본 질문] legal_analysis-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.8,
+        "relevance": 0.7,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.5,
+        "educational_value": 0.7,
+        "overall_score": 0.66
+      },
+      "feedback": "질문의 의도가 불명확하며, 구체적인 분석 방향이나 쟁점이 제시되지 않았습니다. 법적 분석을 위한 세부 요소 지정이 필요합니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "factual_analysis",
+      "difficulty": "basic",
+      "question": "[기본 질문] factual_analysis-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.7,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.6,
+        "educational_value": 0.7,
+        "overall_score": 0.74
+      },
+      "feedback": "기본적인 법률 분석을 요구하는 질문이나, 구체적인 분석 방향이나 초점이 불명확함. 더 명확한 분석 포인트 제시 필요."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "legal_analysis",
+      "difficulty": "basic",
+      "question": "[기본 질문] legal_analysis-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.8,
+        "educational_value": 0.8,
+        "overall_score": 0.9
+      },
+      "feedback": "질문은 문서 내용에 직접 관련되며 법률 개념이 명확히 설명됨."
+    },
+    {
+      "llm": "claude",
+      "strategy": "factual_analysis",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] factual_analysis-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.8,
+        "relevance": 0.7,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.5,
+        "educational_value": 0.7,
+        "overall_score": 0.66
+      },
+      "feedback": "질문이 너무 기본적이며 구체성이 부족합니다. 선사용권의 세 가지 요건에 대한 구체적인 분석을 요구하는 것이 바람직합니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "legal_analysis",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] legal_analysis-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.7,
+        "clarity": 0.8,
+        "educational_value": 0.7,
+        "overall_score": 0.78
+      },
+      "feedback": "질문이 문서의 요점을 포착했으나, 난이도에 비해 분석이 복잡함."
+    },
+    {
+      "llm": "claude",
+      "strategy": "factual_analysis",
+      "difficulty": "advanced",
+      "question": "[기본 질문] factual_analysis-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.8,
+        "relevance": 0.7,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.5,
+        "educational_value": 0.7,
+        "overall_score": 0.66
+      },
+      "feedback": "질문의 의도가 명확하지 않으며, 분석 전략과 난이도만 언급되어 있습니다. 구체적인 분석 대상이나 방향 제시가 필요합니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "legal_analysis",
+      "difficulty": "advanced",
+      "question": "[기본 질문] legal_analysis-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.7,
+        "clarity": 0.6,
+        "educational_value": 0.8,
+        "overall_score": 0.76
+      },
+      "feedback": "법률 개념은 정확하지만 질문이 모호하여 명확성 부족."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "factual_analysis",
+      "difficulty": "basic",
+      "question": "[기본 질문] factual_analysis-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98
+      },
+      "feedback": "질문은 문서 내용과 정확히 부합하며 법률적 학습 가치가 높습니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "legal_judgment",
+      "difficulty": "basic",
+      "question": "[기본 질문] legal_judgment-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.4,
+        "relevance": 0.3,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.3,
+        "educational_value": 0.4,
+        "overall_score": 0.38
+      },
+      "feedback": "구체적인 법률 질문이 없어 평가가 어렵습니다. 선사용권 요건에 대한 구체적인 질문으로 재구성이 필요합니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "factual_analysis",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] factual_analysis-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.7,
+        "clarity": 0.8,
+        "educational_value": 0.7,
+        "overall_score": 0.78
+      },
+      "feedback": "질문이 문서와 잘 연관되지만, 난이도가 조금 높고 명확성이 더 필요합니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "legal_judgment",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] legal_judgment-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.7,
+        "relevance": 0.6,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.4,
+        "educational_value": 0.6,
+        "overall_score": 0.56
+      },
+      "feedback": "질문이 너무 일반적이고 모호합니다. 선사용권의 구체적인 요건이나 사례에 대한 구체적인 질문으로 개선이 필요합니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "factual_analysis",
+      "difficulty": "advanced",
+      "question": "[기본 질문] factual_analysis-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.8,
+        "relevance": 0.7,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.5,
+        "educational_value": 0.7,
+        "overall_score": 0.66
+      },
+      "feedback": "질문의 난이도가 문서와 맞지 않으며, 명확성과 연관성이 부족합니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "legal_judgment",
+      "difficulty": "advanced",
+      "question": "[기본 질문] legal_judgment-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.3,
+        "relevance": 0.4,
+        "difficulty_appropriateness": 0.2,
+        "clarity": 0.3,
+        "educational_value": 0.3,
+        "overall_score": 0.3
+      },
+      "feedback": "질문이 너무 모호하고 구체성이 부족합니다. 선사용권의 요건에 대한 더 명확한 질문이 필요합니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "legal_judgment",
+      "difficulty": "basic",
+      "question": "[기본 질문] legal_judgment-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.7,
+        "clarity": 0.8,
+        "educational_value": 0.7,
+        "overall_score": 0.78
+      },
+      "feedback": "기본 질문으로 법률 개념이 정확하지만 문서와의 연관성이 더 필요합니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "legal_judgment",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] legal_judgment-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.7,
+        "clarity": 0.7,
+        "educational_value": 0.8,
+        "overall_score": 0.78
+      },
+      "feedback": "법률 개념이 명확하나 질문이 구체적이지 않아 연관성이 낮음."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "legal_judgment",
+      "difficulty": "advanced",
+      "question": "[기본 질문] legal_judgment-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.5,
+        "educational_value": 0.7,
+        "overall_score": 0.7
+      },
+      "feedback": "법률 개념은 정확하나, 질문이 문서와 직접적 관련성이 낮음."
+    }
+  ]
+}

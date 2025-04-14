@@ -1,0 +1,861 @@
+{
+  "metadata": {
+    "timestamp": "20250407_151706",
+    "total_queries": 27,
+    "llms_used": [
+      "gemini",
+      "gpt",
+      "claude"
+    ],
+    "strategies_used": [
+      "법리_분석",
+      "사실관계_분석",
+      "법적_판단"
+    ],
+    "difficulty_levels": [
+      "초급",
+      "중급",
+      "고급"
+    ]
+  },
+  "overall_statistics": {
+    "average_scores": {
+      "legal_accuracy": 0.43703703703703706,
+      "relevance": 0.462962962962963,
+      "difficulty_appropriateness": 0.40370370370370356,
+      "clarity": 0.37407407407407406,
+      "educational_value": 0.4074074074074073,
+      "overall_score": 0.41703703703703704,
+      "dense_similarity": 0.05109484880058854
+    },
+    "score_distributions": {
+      "legal_accuracy": {
+        "count": 27.0,
+        "mean": 0.43703703703703706,
+        "std": 0.0966681402775979,
+        "min": 0.2,
+        "25%": 0.35,
+        "50%": 0.5,
+        "75%": 0.5,
+        "max": 0.5
+      },
+      "relevance": {
+        "count": 27.0,
+        "mean": 0.462962962962963,
+        "std": 0.06292943635623921,
+        "min": 0.3,
+        "25%": 0.4,
+        "50%": 0.5,
+        "75%": 0.5,
+        "max": 0.5
+      },
+      "difficulty_appropriateness": {
+        "count": 27.0,
+        "mean": 0.40370370370370356,
+        "std": 0.14272480642961255,
+        "min": 0.1,
+        "25%": 0.25,
+        "50%": 0.5,
+        "75%": 0.5,
+        "max": 0.5
+      },
+      "clarity": {
+        "count": 27.0,
+        "mean": 0.37407407407407406,
+        "std": 0.1831195334549636,
+        "min": 0.1,
+        "25%": 0.15000000000000002,
+        "50%": 0.5,
+        "75%": 0.5,
+        "max": 0.5
+      },
+      "educational_value": {
+        "count": 27.0,
+        "mean": 0.4074074074074073,
+        "std": 0.1356634011240998,
+        "min": 0.2,
+        "25%": 0.25,
+        "50%": 0.5,
+        "75%": 0.5,
+        "max": 0.5
+      },
+      "overall_score": {
+        "count": 27.0,
+        "mean": 0.41703703703703704,
+        "std": 0.12212272562451312,
+        "min": 0.18,
+        "25%": 0.27,
+        "50%": 0.5,
+        "75%": 0.5,
+        "max": 0.5
+      },
+      "dense_similarity": {
+        "count": 27.0,
+        "mean": 0.05109484880058854,
+        "std": 0.0740435290651343,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.13882911950349808,
+        "max": 0.17031006515026093
+      }
+    },
+    "quality_levels": {
+      "high_quality": 0,
+      "medium_quality": 0,
+      "low_quality": 27
+    }
+  },
+  "detailed_analysis": {
+    "by_strategy": {
+      "법리_분석": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.4555555555555555,
+          "relevance": 0.4666666666666667,
+          "difficulty_appropriateness": 0.41111111111111115,
+          "clarity": 0.37777777777777777,
+          "educational_value": 0.41111111111111115,
+          "overall_score": 0.42444444444444446
+        },
+        "success_rate": 0.0
+      },
+      "사실관계_분석": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.43333333333333335,
+          "relevance": 0.4666666666666667,
+          "difficulty_appropriateness": 0.41111111111111115,
+          "clarity": 0.37777777777777777,
+          "educational_value": 0.41111111111111115,
+          "overall_score": 0.42000000000000004
+        },
+        "success_rate": 0.0
+      },
+      "법적_판단": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.4222222222222222,
+          "relevance": 0.4555555555555556,
+          "difficulty_appropriateness": 0.3888888888888889,
+          "clarity": 0.3666666666666667,
+          "educational_value": 0.4,
+          "overall_score": 0.4066666666666667
+        },
+        "success_rate": 0.0
+      }
+    },
+    "by_difficulty": {
+      "초급": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.4444444444444444,
+          "relevance": 0.47777777777777775,
+          "difficulty_appropriateness": 0.4222222222222223,
+          "clarity": 0.3888888888888889,
+          "educational_value": 0.4222222222222223,
+          "overall_score": 0.4311111111111111
+        },
+        "success_rate": 0.0
+      },
+      "중급": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.43333333333333335,
+          "relevance": 0.4444444444444444,
+          "difficulty_appropriateness": 0.3888888888888889,
+          "clarity": 0.3666666666666667,
+          "educational_value": 0.4,
+          "overall_score": 0.4066666666666667
+        },
+        "success_rate": 0.0
+      },
+      "고급": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.43333333333333335,
+          "relevance": 0.4666666666666667,
+          "difficulty_appropriateness": 0.4,
+          "clarity": 0.3666666666666667,
+          "educational_value": 0.4,
+          "overall_score": 0.41333333333333333
+        },
+        "success_rate": 0.0
+      }
+    },
+    "by_llm": {
+      "gemini": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.5,
+          "relevance": 0.5,
+          "difficulty_appropriateness": 0.5,
+          "clarity": 0.5,
+          "educational_value": 0.5,
+          "overall_score": 0.5
+        },
+        "success_rate": 0.0
+      },
+      "gpt": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.5,
+          "relevance": 0.5,
+          "difficulty_appropriateness": 0.5,
+          "clarity": 0.5,
+          "educational_value": 0.5,
+          "overall_score": 0.5
+        },
+        "success_rate": 0.0
+      },
+      "claude": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.3111111111111111,
+          "relevance": 0.3888888888888889,
+          "difficulty_appropriateness": 0.21111111111111114,
+          "clarity": 0.12222222222222223,
+          "educational_value": 0.2222222222222222,
+          "overall_score": 0.25111111111111106
+        },
+        "success_rate": 0.0
+      }
+    },
+    "cross_analysis": {
+      "strategy_difficulty_matrix": {},
+      "llm_strategy_matrix": {}
+    }
+  },
+  "best_queries": {
+    "overall": {
+      "llm": "gemini",
+      "strategy": "법리_분석",
+      "difficulty": "초급",
+      "question": "상표법 제57조의3에 따른 선사용자의 권리는 어떤 경우에 인정되나요?",
+      "reasoning": "선사용자의 권리 요건을 이해하기 위한 기본적인 질문입니다. 상표법 조항의 핵심 내용을 파악해야 합니다.",
+      "category": "상표법",
+      "document_type": "unknown",
+      "complexity_level": "중급",
+      "legal_accuracy": 0.5,
+      "relevance": 0.5,
+      "difficulty_appropriateness": 0.5,
+      "clarity": 0.5,
+      "educational_value": 0.5,
+      "overall_score": 0.5,
+      "dense_similarity": 0.0,
+      "quality_level": "low_quality",
+      "feedback": "평가 중 오류 발생"
+    },
+    "by_strategy": {
+      "법리_분석": {
+        "llm": "gemini",
+        "strategy": "법리_분석",
+        "difficulty": "초급",
+        "question": "상표법 제57조의3에 따른 선사용자의 권리는 어떤 경우에 인정되나요?",
+        "reasoning": "선사용자의 권리 요건을 이해하기 위한 기본적인 질문입니다. 상표법 조항의 핵심 내용을 파악해야 합니다.",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5,
+        "dense_similarity": 0.0,
+        "quality_level": "low_quality",
+        "feedback": "평가 중 오류 발생"
+      },
+      "사실관계_분석": {
+        "llm": "gemini",
+        "strategy": "사실관계_분석",
+        "difficulty": "초급",
+        "question": "타인의 상표등록출원 시점은 언제인가요?",
+        "reasoning": "선사용 시점과 비교하여 선사용자 권리 성립 여부를 판단하는 기준이 됩니다.",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5,
+        "dense_similarity": 0.0,
+        "quality_level": "low_quality",
+        "feedback": "평가 중 오류 발생"
+      },
+      "법적_판단": {
+        "llm": "gemini",
+        "strategy": "법적_판단",
+        "difficulty": "초급",
+        "question": "선사용자의 권리가 인정되면 어떤 법적 효과가 발생하나요?",
+        "reasoning": "선사용자의 권리 인정에 따른 법적 결과를 이해하는 기본적인 질문입니다.",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5,
+        "dense_similarity": 0.0,
+        "quality_level": "low_quality",
+        "feedback": "평가 중 오류 발생"
+      }
+    },
+    "by_difficulty": {
+      "초급": {
+        "llm": "gemini",
+        "strategy": "법리_분석",
+        "difficulty": "초급",
+        "question": "상표법 제57조의3에 따른 선사용자의 권리는 어떤 경우에 인정되나요?",
+        "reasoning": "선사용자의 권리 요건을 이해하기 위한 기본적인 질문입니다. 상표법 조항의 핵심 내용을 파악해야 합니다.",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5,
+        "dense_similarity": 0.0,
+        "quality_level": "low_quality",
+        "feedback": "평가 중 오류 발생"
+      },
+      "중급": {
+        "llm": "gemini",
+        "strategy": "법리_분석",
+        "difficulty": "중급",
+        "question": "부정경쟁의 목적 없이 상표를 사용했다는 것을 어떻게 입증할 수 있나요?",
+        "reasoning": "부정경쟁 목적의 유무는 선사용자 권리 인정에 중요한 요소입니다. 입증 방법과 관련된 법리적 검토가 필요합니다.",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5,
+        "dense_similarity": 0.0,
+        "quality_level": "low_quality",
+        "feedback": "평가 중 오류 발생"
+      },
+      "고급": {
+        "llm": "gemini",
+        "strategy": "법리_분석",
+        "difficulty": "고급",
+        "question": "상표의 동일·유사성 판단 기준과 선사용 상표의 사용 태양은 선사용자 권리 인정에 어떤 영향을 미치나요?",
+        "reasoning": "상표의 동일·유사성 판단 기준과 선사용 상표의 구체적인 사용 태양은 선사용자 권리 인정 여부를 결정하는 데 중요한 영향을 미칩니다. 관련 법리와 판례에 대한 심도 있는 이해가 필요합니다.",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5,
+        "dense_similarity": 0.0,
+        "quality_level": "low_quality",
+        "feedback": "평가 중 오류 발생"
+      }
+    },
+    "by_llm": {
+      "gemini": {
+        "llm": "gemini",
+        "strategy": "법리_분석",
+        "difficulty": "초급",
+        "question": "상표법 제57조의3에 따른 선사용자의 권리는 어떤 경우에 인정되나요?",
+        "reasoning": "선사용자의 권리 요건을 이해하기 위한 기본적인 질문입니다. 상표법 조항의 핵심 내용을 파악해야 합니다.",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5,
+        "dense_similarity": 0.0,
+        "quality_level": "low_quality",
+        "feedback": "평가 중 오류 발생"
+      },
+      "gpt": {
+        "llm": "gpt",
+        "strategy": "법리_분석",
+        "difficulty": "초급",
+        "question": "상표법 제57조의3에서 규정하는 선사용자의 권리란 무엇인가?",
+        "reasoning": "법령의 기본 개념을 이해하기 위한 질문으로, 선사용자의 권리의 정의를 파악하는 데 중점을 둡니다.",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5,
+        "dense_similarity": 0.0,
+        "quality_level": "low_quality",
+        "feedback": "평가 중 오류 발생"
+      },
+      "claude": {
+        "llm": "claude",
+        "strategy": "법리_분석",
+        "difficulty": "초급",
+        "question": "[기본 질문] 법리_분석-초급",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "법령(상표법)",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.4,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.3,
+        "clarity": 0.2,
+        "educational_value": 0.3,
+        "overall_score": 0.34,
+        "dense_similarity": 0.1641087532043457,
+        "quality_level": "low_quality",
+        "feedback": "다음과 같은 중요한 문제점들이 발견됩니다:\n\n1. 실제 질문이 제시되지 않았습니다. '법리_분석-초급'이라는 카테고리만 나와있어 평가할 실질적인 질문 내용이 없습니다.\n\n2. 주어진 법률 문서는 상표법 제57조의3의 선사용권 인정 요건을 명확하게 설명하고 있으므로, 이를 바탕으로 다음과 같은 구체적인 질문들이 가능했을 것입니다:\n   - 선사용권의 세 가지 요건을 설명하시오.\n   - 선사용권 인정을 위한 시간적 요건은 무엇인가?\n   - 부정경쟁의 목적이 없는 사용이란 무엇을 의미하는가?\n\n3. 초급 수준에 맞는 명확한 학습 목표와 평가 포인트가 설정되어야 합니다.\n\n4. 법률 용어와 개념에 대한 이해를 검증할 수 있는 구체적인 질문 형식이 필요합니다.\n\n이러한 요소들을 보완하여 실제 학습자의 이해도를 평가할 수 있는 구체적인 질문으로 개선되어야 합니다."
+      }
+    }
+  },
+  "queries": [
+    {
+      "llm": "gemini",
+      "strategy": "법리_분석",
+      "difficulty": "초급",
+      "question": "상표법 제57조의3에 따른 선사용자의 권리는 어떤 경우에 인정되나요?",
+      "reasoning": "선사용자의 권리 요건을 이해하기 위한 기본적인 질문입니다. 상표법 조항의 핵심 내용을 파악해야 합니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "법리_분석",
+      "difficulty": "중급",
+      "question": "부정경쟁의 목적 없이 상표를 사용했다는 것을 어떻게 입증할 수 있나요?",
+      "reasoning": "부정경쟁 목적의 유무는 선사용자 권리 인정에 중요한 요소입니다. 입증 방법과 관련된 법리적 검토가 필요합니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "법리_분석",
+      "difficulty": "고급",
+      "question": "상표의 동일·유사성 판단 기준과 선사용 상표의 사용 태양은 선사용자 권리 인정에 어떤 영향을 미치나요?",
+      "reasoning": "상표의 동일·유사성 판단 기준과 선사용 상표의 구체적인 사용 태양은 선사용자 권리 인정 여부를 결정하는 데 중요한 영향을 미칩니다. 관련 법리와 판례에 대한 심도 있는 이해가 필요합니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "사실관계_분석",
+      "difficulty": "초급",
+      "question": "타인의 상표등록출원 시점은 언제인가요?",
+      "reasoning": "선사용 시점과 비교하여 선사용자 권리 성립 여부를 판단하는 기준이 됩니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "사실관계_분석",
+      "difficulty": "중급",
+      "question": "선사용자는 해당 상표를 어떤 상품 또는 서비스에 사용하고 있나요?",
+      "reasoning": "지정 상품/서비스의 동일성/유사성을 판단하는 데 중요한 정보입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "사실관계_분석",
+      "difficulty": "고급",
+      "question": "선사용자가 상표를 사용한 기간, 사용량, 광고 활동 등 구체적인 사용 태양은 어떠한가요?",
+      "reasoning": "상표의 계속 사용 여부 및 상표의 식별력 획득 여부를 판단하는 데 중요한 요소입니다. 거래 실정 및 사회통념을 고려해야 합니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gpt",
+      "strategy": "법리_분석",
+      "difficulty": "초급",
+      "question": "상표법 제57조의3에서 규정하는 선사용자의 권리란 무엇인가?",
+      "reasoning": "법령의 기본 개념을 이해하기 위한 질문으로, 선사용자의 권리의 정의를 파악하는 데 중점을 둡니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "법적_판단",
+      "difficulty": "초급",
+      "question": "선사용자의 권리가 인정되면 어떤 법적 효과가 발생하나요?",
+      "reasoning": "선사용자의 권리 인정에 따른 법적 결과를 이해하는 기본적인 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "법적_판단",
+      "difficulty": "중급",
+      "question": "등록상표권자의 상표권 행사와 선사용자의 권리가 충돌하는 경우, 어떻게 해결해야 하나요?",
+      "reasoning": "상표권 침해와 선사용 권리의 관계를 이해하고, 권리 행사 범위를 판단해야 합니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "claude",
+      "strategy": "법리_분석",
+      "difficulty": "초급",
+      "question": "[기본 질문] 법리_분석-초급",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.4,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.3,
+        "clarity": 0.2,
+        "educational_value": 0.3,
+        "overall_score": 0.34
+      },
+      "feedback": "다음과 같은 중요한 문제점들이 발견됩니다:\n\n1. 실제 질문이 제시되지 않았습니다. '법리_분석-초급'이라는 카테고리만 나와있어 평가할 실질적인 질문 내용이 없습니다.\n\n2. 주어진 법률 문서는 상표법 제57조의3의 선사용권 인정 요건을 명확하게 설명하고 있으므로, 이를 바탕으로 다음과 같은 구체적인 질문들이 가능했을 것입니다:\n   - 선사용권의 세 가지 요건을 설명하시오.\n   - 선사용권 인정을 위한 시간적 요건은 무엇인가?\n   - 부정경쟁의 목적이 없는 사용이란 무엇을 의미하는가?\n\n3. 초급 수준에 맞는 명확한 학습 목표와 평가 포인트가 설정되어야 합니다.\n\n4. 법률 용어와 개념에 대한 이해를 검증할 수 있는 구체적인 질문 형식이 필요합니다.\n\n이러한 요소들을 보완하여 실제 학습자의 이해도를 평가할 수 있는 구체적인 질문으로 개선되어야 합니다."
+    },
+    {
+      "llm": "gemini",
+      "strategy": "법적_판단",
+      "difficulty": "고급",
+      "question": "선사용자가 상표 사용을 중단한 경우, 선사용자 권리는 어떻게 되나요? 권리 소멸 시점 및 재사용 가능성을 판단해야 합니다.",
+      "reasoning": "선사용 권리의 소멸 요건 및 재사용 가능성을 판단하기 위해서는 관련 법리와 판례에 대한 심도 있는 이해가 필요합니다. 상표 불사용 취소 심판과의 관계도 고려해야 합니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gpt",
+      "strategy": "법리_분석",
+      "difficulty": "중급",
+      "question": "상표법 제57조의3에서 '부정경쟁의 목적이 없이' 사용한다는 조건은 어떻게 해석될 수 있는가?",
+      "reasoning": "법령의 특정 조건을 해석하고 이를 실제 상황에 어떻게 적용할 수 있는지를 이해하기 위한 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "claude",
+      "strategy": "법리_분석",
+      "difficulty": "중급",
+      "question": "[기본 질문] 법리_분석-중급",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.4,
+        "relevance": 0.3,
+        "difficulty_appropriateness": 0.2,
+        "clarity": 0.1,
+        "educational_value": 0.2,
+        "overall_score": 0.24
+      },
+      "feedback": "다음과 같은 심각한 문제점들이 발견됩니다:\n\n1. 실제 질문이 제시되지 않았습니다. '법리_분석-중급'이라는 태그만 있을 뿐 구체적인 질문 내용이 없습니다.\n\n2. 주어진 법률 문서는 상표법 제57조의3의 선사용권 인정 요건을 명확하게 설명하고 있는데, 이를 활용한 구체적인 문제가 구성되지 않았습니다.\n\n3. 중급 난이도에 맞는 적절한 사례나 쟁점이 포함되지 않았습니다.\n\n개선 제안:\n\n1. 다음과 같은 구체적인 질문을 구성해야 합니다:\n   - 선사용권의 세 가지 요건을 모두 충족하는 사례를 제시하고 분석하도록 하는 문제\n   - 특정 요건의 충족 여부가 쟁점이 되는 사례 분석 문제\n   - 각 요건의 법적 의미와 판단 기준을 설명하도록 하는 문제\n\n2. 중급 난이도에 맞게 복합적 쟁점을 포함시켜야 합니다.\n\n3. 질문의 의도와 평가 기준을 명확히 제시해야 합니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "법리_분석",
+      "difficulty": "고급",
+      "question": "선사용자 권리에 대한 과거 판례들은 어떤 법적 해석을 제공했는가?",
+      "reasoning": "선사용자 권리에 관한 다양한 판례들을 분석하여 법적 해석의 범위를 넓히고 심화된 이해를 도모하기 위한 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gpt",
+      "strategy": "사실관계_분석",
+      "difficulty": "초급",
+      "question": "선사용자가 상표를 사용한 시점과 장소는 어떻게 확인할 수 있는가?",
+      "reasoning": "기본적인 사실관계를 파악하여 법 적용의 기초를 마련하기 위한 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "claude",
+      "strategy": "법리_분석",
+      "difficulty": "고급",
+      "question": "[기본 질문] 법리_분석-고급",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.3,
+        "relevance": 0.4,
+        "difficulty_appropriateness": 0.2,
+        "clarity": 0.1,
+        "educational_value": 0.2,
+        "overall_score": 0.24
+      },
+      "feedback": "다음과 같은 중요한 개선이 필요합니다:\n\n1. 실제 질문이 제시되지 않았습니다. '법리_분석-고급'이라는 태그만 있을 뿐 구체적인 질문 내용이 없습니다.\n\n2. 상표법 제57조의3의 선사용권에 대한 세 가지 요건을 활용한 구체적인 질문이 필요합니다. 예를 들어:\n   - 각 요건의 법적 의미와 판단 기준\n   - 요건들 간의 관계성\n   - 실제 사례에 적용하는 문제\n\n3. 고급 난이도에 맞는 분석적이고 복합적인 사고를 요구하는 질문 구성이 필요합니다.\n\n4. 법적 개념(선사용권, 부정경쟁의 목적 등)에 대한 이해도를 측정할 수 있는 요소가 포함되어야 합니다.\n\n5. 실무적 관점에서의 적용 가능성을 테스트하는 요소가 필요합니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "사실관계_분석",
+      "difficulty": "중급",
+      "question": "선사용자의 상표 사용이 부정경쟁의 목적이 없었다는 것을 입증하기 위해 어떤 증거가 필요한가?",
+      "reasoning": "쟁점 사실을 입증하기 위한 구체적인 증거를 찾고 이를 분석하는 능력을 기르기 위한 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gpt",
+      "strategy": "사실관계_분석",
+      "difficulty": "고급",
+      "question": "선사용자가 상표를 사용한 기간과 그 연속성을 평가할 때 고려해야 할 복합적 요소는 무엇인가?",
+      "reasoning": "복잡한 사실관계를 종합적으로 분석하여 법적 판단에 필요한 정보를 도출하기 위한 심화된 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "claude",
+      "strategy": "사실관계_분석",
+      "difficulty": "초급",
+      "question": "[기본 질문] 사실관계_분석-초급",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.3,
+        "relevance": 0.4,
+        "difficulty_appropriateness": 0.3,
+        "clarity": 0.2,
+        "educational_value": 0.3,
+        "overall_score": 0.3
+      },
+      "feedback": "다음과 같은 심각한 문제점들이 발견됩니다:\n\n1. 실제 질문이 제시되지 않았습니다. '사실관계_분석-초급'이라는 제목만 있을 뿐 구체적인 질문 내용이 없습니다.\n\n2. 주어진 법률 문서는 상표법 제57조의3의 선사용권 요건을 명확하게 설명하고 있는데, 이를 활용한 구체적인 질문이 필요합니다. 예를 들어:\n- '선사용권이 인정되기 위한 3가지 요건은 무엇인가?'\n- '부정경쟁의 목적 없는 사용이란 무엇을 의미하는가?'\n\n3. 초급 난이도에 맞는 명확한 학습 목표가 설정되어야 합니다.\n\n4. 법률 조항의 실제 적용을 테스트할 수 있는 사례 기반 질문이 포함되면 더 효과적일 것입니다.\n\n5. 질문의 형식과 구조가 완전히 누락되어 있어 평가하기 어렵습니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "법적_판단",
+      "difficulty": "초급",
+      "question": "선사용자의 권리가 인정되기 위한 기본 요건은 무엇인가?",
+      "reasoning": "기본적인 법적 결론을 도출하기 위해 필요한 요건들을 이해하는 데 초점을 둔 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gpt",
+      "strategy": "법적_판단",
+      "difficulty": "중급",
+      "question": "선사용자의 상표 사용이 상표권 침해로 주장될 경우, 이를 방어할 수 있는 법리적 논거는 무엇인가?",
+      "reasoning": "법리를 구체적으로 적용하여 문제에 대한 논증을 전개하는 능력을 키우기 위한 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "claude",
+      "strategy": "사실관계_분석",
+      "difficulty": "중급",
+      "question": "[기본 질문] 사실관계_분석-중급",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.3,
+        "relevance": 0.4,
+        "difficulty_appropriateness": 0.2,
+        "clarity": 0.1,
+        "educational_value": 0.2,
+        "overall_score": 0.24
+      },
+      "feedback": "현재 제시된 '사실관계_분석-중급'이라는 질문은 실제 질문의 형태를 갖추지 못하고 있습니다. 다음과 같은 개선이 필요합니다:\n\n1. 구체적인 질문 형태로 재구성이 필요합니다. 예시:\n'A사는 2020년부터 '별표' 상표를 사용해왔는데, B사가 2022년에 동일한 상표를 등록했다. A사가 선사용권을 주장할 수 있는 요건을 모두 설명하시오.'\n\n2. 법적 쟁점을 포함해야 합니다:\n- 선사용 시점의 적법성\n- 부정경쟁 목적 여부\n- 계속 사용 여부\n\n3. 중급 수준에 맞는 복잡성을 추가해야 합니다:\n- 여러 사실관계 조합\n- 다양한 법적 쟁점 포함\n\n4. 분석적 사고를 요구하는 요소가 필요합니다:\n- 요건의 충족 여부 판단\n- 법적 논리 전개\n\n현재 질문은 실제 문제 상황 없이 단순 키워드만 나열되어 있어 학습자의 이해도를 평가하기 어렵습니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "법적_판단",
+      "difficulty": "고급",
+      "question": "선사용자의 권리에 관한 종합적인 법률 의견을 제시하라.",
+      "reasoning": "법리 분석과 사실관계 연구를 종합하여 심층적인 법률적 의견을 형성하는 능력을 기르기 위한 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "claude",
+      "strategy": "사실관계_분석",
+      "difficulty": "고급",
+      "question": "[기본 질문] 사실관계_분석-고급",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.3,
+        "relevance": 0.4,
+        "difficulty_appropriateness": 0.2,
+        "clarity": 0.1,
+        "educational_value": 0.2,
+        "overall_score": 0.24
+      },
+      "feedback": "다음과 같은 심각한 문제점들이 발견됩니다:\n\n1. 실제 질문이 제시되지 않았습니다. '사실관계_분석-고급'이라는 메타 정보만 있을 뿐, 구체적인 질문 내용이 없습니다.\n\n2. 주어진 법률 문서는 상표법 제57조의3의 선사용권 요건을 명확하게 설명하고 있는데, 이를 활용한 구체적인 사례나 분석 과제가 제시되지 않았습니다.\n\n개선 제안:\n\n1. 다음과 같은 구체적인 질문을 제시해야 합니다:\n- 'A기업이 2010년부터 '슈퍼스타' 상표를 사용해왔는데, B기업이 2015년에 이 상표를 등록했다면, A기업의 선사용권이 인정될 수 있는지 각 요건별로 검토하시오.'\n\n2. 실제 사례나 가상의 구체적 사실관계를 포함시켜 분석의 대상을 명확히 해야 합니다.\n\n3. 고급 난이도에 맞게 복합적인 법적 쟁점을 포함시켜야 합니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "법적_판단",
+      "difficulty": "초급",
+      "question": "[기본 질문] 법적_판단-초급",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.3,
+        "relevance": 0.4,
+        "difficulty_appropriateness": 0.2,
+        "clarity": 0.1,
+        "educational_value": 0.2,
+        "overall_score": 0.24
+      },
+      "feedback": "다음과 같은 심각한 문제점들이 발견됩니다:\n\n1. 실제 질문이 제시되지 않았습니다. '법적_판단-초급'이라는 메타 정보만 있을 뿐, 구체적인 질문 내용이 없습니다.\n\n2. 주어진 법률 문서는 상표법 제57조의3의 선사용권 요건에 대해 명확하게 설명하고 있는데, 이를 활용한 구체적인 질문이 생성되지 않았습니다.\n\n개선 제안:\n\n1. 다음과 같은 구체적인 질문 예시를 제시해야 합니다:\n- '상표법상 선사용권이 인정되기 위한 세 가지 요건은 무엇인가요?'\n- '타인의 상표등록출원 이후에 상표 사용을 시작한 경우, 선사용권이 인정될 수 있나요?'\n\n2. 초급 수준에 맞는 기본적인 이해도를 확인하는 질문을 포함해야 합니다.\n\n3. 법적 개념의 이해를 돕는 구체적인 사례나 상황을 포함한 질문을 구성하면 더욱 효과적일 것입니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "법적_판단",
+      "difficulty": "중급",
+      "question": "[기본 질문] 법적_판단-중급",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.2,
+        "relevance": 0.3,
+        "difficulty_appropriateness": 0.1,
+        "clarity": 0.1,
+        "educational_value": 0.2,
+        "overall_score": 0.18
+      },
+      "feedback": "현재 제시된 내용에는 실제 질문이 포함되어 있지 않고 질문의 메타 정보만 있습니다. 다음과 같은 개선이 필요합니다:\n\n1. 구체적인 질문 내용 필요: 상표법 제57조의3의 선사용권 요건에 대한 실제 사례나 구체적인 법적 쟁점을 포함한 질문이 제시되어야 합니다.\n\n2. 중급 난이도에 맞는 문제 구성: 예를 들어 '선사용권의 세 가지 요건 중 하나가 결여된 사례를 제시하고 법적 판단을 요구하는 질문' 등이 적절할 것입니다.\n\n3. 법적 판단 능력 평가: 단순 암기가 아닌 법적 추론과 판단이 필요한 문제가 구성되어야 합니다.\n\n4. 교육적 목표 반영: 선사용권의 실무적 중요성과 관련 판례를 연계한 문제가 바람직합니다.\n\n현재 상태로는 실질적인 평가가 어려우므로, 위 요소들을 고려한 구체적인 질문 내용이 필요합니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "법적_판단",
+      "difficulty": "고급",
+      "question": "[기본 질문] 법적_판단-고급",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.3,
+        "relevance": 0.4,
+        "difficulty_appropriateness": 0.2,
+        "clarity": 0.1,
+        "educational_value": 0.2,
+        "overall_score": 0.24
+      },
+      "feedback": "이 평가에서 주요 문제점들은 다음과 같습니다:\n\n1. 실제 질문이 제시되지 않았습니다. '[기본 질문] 법적_판단-고급'는 질문의 형식이나 내용이 아닌 메타데이터에 불과합니다.\n\n2. 주어진 법률 문서는 상표법 제57조의3의 선사용권 인정 요건에 대해 명확한 세 가지 조건을 제시하고 있는데, 이를 활용한 구체적인 질문이 없습니다.\n\n개선을 위한 제안:\n\n1. 다음과 같은 구체적인 질문 형식을 사용하는 것이 좋습니다:\n   - '선사용권이 인정되기 위한 세 가지 요건을 모두 충족하는 사례를 분석하시오.'\n   - '다음 사례에서 선사용권 인정 요건 중 어떤 요건이 충족되지 않았는지 설명하시오.'\n\n2. 사례 기반 문제를 포함하여 실제 적용 능력을 평가할 수 있어야 합니다.\n\n3. 고급 난이도에 맞게 복합적인 법률 해석이 필요한 문제를 구성해야 합니다."
+    }
+  ]
+}

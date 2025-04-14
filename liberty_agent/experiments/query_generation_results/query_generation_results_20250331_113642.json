@@ -1,0 +1,482 @@
+{
+  "metadata": {
+    "timestamp": "20250331_113642",
+    "total_queries": 9,
+    "llms_used": [
+      "claude"
+    ],
+    "strategies_used": [
+      "PAR",
+      "KWR",
+      "CCE"
+    ],
+    "difficulty_levels": [
+      "basic",
+      "intermediate",
+      "advanced"
+    ]
+  },
+  "overall_statistics": {
+    "average_scores": {
+      "legal_accuracy": 0.5555555555555557,
+      "relevance": 0.5222222222222223,
+      "difficulty_appropriateness": 0.5444444444444444,
+      "clarity": 0.37777777777777777,
+      "educational_value": 0.4,
+      "overall_score": 0.4822222222222221
+    },
+    "score_distributions": {
+      "legal_accuracy": {
+        "count": 9.0,
+        "mean": 0.5555555555555557,
+        "std": 0.3940530139178963,
+        "min": 0.0,
+        "25%": 0.2,
+        "50%": 0.8,
+        "75%": 0.9,
+        "max": 1.0
+      },
+      "relevance": {
+        "count": 9.0,
+        "mean": 0.5222222222222223,
+        "std": 0.4294699575575042,
+        "min": 0.0,
+        "25%": 0.1,
+        "50%": 0.8,
+        "75%": 0.9,
+        "max": 1.0
+      },
+      "difficulty_appropriateness": {
+        "count": 9.0,
+        "mean": 0.5444444444444444,
+        "std": 0.20682789409984761,
+        "min": 0.2,
+        "25%": 0.5,
+        "50%": 0.6,
+        "75%": 0.6,
+        "max": 0.9
+      },
+      "clarity": {
+        "count": 9.0,
+        "mean": 0.37777777777777777,
+        "std": 0.29059326290271154,
+        "min": 0.0,
+        "25%": 0.2,
+        "50%": 0.2,
+        "75%": 0.7,
+        "max": 0.7
+      },
+      "educational_value": {
+        "count": 9.0,
+        "mean": 0.4,
+        "std": 0.33541019662496846,
+        "min": 0.1,
+        "25%": 0.1,
+        "50%": 0.2,
+        "75%": 0.7,
+        "max": 0.8
+      },
+      "overall_score": {
+        "count": 9.0,
+        "mean": 0.4822222222222221,
+        "std": 0.28043616821737605,
+        "min": 0.14,
+        "25%": 0.18,
+        "50%": 0.54,
+        "75%": 0.74,
+        "max": 0.76
+      }
+    },
+    "quality_levels": {
+      "high_quality": 0,
+      "medium_quality": 4,
+      "low_quality": 5
+    }
+  },
+  "detailed_analysis": {
+    "by_strategy": {
+      "PAR": {
+        "count": 3,
+        "average_scores": {
+          "legal_accuracy": 0.6333333333333333,
+          "relevance": 0.6,
+          "difficulty_appropriateness": 0.7000000000000001,
+          "clarity": 0.5333333333333333,
+          "educational_value": 0.5333333333333333,
+          "overall_score": 0.6066666666666667
+        },
+        "success_rate": 0.6666666666666666
+      },
+      "KWR": {
+        "count": 3,
+        "average_scores": {
+          "legal_accuracy": 0.5666666666666668,
+          "relevance": 0.5666666666666668,
+          "difficulty_appropriateness": 0.6,
+          "clarity": 0.5,
+          "educational_value": 0.5333333333333333,
+          "overall_score": 0.5533333333333333
+        },
+        "success_rate": 0.6666666666666666
+      },
+      "CCE": {
+        "count": 3,
+        "average_scores": {
+          "legal_accuracy": 0.4666666666666666,
+          "relevance": 0.4000000000000001,
+          "difficulty_appropriateness": 0.3333333333333333,
+          "clarity": 0.10000000000000002,
+          "educational_value": 0.13333333333333333,
+          "overall_score": 0.2866666666666667
+        },
+        "success_rate": 0.0
+      }
+    },
+    "by_difficulty": {
+      "basic": {
+        "count": 3,
+        "average_scores": {
+          "legal_accuracy": 0.13333333333333333,
+          "relevance": 0.06666666666666667,
+          "difficulty_appropriateness": 0.5666666666666667,
+          "clarity": 0.20000000000000004,
+          "educational_value": 0.10000000000000002,
+          "overall_score": 0.21999999999999997
+        },
+        "success_rate": 0.0
+      },
+      "intermediate": {
+        "count": 3,
+        "average_scores": {
+          "legal_accuracy": 0.9,
+          "relevance": 0.9,
+          "difficulty_appropriateness": 0.6,
+          "clarity": 0.4333333333333333,
+          "educational_value": 0.5333333333333333,
+          "overall_score": 0.6733333333333333
+        },
+        "success_rate": 0.6666666666666666
+      },
+      "advanced": {
+        "count": 3,
+        "average_scores": {
+          "legal_accuracy": 0.6333333333333334,
+          "relevance": 0.6000000000000001,
+          "difficulty_appropriateness": 0.4666666666666666,
+          "clarity": 0.5,
+          "educational_value": 0.5666666666666668,
+          "overall_score": 0.5533333333333333
+        },
+        "success_rate": 0.6666666666666666
+      }
+    },
+    "by_llm": {
+      "claude": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.5555555555555557,
+          "relevance": 0.5222222222222223,
+          "difficulty_appropriateness": 0.5444444444444444,
+          "clarity": 0.37777777777777777,
+          "educational_value": 0.4,
+          "overall_score": 0.4822222222222221
+        },
+        "success_rate": 0.4444444444444444
+      }
+    },
+    "cross_analysis": {
+      "strategy_difficulty_matrix": {},
+      "llm_strategy_matrix": {}
+    }
+  },
+  "best_queries": {
+    "overall": {
+      "llm": "claude",
+      "strategy": "PAR",
+      "difficulty": "advanced",
+      "question": "[기본 질문] PAR-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "category": "상표법",
+      "document_type": "법령",
+      "complexity_level": "중급",
+      "legal_accuracy": 0.9,
+      "relevance": 0.8,
+      "difficulty_appropriateness": 0.6,
+      "clarity": 0.7,
+      "educational_value": 0.8,
+      "overall_score": 0.76,
+      "feedback": "법적 정확성과 교육적 가치는 높은 편이지만, 질문이 문서 내용과 직접적인 연관성이 부족하고 의도가 명확하지 않습니다. 또한 'advanced' 난이도에 비해 질문 수준이 낮습니다. 문서 내용을 바탕으로 보다 구체적이고 도전적인 질문을 제시하면 개선될 것 같습니다."
+    },
+    "by_strategy": {
+      "PAR": {
+        "llm": "claude",
+        "strategy": "PAR",
+        "difficulty": "advanced",
+        "question": "[기본 질문] PAR-advanced",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "법령",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.7,
+        "educational_value": 0.8,
+        "overall_score": 0.76,
+        "feedback": "법적 정확성과 교육적 가치는 높은 편이지만, 질문이 문서 내용과 직접적인 연관성이 부족하고 의도가 명확하지 않습니다. 또한 'advanced' 난이도에 비해 질문 수준이 낮습니다. 문서 내용을 바탕으로 보다 구체적이고 도전적인 질문을 제시하면 개선될 것 같습니다."
+      },
+      "KWR": {
+        "llm": "claude",
+        "strategy": "KWR",
+        "difficulty": "advanced",
+        "question": "[기본 질문] KWR-advanced",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "법령",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.8,
+        "relevance": 0.9,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.7,
+        "educational_value": 0.8,
+        "overall_score": 0.76,
+        "feedback": "법적 개념과 용어 사용은 대체로 정확하지만, 질문 자체가 문서 내용을 충분히 다루지 않고 있습니다. 또한 'advanced' 난이도에 부합하는 질문이 아니며, 의도가 명확하지 않습니다. 교육적 가치 측면에서는 선사용자의 권리에 대한 기본 개념을 다루고 있어 유용할 수 있습니다. 전반적으로 질문을 구체화하고 문서 내용을 더 잘 반영하도록 개선할 필요가 있습니다."
+      },
+      "CCE": {
+        "llm": "claude",
+        "strategy": "CCE",
+        "difficulty": "intermediate",
+        "question": "[기본 질문] CCE-intermediate",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "법령",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.0,
+        "educational_value": 0.2,
+        "overall_score": 0.54,
+        "feedback": "문서의 내용을 정확하게 반영하고 있으나, 실제 질문이 없어 명확성과 교육적 가치가 낮습니다. 문서 내용을 바탕으로 구체적인 질문을 생성하면 더 나은 평가를 받을 수 있을 것입니다."
+      }
+    },
+    "by_difficulty": {
+      "basic": {
+        "llm": "claude",
+        "strategy": "PAR",
+        "difficulty": "basic",
+        "question": "[기본 질문] PAR-basic",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "법령",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.2,
+        "relevance": 0.1,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.2,
+        "educational_value": 0.1,
+        "overall_score": 0.32,
+        "feedback": "제시된 질문은 상표법 제57조의3의 내용과 관련성이 낮고, 법적 개념이나 용어를 포함하지 않아 법률 학습에 도움이 되지 않습니다. 질문이 구체적이지 않아 의도를 파악하기 어렵습니다. 제시된 법률 조항의 핵심 내용을 반영한 구체적인 질문을 만들어야 합니다."
+      },
+      "intermediate": {
+        "llm": "claude",
+        "strategy": "PAR",
+        "difficulty": "intermediate",
+        "question": "[기본 질문] PAR-intermediate",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "법령",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.8,
+        "relevance": 0.9,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.7,
+        "educational_value": 0.7,
+        "overall_score": 0.74,
+        "feedback": "법적 정확성은 높은 편이지만, 문서 내용에 대한 구체적인 질문이 없어 난이도와 명확성이 다소 낮습니다. 상표법 제57조의3에 대한 이해를 확인할 수 있는 구체적인 질문을 추가하면 교육적 가치가 높아질 것입니다."
+      },
+      "advanced": {
+        "llm": "claude",
+        "strategy": "PAR",
+        "difficulty": "advanced",
+        "question": "[기본 질문] PAR-advanced",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "법령",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.7,
+        "educational_value": 0.8,
+        "overall_score": 0.76,
+        "feedback": "법적 정확성과 교육적 가치는 높은 편이지만, 질문이 문서 내용과 직접적인 연관성이 부족하고 의도가 명확하지 않습니다. 또한 'advanced' 난이도에 비해 질문 수준이 낮습니다. 문서 내용을 바탕으로 보다 구체적이고 도전적인 질문을 제시하면 개선될 것 같습니다."
+      }
+    },
+    "by_llm": {
+      "claude": {
+        "llm": "claude",
+        "strategy": "PAR",
+        "difficulty": "advanced",
+        "question": "[기본 질문] PAR-advanced",
+        "reasoning": "재시도 실패로 인한 기본 응답",
+        "category": "상표법",
+        "document_type": "법령",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.7,
+        "educational_value": 0.8,
+        "overall_score": 0.76,
+        "feedback": "법적 정확성과 교육적 가치는 높은 편이지만, 질문이 문서 내용과 직접적인 연관성이 부족하고 의도가 명확하지 않습니다. 또한 'advanced' 난이도에 비해 질문 수준이 낮습니다. 문서 내용을 바탕으로 보다 구체적이고 도전적인 질문을 제시하면 개선될 것 같습니다."
+      }
+    }
+  },
+  "queries": [
+    {
+      "llm": "claude",
+      "strategy": "PAR",
+      "difficulty": "basic",
+      "question": "[기본 질문] PAR-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.2,
+        "relevance": 0.1,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.2,
+        "educational_value": 0.1,
+        "overall_score": 0.32
+      },
+      "feedback": "제시된 질문은 상표법 제57조의3의 내용과 관련성이 낮고, 법적 개념이나 용어를 포함하지 않아 법률 학습에 도움이 되지 않습니다. 질문이 구체적이지 않아 의도를 파악하기 어렵습니다. 제시된 법률 조항의 핵심 내용을 반영한 구체적인 질문을 만들어야 합니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "PAR",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] PAR-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.8,
+        "relevance": 0.9,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.7,
+        "educational_value": 0.7,
+        "overall_score": 0.74
+      },
+      "feedback": "법적 정확성은 높은 편이지만, 문서 내용에 대한 구체적인 질문이 없어 난이도와 명확성이 다소 낮습니다. 상표법 제57조의3에 대한 이해를 확인할 수 있는 구체적인 질문을 추가하면 교육적 가치가 높아질 것입니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "PAR",
+      "difficulty": "advanced",
+      "question": "[기본 질문] PAR-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.7,
+        "educational_value": 0.8,
+        "overall_score": 0.76
+      },
+      "feedback": "법적 정확성과 교육적 가치는 높은 편이지만, 질문이 문서 내용과 직접적인 연관성이 부족하고 의도가 명확하지 않습니다. 또한 'advanced' 난이도에 비해 질문 수준이 낮습니다. 문서 내용을 바탕으로 보다 구체적이고 도전적인 질문을 제시하면 개선될 것 같습니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "KWR",
+      "difficulty": "basic",
+      "question": "[기본 질문] KWR-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.0,
+        "relevance": 0.0,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.2,
+        "educational_value": 0.1,
+        "overall_score": 0.16
+      },
+      "feedback": "제시된 질문이 주어진 법률 문서와 전혀 관련이 없으며, 법적 개념이나 용어를 사용하지 않아 법률 학습에 도움이 되지 않습니다. 질문의 의도가 명확하지 않아 개선이 필요합니다. 주어진 문서 내용을 바탕으로 상표법의 선사용자 권리 인정 요건과 관련된 질문을 작성하는 것이 좋습니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "KWR",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] KWR-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.7,
+        "clarity": 0.6,
+        "educational_value": 0.7,
+        "overall_score": 0.74
+      },
+      "feedback": "법적 정확성과 의미 관련성은 높은 편이지만, 난이도 적절성과 질문 명확성, 교육적 가치는 다소 낮습니다. 질문이 너무 일반적이고 구체성이 부족해 보입니다. 법률 조항에 대한 이해를 확인하는 보다 구체적인 질문이 필요할 것 같습니다. 예를 들어 선사용자의 권리 인정 요건 중 한 가지를 물어보거나, 구체적인 사례를 제시하고 해당 조항의 적용 여부를 묻는 식으로 질문을 수정하면 더 좋을 것 같습니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "KWR",
+      "difficulty": "advanced",
+      "question": "[기본 질문] KWR-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.8,
+        "relevance": 0.9,
+        "difficulty_appropriateness": 0.6,
+        "clarity": 0.7,
+        "educational_value": 0.8,
+        "overall_score": 0.76
+      },
+      "feedback": "법적 개념과 용어 사용은 대체로 정확하지만, 질문 자체가 문서 내용을 충분히 다루지 않고 있습니다. 또한 'advanced' 난이도에 부합하는 질문이 아니며, 의도가 명확하지 않습니다. 교육적 가치 측면에서는 선사용자의 권리에 대한 기본 개념을 다루고 있어 유용할 수 있습니다. 전반적으로 질문을 구체화하고 문서 내용을 더 잘 반영하도록 개선할 필요가 있습니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "CCE",
+      "difficulty": "basic",
+      "question": "[기본 질문] CCE-basic",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.2,
+        "relevance": 0.1,
+        "difficulty_appropriateness": 0.3,
+        "clarity": 0.2,
+        "educational_value": 0.1,
+        "overall_score": 0.18
+      },
+      "feedback": "제시된 질문은 주어진 문서 내용과 거의 관련이 없으며, 법적 개념이나 용어를 전혀 다루고 있지 않습니다. 문서의 핵심 내용인 선사용자의 권리 인정 요건에 대한 질문이 필요합니다. 또한 질문 자체가 명확하지 않아 의도를 파악하기 어렵습니다. 전반적으로 법률 학습에 도움이 되지 않는 질문입니다. 문서 내용을 잘 이해하고 관련된 질문을 작성하는 연습이 필요해 보입니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "CCE",
+      "difficulty": "intermediate",
+      "question": "[기본 질문] CCE-intermediate",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.0,
+        "educational_value": 0.2,
+        "overall_score": 0.54
+      },
+      "feedback": "문서의 내용을 정확하게 반영하고 있으나, 실제 질문이 없어 명확성과 교육적 가치가 낮습니다. 문서 내용을 바탕으로 구체적인 질문을 생성하면 더 나은 평가를 받을 수 있을 것입니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "CCE",
+      "difficulty": "advanced",
+      "question": "[기본 질문] CCE-advanced",
+      "reasoning": "재시도 실패로 인한 기본 응답",
+      "scores": {
+        "legal_accuracy": 0.2,
+        "relevance": 0.1,
+        "difficulty_appropriateness": 0.2,
+        "clarity": 0.1,
+        "educational_value": 0.1,
+        "overall_score": 0.14
+      },
+      "feedback": "제시된 질문은 주어진 문서 내용과 거의 관련이 없으며, 법적 개념이나 용어를 전혀 다루고 있지 않습니다. 질문의 의도와 목적이 불분명하고, 법률 학습에 도움이 되지 않습니다. 문서 내용을 바탕으로 선사용자의 권리 인정 요건과 관련된 구체적이고 명확한 질문을 작성하는 것이 필요합니다."
+    }
+  ]
+}

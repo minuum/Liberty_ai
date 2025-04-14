@@ -1,0 +1,851 @@
+{
+  "metadata": {
+    "timestamp": "20250331_143901",
+    "total_queries": 27,
+    "llms_used": [
+      "gemini",
+      "gpt",
+      "claude"
+    ],
+    "strategies_used": [
+      "PAR",
+      "KWR",
+      "CCE"
+    ],
+    "difficulty_levels": [
+      "basic",
+      "intermediate",
+      "advanced"
+    ]
+  },
+  "overall_statistics": {
+    "average_scores": {
+      "legal_accuracy": 0.6333333333333333,
+      "relevance": 0.6481481481481481,
+      "difficulty_appropriateness": 0.648148148148148,
+      "clarity": 0.6111111111111112,
+      "educational_value": 0.6314814814814815,
+      "overall_score": 0.6344444444444444,
+      "dense_similarity": 0.0
+    },
+    "score_distributions": {
+      "legal_accuracy": {
+        "count": 27.0,
+        "mean": 0.6333333333333333,
+        "std": 0.1860521018838127,
+        "min": 0.5,
+        "25%": 0.5,
+        "50%": 0.5,
+        "75%": 0.8500000000000001,
+        "max": 1.0
+      },
+      "relevance": {
+        "count": 27.0,
+        "mean": 0.6481481481481481,
+        "std": 0.2082350195375969,
+        "min": 0.5,
+        "25%": 0.5,
+        "50%": 0.5,
+        "75%": 0.8,
+        "max": 1.0
+      },
+      "difficulty_appropriateness": {
+        "count": 27.0,
+        "mean": 0.648148148148148,
+        "std": 0.1987854861796241,
+        "min": 0.5,
+        "25%": 0.5,
+        "50%": 0.5,
+        "75%": 0.9,
+        "max": 1.0
+      },
+      "clarity": {
+        "count": 27.0,
+        "mean": 0.6111111111111112,
+        "std": 0.16486202467362576,
+        "min": 0.5,
+        "25%": 0.5,
+        "50%": 0.5,
+        "75%": 0.8,
+        "max": 1.0
+      },
+      "educational_value": {
+        "count": 27.0,
+        "mean": 0.6314814814814815,
+        "std": 0.18247663082630827,
+        "min": 0.5,
+        "25%": 0.5,
+        "50%": 0.5,
+        "75%": 0.8500000000000001,
+        "max": 0.95
+      },
+      "overall_score": {
+        "count": 27.0,
+        "mean": 0.6344444444444444,
+        "std": 0.1844812546936228,
+        "min": 0.5,
+        "25%": 0.5,
+        "50%": 0.5,
+        "75%": 0.8200000000000001,
+        "max": 0.98
+      },
+      "dense_similarity": {
+        "count": 27.0,
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 0.0
+      }
+    },
+    "quality_levels": {
+      "high_quality": 7,
+      "medium_quality": 3,
+      "low_quality": 17
+    }
+  },
+  "detailed_analysis": {
+    "by_strategy": {
+      "PAR": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.6777777777777778,
+          "relevance": 0.6666666666666666,
+          "difficulty_appropriateness": 0.6888888888888889,
+          "clarity": 0.6666666666666666,
+          "educational_value": 0.6611111111111111,
+          "overall_score": 0.6722222222222223
+        },
+        "success_rate": 0.4444444444444444
+      },
+      "KWR": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.5888888888888889,
+          "relevance": 0.5888888888888889,
+          "difficulty_appropriateness": 0.5888888888888889,
+          "clarity": 0.5777777777777778,
+          "educational_value": 0.5888888888888889,
+          "overall_score": 0.5866666666666667
+        },
+        "success_rate": 0.2222222222222222
+      },
+      "CCE": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.6333333333333333,
+          "relevance": 0.6888888888888889,
+          "difficulty_appropriateness": 0.6666666666666666,
+          "clarity": 0.5888888888888889,
+          "educational_value": 0.6444444444444445,
+          "overall_score": 0.6444444444444445
+        },
+        "success_rate": 0.4444444444444444
+      }
+    },
+    "by_difficulty": {
+      "basic": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.6444444444444445,
+          "relevance": 0.6444444444444444,
+          "difficulty_appropriateness": 0.6444444444444445,
+          "clarity": 0.6333333333333333,
+          "educational_value": 0.6333333333333333,
+          "overall_score": 0.64
+        },
+        "success_rate": 0.3333333333333333
+      },
+      "intermediate": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.6111111111111112,
+          "relevance": 0.6555555555555556,
+          "difficulty_appropriateness": 0.6222222222222222,
+          "clarity": 0.5888888888888889,
+          "educational_value": 0.6277777777777778,
+          "overall_score": 0.6211111111111111
+        },
+        "success_rate": 0.3333333333333333
+      },
+      "advanced": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.6444444444444444,
+          "relevance": 0.6444444444444445,
+          "difficulty_appropriateness": 0.6777777777777777,
+          "clarity": 0.6111111111111112,
+          "educational_value": 0.6333333333333333,
+          "overall_score": 0.6422222222222222
+        },
+        "success_rate": 0.4444444444444444
+      }
+    },
+    "by_llm": {
+      "gemini": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.5,
+          "relevance": 0.5,
+          "difficulty_appropriateness": 0.5,
+          "clarity": 0.5,
+          "educational_value": 0.5,
+          "overall_score": 0.5
+        },
+        "success_rate": 0.0
+      },
+      "gpt": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.5555555555555556,
+          "relevance": 0.5555555555555556,
+          "difficulty_appropriateness": 0.588888888888889,
+          "clarity": 0.5444444444444444,
+          "educational_value": 0.5444444444444445,
+          "overall_score": 0.5577777777777778
+        },
+        "success_rate": 0.2222222222222222
+      },
+      "claude": {
+        "count": 9,
+        "average_scores": {
+          "legal_accuracy": 0.8444444444444446,
+          "relevance": 0.8888888888888888,
+          "difficulty_appropriateness": 0.8555555555555556,
+          "clarity": 0.788888888888889,
+          "educational_value": 0.8500000000000001,
+          "overall_score": 0.8455555555555557
+        },
+        "success_rate": 0.8888888888888888
+      }
+    },
+    "cross_analysis": {
+      "strategy_difficulty_matrix": {},
+      "llm_strategy_matrix": {}
+    }
+  },
+  "best_queries": {
+    "overall": {
+      "llm": "claude",
+      "strategy": "PAR",
+      "difficulty": "basic",
+      "question": "상표법 제57조의3에 따른 선사용자의 권리가 인정되기 위한 세 가지 요건은 무엇인가요?",
+      "reasoning": "법조문의 기본적인 내용 이해를 확인하는 기초적인 질문입니다.",
+      "category": "상표법",
+      "document_type": "법령 해석/설명문",
+      "complexity_level": "중급",
+      "legal_accuracy": 1.0,
+      "relevance": 1.0,
+      "difficulty_appropriateness": 1.0,
+      "clarity": 1.0,
+      "educational_value": 0.9,
+      "overall_score": 0.98,
+      "dense_similarity": 0.0,
+      "feedback": "이 질문은 다음과 같은 장점들을 가지고 있습니다:\n\n1. 법조문의 핵심 요건을 정확하게 파악하도록 하는 질문입니다.\n2. 문서의 내용을 그대로 반영하고 있어 관련성이 매우 높습니다.\n3. Basic 난이도에 적합한 기초적인 이해도를 확인하는 질문입니다.\n4. 질문의 의도가 명확하고 이해하기 쉽습니다.\n\n개선을 위한 제안:\n\n1. 교육적 가치를 더욱 높이기 위해서는 각 요건의 실제 사례나 적용 상황을 추가로 질문하는 것을 고려해볼 수 있습니다.\n2. '부정경쟁의 목적'이나 '계속 사용'의 의미에 대한 구체적인 설명을 요구하는 후속 질문을 추가하면 더욱 심도 있는 학습이 가능할 것입니다."
+    },
+    "by_strategy": {
+      "PAR": {
+        "llm": "claude",
+        "strategy": "PAR",
+        "difficulty": "basic",
+        "question": "상표법 제57조의3에 따른 선사용자의 권리가 인정되기 위한 세 가지 요건은 무엇인가요?",
+        "reasoning": "법조문의 기본적인 내용 이해를 확인하는 기초적인 질문입니다.",
+        "category": "상표법",
+        "document_type": "법령 해석/설명문",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98,
+        "dense_similarity": 0.0,
+        "feedback": "이 질문은 다음과 같은 장점들을 가지고 있습니다:\n\n1. 법조문의 핵심 요건을 정확하게 파악하도록 하는 질문입니다.\n2. 문서의 내용을 그대로 반영하고 있어 관련성이 매우 높습니다.\n3. Basic 난이도에 적합한 기초적인 이해도를 확인하는 질문입니다.\n4. 질문의 의도가 명확하고 이해하기 쉽습니다.\n\n개선을 위한 제안:\n\n1. 교육적 가치를 더욱 높이기 위해서는 각 요건의 실제 사례나 적용 상황을 추가로 질문하는 것을 고려해볼 수 있습니다.\n2. '부정경쟁의 목적'이나 '계속 사용'의 의미에 대한 구체적인 설명을 요구하는 후속 질문을 추가하면 더욱 심도 있는 학습이 가능할 것입니다."
+      },
+      "KWR": {
+        "llm": "claude",
+        "strategy": "KWR",
+        "difficulty": "intermediate",
+        "question": "'사용의 계속성'이 중단된 경우, 선사용자의 권리는 어떻게 되나요?",
+        "reasoning": "주요 키워드의 법적 효과를 이해하는지 확인하는 중급 질문입니다.",
+        "category": "상표법",
+        "document_type": "법령 해석/설명문",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.9,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.8,
+        "educational_value": 0.9,
+        "overall_score": 0.9,
+        "dense_similarity": 0.0,
+        "feedback": "다음과 같은 장점과 개선점이 있습니다:\n\n장점:\n1. 문서의 핵심 요건 중 하나인 '사용의 계속성'에 초점을 맞춘 적절한 질문입니다.\n2. 법적 효과를 묻는 질문으로 실무적 중요성이 높습니다.\n3. 중급 수준의 난이도로 적절히 설정되었습니다.\n\n개선을 위한 제안:\n1. '사용의 계속성 중단'의 구체적인 상황이나 시점을 예시로 포함하면 더 명확할 것 같습니다.\n2. '선사용자의 권리'와 함께 '상표권 침해 주장에 대한 항변'이라는 맥락을 추가하면 좋겠습니다.\n3. 질문을 '사용의 계속성이 중단된 경우, 제57조의3에 따른 선사용자의 권리 주장이 가능한가요?'와 같이 더 구체적으로 표현하면 좋겠습니다."
+      },
+      "CCE": {
+        "llm": "claude",
+        "strategy": "CCE",
+        "difficulty": "basic",
+        "question": "A가 상표등록 전부터 사용해온 상표를 B가 나중에 등록한 경우, A의 권리는 어떻게 보호받나요?",
+        "reasoning": "기본적인 사례를 통해 법적 개념의 이해를 확인하는 질문입니다.",
+        "category": "상표법",
+        "document_type": "법령 해석/설명문",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.9,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.8,
+        "educational_value": 0.9,
+        "overall_score": 0.9,
+        "dense_similarity": 0.0,
+        "feedback": "이 질문은 전반적으로 잘 구성되었으나, 다음과 같은 개선사항을 제안합니다:\n\n1. 법적 정확성: '선사용자의 권리'라는 법적 용어를 직접 사용하면 더 정확할 것입니다.\n\n2. 의미 관련성: 문서의 핵심 내용을 정확히 반영하고 있습니다.\n\n3. 난이도: basic 수준에 적합하나, 부정경쟁 목적 없는 사용이라는 요건도 언급하면 좋겠습니다.\n\n4. 명확성: '보호받나요'라는 표현보다 '어떤 권리가 인정되나요'가 더 구체적일 것입니다.\n\n5. 교육적 가치: 실제 사례와 유사한 상황을 제시하여 학습 효과가 높습니다.\n\n개선된 질문 제안:\n'A가 부정경쟁의 목적 없이 상표를 사용하던 중 B가 같은 상표를 나중에 등록한 경우, 선사용자 A의 권리는 어떻게 인정되나요?'"
+      }
+    },
+    "by_difficulty": {
+      "basic": {
+        "llm": "claude",
+        "strategy": "PAR",
+        "difficulty": "basic",
+        "question": "상표법 제57조의3에 따른 선사용자의 권리가 인정되기 위한 세 가지 요건은 무엇인가요?",
+        "reasoning": "법조문의 기본적인 내용 이해를 확인하는 기초적인 질문입니다.",
+        "category": "상표법",
+        "document_type": "법령 해석/설명문",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98,
+        "dense_similarity": 0.0,
+        "feedback": "이 질문은 다음과 같은 장점들을 가지고 있습니다:\n\n1. 법조문의 핵심 요건을 정확하게 파악하도록 하는 질문입니다.\n2. 문서의 내용을 그대로 반영하고 있어 관련성이 매우 높습니다.\n3. Basic 난이도에 적합한 기초적인 이해도를 확인하는 질문입니다.\n4. 질문의 의도가 명확하고 이해하기 쉽습니다.\n\n개선을 위한 제안:\n\n1. 교육적 가치를 더욱 높이기 위해서는 각 요건의 실제 사례나 적용 상황을 추가로 질문하는 것을 고려해볼 수 있습니다.\n2. '부정경쟁의 목적'이나 '계속 사용'의 의미에 대한 구체적인 설명을 요구하는 후속 질문을 추가하면 더욱 심도 있는 학습이 가능할 것입니다."
+      },
+      "intermediate": {
+        "llm": "claude",
+        "strategy": "PAR",
+        "difficulty": "intermediate",
+        "question": "선사용자의 권리 인정에서 '부정경쟁의 목적이 없는 사용'이란 구체적으로 어떤 의미인가요?",
+        "reasoning": "법적 개념에 대한 심층적 이해를 확인하는 중급 수준의 질문입니다.",
+        "category": "상표법",
+        "document_type": "법령 해석/설명문",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.9,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.9,
+        "educational_value": 0.95,
+        "overall_score": 0.93,
+        "dense_similarity": 0.0,
+        "feedback": "이 질문에 대한 세부 평가 의견은 다음과 같습니다:\n\n1. 법적 정확성: '부정경쟁의 목적' 이라는 핵심 법률 용어를 정확하게 사용했으며, 선사용권의 요건 중 중요한 부분을 다루고 있습니다.\n\n2. 의미 관련성: 주어진 법률 문서의 핵심 요건 중 하나를 직접적으로 다루고 있어 매우 높은 관련성을 보입니다.\n\n3. 난이도 적절성: 단순한 개념 이해를 넘어 구체적인 법적 해석을 요구하는 중급 수준의 질문으로 적절합니다.\n\n4. 질문 명확성: '구체적으로 어떤 의미인가'라는 표현을 통해 질문의 의도가 명확히 전달됩니다.\n\n5. 교육적 가치: 실무적으로도 중요한 개념을 다루고 있어 교육적 가치가 높습니다.\n\n개선을 위한 제안:\n- '부정경쟁의 목적'과 관련된 구체적인 사례나 판례를 언급하는 부가 질문을 추가하면 더욱 심도 있는 학습이 가능할 것입니다.\n- '상표법상' 이라는 문구를 추가하여 법적 맥락을 더 명확히 할 수 있습니다."
+      },
+      "advanced": {
+        "llm": "claude",
+        "strategy": "CCE",
+        "difficulty": "advanced",
+        "question": "E사가 F사의 상표등록 전부터 사용했으나 중간에 사용이 일시 중단된 경우의 법적 효과는?",
+        "reasoning": "복잡한 사례에서 법적 판단 능력을 확인하는 고급 질문입니다.",
+        "category": "상표법",
+        "document_type": "법령 해석/설명문",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.9,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.8,
+        "educational_value": 0.9,
+        "overall_score": 0.9,
+        "dense_similarity": 0.0,
+        "feedback": "이 질문은 전반적으로 우수하며, 다음과 같은 특징이 있습니다:\n\n1. 법적 정확성: 상표법 제57조의3의 핵심 요건 중 '계속 사용' 요건을 정확하게 다루고 있습니다.\n\n2. 의미 관련성: 제시된 법률 문서의 세 번째 요건을 직접적으로 검증하는 사례를 다루고 있습니다.\n\n3. 난이도: Advanced 수준에 적합한 복잡성을 가지고 있습니다.\n\n개선을 위한 제안:\n\n1. 질문의 명확성을 높이기 위해 '일시 중단'의 구체적인 기간이나 상황을 명시하면 좋을 것 같습니다.\n\n2. E사와 F사의 구체적인 상황 설정(예: 업종, 상표 유사성 정도)을 추가하면 더욱 실제적인 사례가 될 것 같습니다.\n\n3. '법적 효과'의 범위를 더 구체적으로 한정하면 좋을 것 같습니다."
+      }
+    },
+    "by_llm": {
+      "gemini": {
+        "llm": "gemini",
+        "strategy": "PAR",
+        "difficulty": "basic",
+        "question": "상표법 제57조의3에 따른 선사용자의 권리 인정 요건은 몇 가지입니까?",
+        "reasoning": "문서의 핵심 내용을 직접적으로 묻는 기본적인 질문입니다.",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5,
+        "dense_similarity": 0.0,
+        "feedback": "평가 중 오류 발생"
+      },
+      "gpt": {
+        "llm": "gpt",
+        "strategy": "PAR",
+        "difficulty": "advanced",
+        "question": "선사용자 권리와 관련된 최근 판례는 무엇인가요?",
+        "reasoning": "법적 쟁점의 실질적 적용을 묻는 고급 질문입니다.",
+        "category": "상표법",
+        "document_type": "unknown",
+        "complexity_level": "중급",
+        "legal_accuracy": 0.8,
+        "relevance": 0.7,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.8,
+        "educational_value": 0.7,
+        "overall_score": 0.78,
+        "dense_similarity": 0.0,
+        "feedback": "생성된 질문은 법적인 용어와 개념이 정확하게 사용되어 있으며, 난이도도 고급 수준에 적합합니다. 그러나 문서에서 직접적으로 '최근 판례'에 대한 언급이 없기 때문에, 문서 내용과의 직접적인 연관성이 다소 부족합니다. 질문이 좀 더 명확하게 문서의 조건들을 반영하면서도 판례의 구체적인 사례를 묻는 방식으로 개선될 수 있습니다. 예를 들어, '선사용자 권리의 조건을 만족한 최근의 사례는 무엇인가요?'와 같이 구체적인 조건과 사례를 함께 묻는 질문이 더 적절할 수 있습니다. 또한 교육적 가치를 높이기 위해서는 판례를 통해 배울 수 있는 법적 교훈이나 적용 사례를 함께 제시하는 것이 좋습니다."
+      },
+      "claude": {
+        "llm": "claude",
+        "strategy": "PAR",
+        "difficulty": "basic",
+        "question": "상표법 제57조의3에 따른 선사용자의 권리가 인정되기 위한 세 가지 요건은 무엇인가요?",
+        "reasoning": "법조문의 기본적인 내용 이해를 확인하는 기초적인 질문입니다.",
+        "category": "상표법",
+        "document_type": "법령 해석/설명문",
+        "complexity_level": "중급",
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98,
+        "dense_similarity": 0.0,
+        "feedback": "이 질문은 다음과 같은 장점들을 가지고 있습니다:\n\n1. 법조문의 핵심 요건을 정확하게 파악하도록 하는 질문입니다.\n2. 문서의 내용을 그대로 반영하고 있어 관련성이 매우 높습니다.\n3. Basic 난이도에 적합한 기초적인 이해도를 확인하는 질문입니다.\n4. 질문의 의도가 명확하고 이해하기 쉽습니다.\n\n개선을 위한 제안:\n\n1. 교육적 가치를 더욱 높이기 위해서는 각 요건의 실제 사례나 적용 상황을 추가로 질문하는 것을 고려해볼 수 있습니다.\n2. '부정경쟁의 목적'이나 '계속 사용'의 의미에 대한 구체적인 설명을 요구하는 후속 질문을 추가하면 더욱 심도 있는 학습이 가능할 것입니다."
+      }
+    }
+  },
+  "queries": [
+    {
+      "llm": "gemini",
+      "strategy": "PAR",
+      "difficulty": "basic",
+      "question": "상표법 제57조의3에 따른 선사용자의 권리 인정 요건은 몇 가지입니까?",
+      "reasoning": "문서의 핵심 내용을 직접적으로 묻는 기본적인 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "PAR",
+      "difficulty": "intermediate",
+      "question": "선사용자가 권리를 인정받기 위해 부정경쟁의 목적이 없어야 한다는 것은 무슨 의미입니까?",
+      "reasoning": "요건 중 하나를 구체적으로 묻는 중간 수준의 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "PAR",
+      "difficulty": "advanced",
+      "question": "등록상표권자의 침해 주장이 있기 전에 상표 사용을 중단했다면 선사용자의 권리가 인정될 수 있습니까?",
+      "reasoning": "요건 간의 관계를 고려해야 하는 심화된 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gpt",
+      "strategy": "PAR",
+      "difficulty": "basic",
+      "question": "선사용자의 권리 인정 요건은 무엇인가요?",
+      "reasoning": "문서의 핵심 포인트를 간단히 묻는 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "KWR",
+      "difficulty": "basic",
+      "question": "상표등록출원 전부터 상표를 사용해야 한다는 요건에서 '전부터'의 의미는 무엇입니까?",
+      "reasoning": "'상표등록출원 전'이라는 키워드에 대한 기본적인 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "KWR",
+      "difficulty": "intermediate",
+      "question": "'동일·유사한 상표'를 사용했다는 것은 어떤 기준으로 판단합니까?",
+      "reasoning": "'동일·유사한 상표'라는 키워드를 활용하여 판단 기준을 묻는 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gpt",
+      "strategy": "PAR",
+      "difficulty": "intermediate",
+      "question": "선사용자 권리의 법적 기준을 설명해주세요.",
+      "reasoning": "법적 쟁점을 중심으로 한 심화된 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "KWR",
+      "difficulty": "advanced",
+      "question": "'계속되고 있었어야 한다'는 요건의 충족 여부를 판단하는 구체적인 기준은 무엇입니까?",
+      "reasoning": "'계속되고 있었어야 한다'는 키워드를 활용하여 지속성의 판단 기준을 묻는 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "CCE",
+      "difficulty": "basic",
+      "question": "A가 B의 상표등록출원 전에 동일한 상표를 사용했으나 등록은 하지 않았습니다. A는 선사용자의 권리를 주장할 수 있습니까?",
+      "reasoning": "선사용자가 권리를 주장할 수 있는 기본적인 상황을 제시하는 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "CCE",
+      "difficulty": "intermediate",
+      "question": "C는 D의 상표와 유사한 상표를 사용하며 D의 고객을 유인하려는 의도가 있었습니다. 선사용자의 권리를 주장할 수 있습니까?",
+      "reasoning": "부정경쟁의 목적이 있는 경우를 제시하는 중간 수준의 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gemini",
+      "strategy": "CCE",
+      "difficulty": "advanced",
+      "question": "E는 F의 상표등록출원 전에 상표를 사용했으나 F가 침해 주장을 하기 전에 사업을 일시 중단했습니다. E는 선사용자의 권리를 주장할 수 있습니까?",
+      "reasoning": "상표 사용의 계속성에 대한 복잡한 상황을 제시하는 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gpt",
+      "strategy": "PAR",
+      "difficulty": "advanced",
+      "question": "선사용자 권리와 관련된 최근 판례는 무엇인가요?",
+      "reasoning": "법적 쟁점의 실질적 적용을 묻는 고급 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.8,
+        "relevance": 0.7,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.8,
+        "educational_value": 0.7,
+        "overall_score": 0.78
+      },
+      "feedback": "생성된 질문은 법적인 용어와 개념이 정확하게 사용되어 있으며, 난이도도 고급 수준에 적합합니다. 그러나 문서에서 직접적으로 '최근 판례'에 대한 언급이 없기 때문에, 문서 내용과의 직접적인 연관성이 다소 부족합니다. 질문이 좀 더 명확하게 문서의 조건들을 반영하면서도 판례의 구체적인 사례를 묻는 방식으로 개선될 수 있습니다. 예를 들어, '선사용자 권리의 조건을 만족한 최근의 사례는 무엇인가요?'와 같이 구체적인 조건과 사례를 함께 묻는 질문이 더 적절할 수 있습니다. 또한 교육적 가치를 높이기 위해서는 판례를 통해 배울 수 있는 법적 교훈이나 적용 사례를 함께 제시하는 것이 좋습니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "KWR",
+      "difficulty": "basic",
+      "question": "상표법 제57조의3의 핵심은 무엇인가요?",
+      "reasoning": "주요 키워드를 기반으로 한 기본 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "claude",
+      "strategy": "PAR",
+      "difficulty": "basic",
+      "question": "상표법 제57조의3에 따른 선사용자의 권리가 인정되기 위한 세 가지 요건은 무엇인가요?",
+      "reasoning": "법조문의 기본적인 내용 이해를 확인하는 기초적인 질문입니다.",
+      "scores": {
+        "legal_accuracy": 1.0,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 1.0,
+        "clarity": 1.0,
+        "educational_value": 0.9,
+        "overall_score": 0.98
+      },
+      "feedback": "이 질문은 다음과 같은 장점들을 가지고 있습니다:\n\n1. 법조문의 핵심 요건을 정확하게 파악하도록 하는 질문입니다.\n2. 문서의 내용을 그대로 반영하고 있어 관련성이 매우 높습니다.\n3. Basic 난이도에 적합한 기초적인 이해도를 확인하는 질문입니다.\n4. 질문의 의도가 명확하고 이해하기 쉽습니다.\n\n개선을 위한 제안:\n\n1. 교육적 가치를 더욱 높이기 위해서는 각 요건의 실제 사례나 적용 상황을 추가로 질문하는 것을 고려해볼 수 있습니다.\n2. '부정경쟁의 목적'이나 '계속 사용'의 의미에 대한 구체적인 설명을 요구하는 후속 질문을 추가하면 더욱 심도 있는 학습이 가능할 것입니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "KWR",
+      "difficulty": "intermediate",
+      "question": "상표 등록 전 사용의 의미는 무엇인가요?",
+      "reasoning": "문서 내 구체적 키워드의 법적 의미를 묻는 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gpt",
+      "strategy": "KWR",
+      "difficulty": "advanced",
+      "question": "부정경쟁 목적의 판단 기준은 무엇인가요?",
+      "reasoning": "주요 키워드의 법적 해석을 심층적으로 묻는 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "claude",
+      "strategy": "PAR",
+      "difficulty": "intermediate",
+      "question": "선사용자의 권리 인정에서 '부정경쟁의 목적이 없는 사용'이란 구체적으로 어떤 의미인가요?",
+      "reasoning": "법적 개념에 대한 심층적 이해를 확인하는 중급 수준의 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.9,
+        "educational_value": 0.95,
+        "overall_score": 0.93
+      },
+      "feedback": "이 질문에 대한 세부 평가 의견은 다음과 같습니다:\n\n1. 법적 정확성: '부정경쟁의 목적' 이라는 핵심 법률 용어를 정확하게 사용했으며, 선사용권의 요건 중 중요한 부분을 다루고 있습니다.\n\n2. 의미 관련성: 주어진 법률 문서의 핵심 요건 중 하나를 직접적으로 다루고 있어 매우 높은 관련성을 보입니다.\n\n3. 난이도 적절성: 단순한 개념 이해를 넘어 구체적인 법적 해석을 요구하는 중급 수준의 질문으로 적절합니다.\n\n4. 질문 명확성: '구체적으로 어떤 의미인가'라는 표현을 통해 질문의 의도가 명확히 전달됩니다.\n\n5. 교육적 가치: 실무적으로도 중요한 개념을 다루고 있어 교육적 가치가 높습니다.\n\n개선을 위한 제안:\n- '부정경쟁의 목적'과 관련된 구체적인 사례나 판례를 언급하는 부가 질문을 추가하면 더욱 심도 있는 학습이 가능할 것입니다.\n- '상표법상' 이라는 문구를 추가하여 법적 맥락을 더 명확히 할 수 있습니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "CCE",
+      "difficulty": "basic",
+      "question": "선사용권이 인정되는 사례는 어떤 것이 있나요?",
+      "reasoning": "기본적인 사례를 통해 이해를 돕기 위한 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "gpt",
+      "strategy": "CCE",
+      "difficulty": "intermediate",
+      "question": "국내에서 유사 상표 사용의 사례를 설명해주세요.",
+      "reasoning": "실제 사례를 통해 법 적용을 이해하기 위한 중급 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "claude",
+      "strategy": "PAR",
+      "difficulty": "advanced",
+      "question": "선사용자의 권리와 등록상표권이 충돌할 경우, 어떤 법적 원칙에 따라 해결되어야 하나요?",
+      "reasoning": "법적 권리 간의 충돌 해결방안을 고민하게 하는 고급 수준의 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.8,
+        "educational_value": 0.9,
+        "overall_score": 0.86
+      },
+      "feedback": "이 질문에 대한 세부 평가와 개선점은 다음과 같습니다:\n\n1. 법적 정확성(0.9): 선사용자의 권리와 등록상표권의 법적 충돌이라는 개념을 정확하게 다루고 있습니다.\n\n2. 관련성(0.8): 주어진 법률 문서의 내용과 직접적으로 연관되어 있으나, 문서에서 명시적으로 다루지 않은 충돌 해결 원칙까지 확장하여 질문하고 있습니다.\n\n3. 난이도 적절성(0.9): 법적 권리 간의 충돌 해결이라는 고급 수준의 법률적 사고를 요구하는 질문으로 advanced 난이도에 적합합니다.\n\n4. 명확성(0.8): 질문의 의도는 명확하나, '어떤 법적 원칙'이라는 표현이 다소 광범위할 수 있습니다. '선사용권과 등록상표권의 구체적인 조정 기준은 무엇인가?'와 같이 더 구체화할 수 있습니다.\n\n5. 교육적 가치(0.9): 상표법의 핵심 원칙을 이해하고 실제 법적 문제 해결능력을 키울 수 있는 우수한 학습 가치를 지닙니다.\n\n개선을 위해서는 질문의 범위를 더 구체화하고, 주어진 법조문의 세 가지 요건과 연계하여 충돌 해결 원칙을 묻는 방향으로 수정하면 좋을 것 같습니다."
+    },
+    {
+      "llm": "gpt",
+      "strategy": "CCE",
+      "difficulty": "advanced",
+      "question": "상표권 침해 주장 후에도 인정된 선사용 사례는?",
+      "reasoning": "복잡한 사례를 통해 법적 적용을 심층적으로 이해하기 위한 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.7,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.6,
+        "educational_value": 0.7,
+        "overall_score": 0.74
+      },
+      "feedback": "생성된 질문은 상표법 제57조의3의 선사용자 권리에 대한 조건을 반영하려고 시도했으나, '상표권 침해 주장 후에도 인정된 선사용 사례는?'이라는 질문은 문서의 조건을 명확히 드러내지 않으며, 선사용자의 권리가 성립되지 않는 경우를 묻는 것처럼 보일 수 있습니다. 법적 정확성을 높이기 위해 '상표권 침해 주장 후에도 인정된 선사용자의 권리 조건은 무엇인가?'와 같이 조건을 직접적으로 묻는 형태로 개선할 수 있습니다. 난이도는 'advanced'로 설정된 것에 비해 질문이 비교적 명확하지 않아 학습자가 혼란스러울 수 있습니다. 법률 학습을 위한 질문의 교육적 가치를 높이기 위해 선사용자의 권리가 인정되기 위한 구체적인 사례나 조건을 묻도록 개선하는 것이 좋습니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "KWR",
+      "difficulty": "basic",
+      "question": "'동일·유사한 상표'의 판단 기준은 무엇인가요?",
+      "reasoning": "핵심 키워드에 대한 기본적인 이해를 확인하는 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 0.8,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.9,
+        "educational_value": 0.9,
+        "overall_score": 0.88
+      },
+      "feedback": "이 질문에 대한 세부적인 평가와 피드백은 다음과 같습니다:\n\n1. 법적 정확성(0.9): '동일·유사한 상표'는 상표법에서 매우 중요한 법적 개념으로, 이에 대한 판단 기준을 묻는 것은 적절합니다.\n\n2. 의미 관련성(0.8): 주어진 문서에서 '동일·유사한 상표'라는 용어가 언급되어 있지만, 판단 기준에 대한 직접적인 내용은 포함되어 있지 않습니다. 다만, 선사용권의 핵심 요소를 이해하는데 필수적인 개념이므로 관련성이 있습니다.\n\n3. 난이도 적절성(0.9): basic 난이도에 맞게 기본적인 개념에 대한 이해를 확인하는 질문입니다.\n\n4. 질문 명확성(0.9): 질문의 의도가 명확하게 전달됩니다.\n\n5. 교육적 가치(0.9): 상표법의 기본 개념을 이해하는데 매우 중요한 질문입니다.\n\n개선을 위한 제안:\n- 문서 내용에 더 직접적으로 연관된 질문으로 수정하거나\n- '선사용권 인정을 위한 동일·유사 상표 사용의 의미는 무엇인가요?'와 같이 문맥에 더 맞게 질문을 구체화할 수 있습니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "KWR",
+      "difficulty": "intermediate",
+      "question": "'사용의 계속성'이 중단된 경우, 선사용자의 권리는 어떻게 되나요?",
+      "reasoning": "주요 키워드의 법적 효과를 이해하는지 확인하는 중급 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.8,
+        "educational_value": 0.9,
+        "overall_score": 0.9
+      },
+      "feedback": "다음과 같은 장점과 개선점이 있습니다:\n\n장점:\n1. 문서의 핵심 요건 중 하나인 '사용의 계속성'에 초점을 맞춘 적절한 질문입니다.\n2. 법적 효과를 묻는 질문으로 실무적 중요성이 높습니다.\n3. 중급 수준의 난이도로 적절히 설정되었습니다.\n\n개선을 위한 제안:\n1. '사용의 계속성 중단'의 구체적인 상황이나 시점을 예시로 포함하면 더 명확할 것 같습니다.\n2. '선사용자의 권리'와 함께 '상표권 침해 주장에 대한 항변'이라는 맥락을 추가하면 좋겠습니다.\n3. 질문을 '사용의 계속성이 중단된 경우, 제57조의3에 따른 선사용자의 권리 주장이 가능한가요?'와 같이 더 구체적으로 표현하면 좋겠습니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "KWR",
+      "difficulty": "advanced",
+      "question": "상표권 침해 주장 시점과 선사용자 권리의 법적 관계를 설명해보세요.",
+      "reasoning": "여러 키워드 간의 관계를 종합적으로 이해하는지 확인하는 고급 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.5,
+        "relevance": 0.5,
+        "difficulty_appropriateness": 0.5,
+        "clarity": 0.5,
+        "educational_value": 0.5,
+        "overall_score": 0.5
+      },
+      "feedback": "평가 중 오류 발생"
+    },
+    {
+      "llm": "claude",
+      "strategy": "CCE",
+      "difficulty": "basic",
+      "question": "A가 상표등록 전부터 사용해온 상표를 B가 나중에 등록한 경우, A의 권리는 어떻게 보호받나요?",
+      "reasoning": "기본적인 사례를 통해 법적 개념의 이해를 확인하는 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.8,
+        "educational_value": 0.9,
+        "overall_score": 0.9
+      },
+      "feedback": "이 질문은 전반적으로 잘 구성되었으나, 다음과 같은 개선사항을 제안합니다:\n\n1. 법적 정확성: '선사용자의 권리'라는 법적 용어를 직접 사용하면 더 정확할 것입니다.\n\n2. 의미 관련성: 문서의 핵심 내용을 정확히 반영하고 있습니다.\n\n3. 난이도: basic 수준에 적합하나, 부정경쟁 목적 없는 사용이라는 요건도 언급하면 좋겠습니다.\n\n4. 명확성: '보호받나요'라는 표현보다 '어떤 권리가 인정되나요'가 더 구체적일 것입니다.\n\n5. 교육적 가치: 실제 사례와 유사한 상황을 제시하여 학습 효과가 높습니다.\n\n개선된 질문 제안:\n'A가 부정경쟁의 목적 없이 상표를 사용하던 중 B가 같은 상표를 나중에 등록한 경우, 선사용자 A의 권리는 어떻게 인정되나요?'"
+    },
+    {
+      "llm": "claude",
+      "strategy": "CCE",
+      "difficulty": "intermediate",
+      "question": "C사가 D사의 상표와 유사한 디자인을 10년간 사용해왔다면, 선사용권을 주장할 수 있나요?",
+      "reasoning": "구체적 사례에서 법적 요건의 적용을 확인하는 중급 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.7,
+        "relevance": 0.9,
+        "difficulty_appropriateness": 0.8,
+        "clarity": 0.6,
+        "educational_value": 0.8,
+        "overall_score": 0.76
+      },
+      "feedback": "1. 법적 정확성: 선사용권의 세 가지 요건 중 '사용 기간'만 언급되어 있어, 부정경쟁 목적 여부와 계속 사용 여부가 누락되었습니다.\n\n2. 의미 관련성: 문서의 핵심 내용인 선사용권 요건과 직접적으로 연관된 사례를 다루고 있습니다.\n\n3. 난이도: 실제 사례를 통한 법적 요건 적용을 요구하는 중급 수준의 질문으로 적절합니다.\n\n4. 명확성: '유사한 디자인'이라는 표현보다는 '유사한 상표'라는 용어를 사용하는 것이 더 정확할 것이며, 부정경쟁 목적 유무에 대한 정보도 포함되면 좋겠습니다.\n\n5. 개선 제안: '10년간 부정경쟁의 목적 없이 사용해왔고, 현재까지도 계속 사용 중인 C사가 D사의 상표와 유사한 상표를 사용하고 있다면, 선사용권을 주장할 수 있나요?'와 같이 수정하면 더 완성도 높은 질문이 될 것입니다."
+    },
+    {
+      "llm": "claude",
+      "strategy": "CCE",
+      "difficulty": "advanced",
+      "question": "E사가 F사의 상표등록 전부터 사용했으나 중간에 사용이 일시 중단된 경우의 법적 효과는?",
+      "reasoning": "복잡한 사례에서 법적 판단 능력을 확인하는 고급 질문입니다.",
+      "scores": {
+        "legal_accuracy": 0.9,
+        "relevance": 1.0,
+        "difficulty_appropriateness": 0.9,
+        "clarity": 0.8,
+        "educational_value": 0.9,
+        "overall_score": 0.9
+      },
+      "feedback": "이 질문은 전반적으로 우수하며, 다음과 같은 특징이 있습니다:\n\n1. 법적 정확성: 상표법 제57조의3의 핵심 요건 중 '계속 사용' 요건을 정확하게 다루고 있습니다.\n\n2. 의미 관련성: 제시된 법률 문서의 세 번째 요건을 직접적으로 검증하는 사례를 다루고 있습니다.\n\n3. 난이도: Advanced 수준에 적합한 복잡성을 가지고 있습니다.\n\n개선을 위한 제안:\n\n1. 질문의 명확성을 높이기 위해 '일시 중단'의 구체적인 기간이나 상황을 명시하면 좋을 것 같습니다.\n\n2. E사와 F사의 구체적인 상황 설정(예: 업종, 상표 유사성 정도)을 추가하면 더욱 실제적인 사례가 될 것 같습니다.\n\n3. '법적 효과'의 범위를 더 구체적으로 한정하면 좋을 것 같습니다."
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "metadata": {
+    "timestamp": "20250330_223704",
+    "total_queries": 6,
+    "llms_used": [
+      "gemini",
+      "claude"
+    ],
+    "categories": [
+      "형사"
+    ]
+  },
+  "quality_statistics": {
+    "overall": {
+      "high_quality": 1,
+      "medium_quality": 0,
+      "low_quality": 5
+    },
+    "by_llm": {
+      "gemini": {
+        "high_quality": 0,
+        "medium_quality": 0,
+        "low_quality": 3
+      },
+      "claude": {
+        "high_quality": 1,
+        "medium_quality": 0,
+        "low_quality": 2
+      }
+    }
+  },
+  "performance_metrics": {
+    "overall": {
+      "semantic_similarity": 0.5166666666666666,
+      "grammatical_accuracy": 0.75,
+      "clarity": 0.7000000000000001
+    },
+    "by_llm": {
+      "gemini": {
+        "average_scores": {
+          "semantic_similarity": 0.5,
+          "grammatical_accuracy": 0.5,
+          "clarity": 0.5
+        },
+        "score_distribution": {
+          "semantic_similarity": {
+            "count": 3.0,
+            "mean": 0.5,
+            "std": 0.0,
+            "min": 0.5,
+            "25%": 0.5,
+            "50%": 0.5,
+            "75%": 0.5,
+            "max": 0.5
+          },
+          "grammatical_accuracy": {
+            "count": 3.0,
+            "mean": 0.5,
+            "std": 0.0,
+            "min": 0.5,
+            "25%": 0.5,
+            "50%": 0.5,
+            "75%": 0.5,
+            "max": 0.5
+          },
+          "clarity": {
+            "count": 3.0,
+            "mean": 0.5,
+            "std": 0.0,
+            "min": 0.5,
+            "25%": 0.5,
+            "50%": 0.5,
+            "75%": 0.5,
+            "max": 0.5
+          }
+        }
+      },
+      "claude": {
+        "average_scores": {
+          "semantic_similarity": 0.5333333333333333,
+          "grammatical_accuracy": 1.0,
+          "clarity": 0.9
+        },
+        "score_distribution": {
+          "semantic_similarity": {
+            "count": 3.0,
+            "mean": 0.5333333333333333,
+            "std": 0.3214550253664319,
+            "min": 0.3,
+            "25%": 0.35,
+            "50%": 0.4,
+            "75%": 0.65,
+            "max": 0.9
+          },
+          "grammatical_accuracy": {
+            "count": 3.0,
+            "mean": 1.0,
+            "std": 0.0,
+            "min": 1.0,
+            "25%": 1.0,
+            "50%": 1.0,
+            "75%": 1.0,
+            "max": 1.0
+          },
+          "clarity": {
+            "count": 3.0,
+            "mean": 0.9,
+            "std": 0.09999999999999998,
+            "min": 0.8,
+            "25%": 0.8500000000000001,
+            "50%": 0.9,
+            "75%": 0.95,
+            "max": 1.0
+          }
+        }
+      }
+    }
+  },
+  "generated_queries": [
+    {
+      "llm": "gemini",
+      "category": "형사",
+      "original_query": "질문: \"피고인이 주장한 선사용자로서의 권리가 인정되기 위해 충족해야 할 요건은 무엇이며, 이러한 요건 각각의 법적 의미는 무엇인가?\" \n\n이 질문은 피고인이 주장한 선사용자로서의 권리를 인정받기 위해 필요한 요건들을 구체적으로 분석하고, 각 요건이 법적으로 어떤 의미를 가지는지를 설명하도록 요구합니다. 이를 통해 상표법의 적용 및 해석에 대한 깊이 있는 이해를 도모할 수 있습니다.",
+      "generated_query": "상표법 제57조의3에 따른 선사용자의 상표 사용 권리가 인정되기 위한 세 가지 핵심 요건은 무엇이며, 이 사건에서 피고인은 왜 해당 요건들을 충족하지 못하여 상표권 침해로 인정되었는가?",
+      "quality_scores": {
+        "semantic_similarity": 0.5,
+        "grammatical_accuracy": 0.5,
+        "clarity": 0.5
+      }
+    },
+    {
+      "llm": "claude",
+      "category": "형사",
+      "original_query": "질문: \"피고인이 주장한 선사용자로서의 권리가 인정되기 위해 충족해야 할 요건은 무엇이며, 이러한 요건 각각의 법적 의미는 무엇인가?\" \n\n이 질문은 피고인이 주장한 선사용자로서의 권리를 인정받기 위해 필요한 요건들을 구체적으로 분석하고, 각 요건이 법적으로 어떤 의미를 가지는지를 설명하도록 요구합니다. 이를 통해 상표법의 적용 및 해석에 대한 깊이 있는 이해를 도모할 수 있습니다.",
+      "generated_query": "상표법상 선사용자의 권리를 인정받기 위해서는 어떤 요건들을 충족해야 하는가?",
+      "quality_scores": {
+        "semantic_similarity": 0.9,
+        "grammatical_accuracy": 1.0,
+        "clarity": 0.9
+      }
+    },
+    {
+      "llm": "gemini",
+      "category": "형사",
+      "original_query": "질문: \"피고인이 주장한 선사용자로서의 권리가 인정되기 위해 충족해야 할 요건은 무엇이며, 이러한 요건 각각의 법적 의미는 무엇인가?\" \n\n이 질문은 피고인이 주장한 선사용자로서의 권리를 인정받기 위해 필요한 요건들을 구체적으로 분석하고, 각 요건이 법적으로 어떤 의미를 가지는지를 설명하도록 요구합니다. 이를 통해 상표법의 적용 및 해석에 대한 깊이 있는 이해를 도모할 수 있습니다.",
+      "generated_query": "피고인이 '수협' 명칭을 사용하여 대부업 광고 및 영업을 한 행위가 상표법 및 부정경쟁방지법 위반으로 판단된 근거는 무엇이며, 특히 일반인에게 혼동을 초래했다는 점이 어떻게 입증되었는가?",
+      "quality_scores": {
+        "semantic_similarity": 0.5,
+        "grammatical_accuracy": 0.5,
+        "clarity": 0.5
+      }
+    },
+    {
+      "llm": "gemini",
+      "category": "형사",
+      "original_query": "질문: \"피고인이 주장한 선사용자로서의 권리가 인정되기 위해 충족해야 할 요건은 무엇이며, 이러한 요건 각각의 법적 의미는 무엇인가?\" \n\n이 질문은 피고인이 주장한 선사용자로서의 권리를 인정받기 위해 필요한 요건들을 구체적으로 분석하고, 각 요건이 법적으로 어떤 의미를 가지는지를 설명하도록 요구합니다. 이를 통해 상표법의 적용 및 해석에 대한 깊이 있는 이해를 도모할 수 있습니다.",
+      "generated_query": "상표법 및 부정경쟁방지법에 따른 선사용자의 권리 주장이 인정되지 않을 경우, 어떠한 법적 책임을 지게 되며, 본 사건에서 피고인은 구체적으로 어떤 조항 위반으로 처벌받게 되는가?",
+      "quality_scores": {
+        "semantic_similarity": 0.5,
+        "grammatical_accuracy": 0.5,
+        "clarity": 0.5
+      }
+    },
+    {
+      "llm": "claude",
+      "category": "형사",
+      "original_query": "질문: \"피고인이 주장한 선사용자로서의 권리가 인정되기 위해 충족해야 할 요건은 무엇이며, 이러한 요건 각각의 법적 의미는 무엇인가?\" \n\n이 질문은 피고인이 주장한 선사용자로서의 권리를 인정받기 위해 필요한 요건들을 구체적으로 분석하고, 각 요건이 법적으로 어떤 의미를 가지는지를 설명하도록 요구합니다. 이를 통해 상표법의 적용 및 해석에 대한 깊이 있는 이해를 도모할 수 있습니다.",
+      "generated_query": "피고인이 '수협' 명칭을 사용한 대부업 광고 및 영업 행위가 상표권 침해에 해당하는 이유는 무엇인가?",
+      "quality_scores": {
+        "semantic_similarity": 0.3,
+        "grammatical_accuracy": 1.0,
+        "clarity": 1.0
+      }
+    },
+    {
+      "llm": "claude",
+      "category": "형사",
+      "original_query": "질문: \"피고인이 주장한 선사용자로서의 권리가 인정되기 위해 충족해야 할 요건은 무엇이며, 이러한 요건 각각의 법적 의미는 무엇인가?\" \n\n이 질문은 피고인이 주장한 선사용자로서의 권리를 인정받기 위해 필요한 요건들을 구체적으로 분석하고, 각 요건이 법적으로 어떤 의미를 가지는지를 설명하도록 요구합니다. 이를 통해 상표법의 적용 및 해석에 대한 깊이 있는 이해를 도모할 수 있습니다.",
+      "generated_query": "상표법과 부정경쟁방지법에 따라 피고인의 행위가 어떤 법적 책임을 지게 되는지 설명해 보시오.",
+      "quality_scores": {
+        "semantic_similarity": 0.4,
+        "grammatical_accuracy": 1.0,
+        "clarity": 0.8
+      }
+    }
+  ]
+}

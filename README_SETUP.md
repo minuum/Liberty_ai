@@ -1,3 +1,4 @@
+
 # Liberty_ai 설치 및 설정 가이드
 
 ## 🚀 소개
@@ -18,6 +19,7 @@ Liberty_ai/
 │   ├── database_manager.py # 데이터베이스 관리
 │   ├── chat_manager.py     # 채팅 세션 관리
 │   └── ui_manager.py       # UI 관리
+├── data/                   # 법률 데이터셋 저장 디렉토리 (AI Hub 데이터셋 위치)
 ├── pyproject.toml          # Poetry 의존성 정의
 ├── requirements.txt        # pip 의존성 목록
 ├── Dockerfile              # 도커 이미지 설정
@@ -105,6 +107,33 @@ mkdir -p cache
 mkdir -p chat_logs
 ```
 
+### 3. AI Hub 데이터셋 설정
+
+프로젝트에서는 [AI Hub의 생성형AI 법률/규정 텍스트 분석 데이터(고도화)](https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=&topMenu=&aihubDataSe=data&dataSetSn=71723)를 사용합니다.
+
+#### 데이터셋 다운로드 및 설치 방법
+
+1. AI Hub 계정으로 로그인
+2. 위 링크에서 데이터셋 다운로드 신청 및 승인 받기
+3. 데이터셋을 다운로드 받은 후 **반드시 프로젝트 루트의 `data` 디렉토리 안에 저장**해야 합니다:
+
+```bash
+# 데이터 디렉토리 생성
+mkdir -p Liberty_ai/data
+
+# 다운로드 받은 AI Hub 데이터셋을 data 디렉토리로 이동
+# 예시:
+mv ~/Downloads/생성형AI_법률규정_텍스트_분석_데이터_고도화_상황에_따른_판례_데이터/* Liberty_ai/data/
+```
+
+#### 데이터셋 특징
+- 60,000건 이상의 판례 데이터를 라벨링한 학습용 데이터
+- 카테고리별 2,000건 이상의 고른 분포
+- 판례의 주요 내용 추출요약, 질의응답 셋, 용어 정보(키워드) 라벨링
+- 판결 요약, 판결 예측 등 자연어 이해 및 생성 성능 향상을 위한 학습 데이터
+
+> **중요**: 이 데이터셋은 반드시 `Liberty_ai` 루트 디렉토리 아래의 `data` 폴더에 저장해야 시스템이 올바르게 작동합니다. 기본 설정은 이 경로를 참조합니다.
+
 ## 🚀 애플리케이션 실행
 
 ### 로컬 실행
@@ -163,6 +192,8 @@ python -c "from liberty_agent.legal_agent import LegalAgent; agent = LegalAgent(
 
 3. **첫 실행 시간**: 첫 실행 시 캐시 생성에 시간이 걸릴 수 있습니다.
 
+4. **데이터셋 용량**: AI Hub 법률 데이터셋은 용량이 큰 편이므로 충분한 디스크 공간이 필요합니다.
+
 ## 🛠️ 트러블슈팅
 
 ### 일반적인 문제 해결
@@ -175,6 +206,8 @@ python -c "from liberty_agent.legal_agent import LegalAgent; agent = LegalAgent(
 
 4. **Pinecone 오류**: Pinecone 인덱스 이름과 API 키가 올바른지 확인하고 인덱스 상태를 확인하세요.
 
+5. **데이터셋 경로 오류**: AI Hub 데이터셋이 반드시 `Liberty_ai/data/` 디렉토리에 있는지 확인하세요.
+
 ## 📞 지원
 
-문제가 발생하면 이슈를 생성하거나 Pull Request를 제출해주세요. 
+문제가 발생하면 이슈를 생성하거나 Pull Request를 제출해주세요.

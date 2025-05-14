@@ -3185,6 +3185,33 @@ files = [
 ]
 
 [[package]]
+name = "keybert"
+version = "0.9.0"
+description = "KeyBERT performs keyword extraction with state-of-the-art transformer models."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "keybert-0.9.0-py3-none-any.whl", hash = "sha256:afa2f300a72f69d279e4482bc85d8b34493b119876dc0818cb4f260466285b36"},
+    {file = "keybert-0.9.0.tar.gz", hash = "sha256:eec8ebd37d3d9fa238d7075e727adb993de4f3ed67c94112840e4cc0e55d7657"},
+]
+
+[package.dependencies]
+numpy = ">=1.18.5"
+rich = ">=10.4.0"
+scikit-learn = ">=0.22.2"
+sentence-transformers = ">=0.3.8"
+
+[package.extras]
+dev = ["keybert[docs,test]"]
+docs = ["mkdocs (>=1.1)", "mkdocs-material (>=4.6.3)", "mkdocstrings (>=0.8.0)"]
+flair = ["flair (>=0.7)", "torch (>=1.4.0)", "transformers (>=3.5.1)"]
+gensim = ["gensim (>=3.6.0)"]
+spacy = ["spacy (>=3.0.1)"]
+test = ["black (>=19.3b0)", "flake8 (>=3.6.0)", "pre-commit (>=2.2.0)", "pytest (>=5.4.3)", "pytest-cov (>=2.6.1)"]
+tgi = ["huggingface-hub (>=0.23.3)", "pydantic (>=2.7.4)"]
+use = ["tensorflow", "tensorflow_hub", "tensorflow_text"]
+
+[[package]]
 name = "kiwipiepy"
 version = "0.17.1"
 description = "Kiwi, the Korean Tokenizer for Python"
@@ -10282,4 +10309,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11.10,<3.12"
-content-hash = "c87cdd42ccc7f37907b72cd9fcbfa811c85cf62fe816863ea94ecc499adf9c9f"
+content-hash = "ce58a40721033152e4847501b94c3a68ec5cfdfea4e1a33bc9b5a07ddd196fcb"

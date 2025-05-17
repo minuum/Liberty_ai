@@ -1,13 +1,22 @@
 import logging
 from typing import List, Tuple
+from pathlib import Path
 import numpy as np
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
 from langchain_upstage import UpstageEmbeddings
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_PROMPTS_ROOT_DIR = Path(__file__).parent / "prompts"
+
+# 기본 프롬프트 내용 정의 (파일 로드 실패 시 또는 internal 모드 시 사용)
+DEFAULT_INTERNAL_PROMPTS = {
+    "rag_answer_system": "당신은 법률 전문가입니다. 주어진 컨텍스트를 바탕으로 사용자의 질문에 정확하고 간결하게 답변해주세요. 컨텍스트에 없는 내용은 언급하지 마세요.",
+    "rag_answer_human": "컨텍스트:\n{context}\n\n질문: {query}\n\n답변:"
+}
 
 class SimpleRAGSystem:
     def __init__(self, 
@@ -15,14 +24,23 @@ class SimpleRAGSystem:
                  embedding_model: UpstageEmbeddings,
                  llm_model_name: str = "gpt-4o-2024-08-06",
                  llm_temperature: float = 0.1,
-                 llm_api_key: str = None):
+                 llm_api_key: str = None,
+                 prompt_mode: str = "internal", # "internal", "koo", "harin", "minu"
+                 prompts_root_dir: Path = DEFAULT_PROMPTS_ROOT_DIR
+                ):
         self.llm = ChatOpenAI(
             model_name=llm_model_name, 
             temperature=llm_temperature,
             api_key=llm_api_key
         )
         self.dense_embedder = embedding_model
+        self.prompt_mode = prompt_mode
         
+        if self.prompt_mode in ["koo", "harin", "minu"]:
+            self.prompts_dir = prompts_root_dir / self.prompt_mode
+        else: # internal 또는 기타
+             self.prompts_dir = prompts_root_dir # 사용 안함, 내부 프롬프트로 대체
+
         try:
             logger.info(f"FAISS 벡터 저장소 로드 중... ({faiss_cache_dir})")
             self.vectorstore = FAISS.load_local(
@@ -35,6 +53,22 @@ class SimpleRAGSystem:
             logger.error(f"FAISS 벡터 저장소 로드 중 오류 발생: {e}")
             self.vectorstore = None
             raise
+
+    def _load_prompt_content(self, file_key: str) -> str:
+        """지정된 키에 해당하는 프롬프트 내용을 로드합니다."""
+        if self.prompt_mode in ["koo", "harin", "minu"]:
+            prompt_file_path = self.prompts_dir / f"{file_key}.txt"
+            try:
+                content = prompt_file_path.read_text(encoding="utf-8")
+                logger.info(f"외부 프롬프트 로드 성공 (멤버: {self.prompt_mode}): {prompt_file_path}")
+                return content
+            except FileNotFoundError:
+                logger.warning(f"외부 프롬프트 파일 없음 (멤버: {self.prompt_mode}): {prompt_file_path}. 내부 기본값 사용 시도.")
+            except Exception as e:
+                logger.error(f"외부 프롬프트 로드 중 오류 (멤버: {self.prompt_mode}, {prompt_file_path}): {e}. 내부 기본값 사용 시도.")
+        
+        logger.debug(f"내부 기본 프롬프트 사용: key='{file_key}'")
+        return DEFAULT_INTERNAL_PROMPTS.get(file_key, "")
 
     def retrieve(self, query: str, top_k: int = 3) -> Tuple[List[Document], List[float]]:
         """FAISS 벡터 저장소를 사용하여 유사한 문서를 검색하고 L2 거리를 반환합니다."""
@@ -64,9 +98,12 @@ class SimpleRAGSystem:
 
         context_str = "\n\n".join([doc.page_content for doc in retrieved_docs])
         
+        system_content = self._load_prompt_content("rag_answer_system")
+        human_template = self._load_prompt_content("rag_answer_human")
+
         prompt_template = ChatPromptTemplate.from_messages([
-            ("system", "당신은 법률 전문가입니다. 주어진 컨텍스트를 바탕으로 사용자의 질문에 정확하고 간결하게 답변해주세요. 컨텍스트에 없는 내용은 언급하지 마세요."),
-            ("human", "컨텍스트:\n{context}\n\n질문: {query}\n\n답변:")
+            SystemMessagePromptTemplate.from_template(system_content),
+            HumanMessagePromptTemplate.from_template(human_template)
         ])
         
         chain = prompt_template | self.llm

@@ -1,0 +1,70 @@
+[
+    {
+        "query_id":"test_1",
+        "gt_query":"계약 해지 시 위약금은 어떻게 처리되나요?",
+        "gt_answer":"긍정",
+        "transformed_query":"계약 해지 시 위약금 규정은 어떻게 적용되는가?",
+        "transformed_query_difficulty":"중급",
+        "transformed_query_strategy":"법리 해석",
+        "policy_level":2,
+        "original_category":"민사",
+        "generated_answer_standard_rag":"주어진 정보만으로는 판단하기 어렵습니다. 문서 1과 문서 2의 구체적인 법률 조항과 판례 내용이 제공되지 않았기 때문에, 계약 해지 시 위약금 규정의 적용에 대한 구체적인 설명을 제공할 수 없습니다. 일반적으로 위약금 규정은 계약의 특정 조항에 따라 다르게 적용될 수 있으며, 관련 법률과 판례에 따라 해석됩니다. 계약서에 명시된 위약금 조항과 관련 법률의 해석이 중요합니다.",
+        "retrieved_contexts":[
+            {
+                "page_content":"이는 '계약 해지 시 위약금 규정은 어떻게 적용되는가?'와 관련된 법률 문서 내용 1입니다. 실제 법률 조항과 판례 내용이 여기에 포함됩니다.",
+                "metadata":{
+                    "source":"legal_doc_1.txt",
+                    "category":"민사"
+                },
+                "distance":0.1
+            },
+            {
+                "page_content":"이는 '계약 해지 시 위약금 규정은 어떻게 적용되는가?'와 관련된 법률 문서 내용 2입니다. 실제 법률 조항과 판례 내용이 여기에 포함됩니다.",
+                "metadata":{
+                    "source":"legal_doc_2.txt",
+                    "category":"민사"
+                },
+                "distance":0.2
+            }
+        ],
+        "experiment_method":"Enhanced Standard RAG",
+        "model_name":"gpt-4o-2024-08-06",
+        "temperature":0.1,
+        "top_k":2,
+        "correct_standard_rag":false
+    },
+    {
+        "query_id":"test_2",
+        "gt_query":"임금 체불 시 대응 방법은?",
+        "gt_answer":"부정",
+        "transformed_query":"임금 체불 발생 시 근로자의 권리 구제 방법은?",
+        "transformed_query_difficulty":"기초",
+        "transformed_query_strategy":"절차질문",
+        "policy_level":1,
+        "original_category":"근로자",
+        "generated_answer_standard_rag":"주어진 정보만으로는 판단하기 어렵습니다. 임금 체불 발생 시 근로자의 권리 구제 방법에 대한 구체적인 법률 조항이나 판례 내용이 포함된 문서가 제공되지 않았기 때문입니다. 일반적으로 임금 체불이 발생한 경우, 근로자는 노동청에 진정을 제기하거나 민사 소송을 통해 임금 청구를 할 수 있으며, 경우에 따라 형사 고소도 고려할 수 있습니다. 그러나 구체적인 절차나 방법은 관련 법률 문서의 내용을 참조해야 합니다.",
+        "retrieved_contexts":[
+            {
+                "page_content":"이는 '임금 체불 발생 시 근로자의 권리 구제 방법은?'와 관련된 법률 문서 내용 1입니다. 실제 법률 조항과 판례 내용이 여기에 포함됩니다.",
+                "metadata":{
+                    "source":"legal_doc_1.txt",
+                    "category":"민사"
+                },
+                "distance":0.1
+            },
+            {
+                "page_content":"이는 '임금 체불 발생 시 근로자의 권리 구제 방법은?'와 관련된 법률 문서 내용 2입니다. 실제 법률 조항과 판례 내용이 여기에 포함됩니다.",
+                "metadata":{
+                    "source":"legal_doc_2.txt",
+                    "category":"민사"
+                },
+                "distance":0.2
+            }
+        ],
+        "experiment_method":"Enhanced Standard RAG",
+        "model_name":"gpt-4o-2024-08-06",
+        "temperature":0.1,
+        "top_k":2,
+        "correct_standard_rag":false
+    }
+]

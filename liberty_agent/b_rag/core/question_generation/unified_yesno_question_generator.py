@@ -11,12 +11,27 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
-from core.schemas.yesno_question_schemas import (
-    TenLevelYesNoQuestions, 
-    LevelQuestion, 
-    YesNoAnswer,
-    SAMPLE_TARGET_AUDIENCES
-)
+try:
+    from liberty_agent.b_rag.core.schemas.yesno_question_schemas import (
+        TenLevelYesNoQuestions, 
+        LevelQuestion, 
+        YesNoAnswer,
+        SAMPLE_TARGET_AUDIENCES
+    )
+except ImportError:
+    from core.schemas.yesno_question_schemas import (
+        TenLevelYesNoQuestions, 
+        LevelQuestion, 
+        YesNoAnswer,
+        SAMPLE_TARGET_AUDIENCES
+    )
+except ImportError:
+    from core.schemas.yesno_question_schemas import (
+        TenLevelYesNoQuestions, 
+        LevelQuestion, 
+        YesNoAnswer,
+        SAMPLE_TARGET_AUDIENCES
+    )
 
 # 환경 변수 로드
 load_dotenv()
@@ -58,43 +73,8 @@ class UnifiedYesNoQuestionGenerator:
     
     def _load_unified_prompt(self) -> ChatPromptTemplate:
         """통합 프롬프트 로드"""
-        try:
-            # 개선된 프롬프트 파일 우선 시도
-            prompt_path = Path(__file__).parent / "prompts" / "minu" / "unified_yesno_question_generator_v2.txt"
-            
-            if not prompt_path.exists():
-                # 기존 프롬프트 파일 사용
-                prompt_path = Path(__file__).parent / "prompts" / "minu" / "unified_yesno_question_generator.txt"
-            
-            with open(prompt_path, 'r', encoding='utf-8') as f:
-                system_prompt = f.read()
-                
-            print(f"✅ 프롬프트 로드 완료: {prompt_path.name}")
-            
-            # Few-shot 예시 추가
-            few_shot_examples = self._get_few_shot_examples()
-            
-            full_system_prompt = f"{system_prompt}\n\n{few_shot_examples}"
-            
-            prompt = ChatPromptTemplate.from_messages([
-                ("system", full_system_prompt),
-                ("human", """
-                GT 질문: {gt_question}
-                
-                판결문 내용:
-                {document_content}
-                
-                참고 키워드: {keywords_to_consider}
-                
-                위 정보를 바탕으로 GT 질문과 의미론적으로 동일한 10개 레벨의 Yes/No 질문을 생성해주세요.
-                """)
-            ])
-            
-            return prompt
-            
-        except FileNotFoundError:
-            print("⚠️ 통합 프롬프트 파일을 찾을 수 없습니다. 기본 프롬프트를 사용합니다.")
-            return self._create_default_prompt()
+        print("🔧 개선된 기본 프롬프트를 사용합니다.")
+        return self._create_enhanced_prompt()
     
     def _get_few_shot_examples(self) -> str:
         """Few-shot 예시 생성"""
@@ -110,6 +90,78 @@ GT 질문: "동업자가 채권의 준점유자에 해당하지 아니 한다고
 
 모든 질문의 예상 답변은 동일해야 하며, 각 레벨에 맞는 언어 수준으로 표현되어야 합니다.
 """
+    
+    def _create_enhanced_prompt(self) -> ChatPromptTemplate:
+        """개선된 프롬프트 생성 (논문 아이디어 통합)"""
+        system_prompt = """당신은 법률 질문 생성 전문가입니다. 주어진 GT 질문과 판결문을 바탕으로 의미론적으로 관련되면서도 다양한 관점의 10개 레벨 Yes/No 질문을 생성해야 합니다.
+
+## 핵심 원칙 (FIT-RAG 기반 이중 평가)
+
+1. **의미적 관련성**: GT 질문과 관련된 다양한 법적 관점을 포함
+2. **균형잡힌 분배**: Yes/No 답변이 고르게 분포되도록 조정 (4-6개 Yes, 4-6개 No)
+3. **이중 평가 기준**:
+   - **사실 정보**: 판결문에 명확한 근거가 있는가?
+   - **법적 유용성**: 법률 학습/실무에 도움이 되는가?
+4. **적응적 난이도**: 레벨별 특성화된 언어 수준
+
+## 질문 생성 전략 (SummRAG 논리적 단계)
+
+### 단계 1: 판결문 핵심 요소 분석
+- 주요 법적 쟁점 3-5개 추출
+- 각 쟁점별 Yes/No 가능성 평가
+- 다양한 관점(원고/피고/법원) 고려
+
+### 단계 2: 답변 분배 계획
+- Yes 답변 질문: 5개 (레벨 1,3,5,7,9)
+- No 답변 질문: 5개 (레벨 2,4,6,8,10)
+- 각 질문은 서로 다른 법적 관점 반영
+
+### 단계 3: 레벨별 질문 생성
+
+**Level 1-2 (전문가 수준)**
+- 법조문 정확한 인용, 판례 번호 포함
+- 복잡한 법리 해석, 예외 조항 고려
+
+**Level 3-4 (고급 수준)**
+- 법률 용어 + 간단한 설명
+- 법리적 논리 구조 포함
+
+**Level 5-6 (중급 수준)**
+- 법률 용어와 일반 용어 혼합
+- 실무적 관점 포함
+
+**Level 7-8 (초급 수준)**
+- 일상 언어 중심, 핵심 개념만
+- 구체적 상황 설명
+
+**Level 9-10 (기초 수준)**
+- 매우 간단한 표현
+- 일상적 상황으로 변환
+
+## 품질 검증 체크리스트
+
+1. Yes/No 답변이 4-6개씩 분배되었는가?
+2. 모든 질문이 판결문에 근거를 가지는가?
+3. 각 질문이 법률 학습에 도움이 되는가?
+4. 다양한 법적 관점이 포함되었는가?
+5. 레벨별 난이도가 적절히 조정되었는가?
+
+반드시 JSON 형식으로 응답하세요."""
+        
+        human_prompt = """GT 질문: {gt_question}
+
+판결문 내용:
+{document_content}
+
+참고 키워드: {keywords_to_consider}
+
+위 정보를 바탕으로 GT 질문과 관련된 10개 레벨의 Yes/No 질문을 JSON 형식으로 생성해주세요.
+균형잡힌 Yes/No 분배(4-6개씩)를 반드시 달성하세요."""
+        
+        return ChatPromptTemplate.from_messages([
+            ("system", system_prompt),
+            ("human", human_prompt)
+        ])
     
     def _create_default_prompt(self) -> ChatPromptTemplate:
         """기본 프롬프트 생성"""
@@ -215,11 +267,16 @@ GT 질문: {gt_question}
                     print(f"❌ Level {question.level} 질문이 Yes/No 형식이 아닙니다: {question.question}")
                     return False
             
-            # 의미론적 일관성 검증 (간단한 키워드 기반)
-            consistency_rate = result.get_consistency_rate()
-            if consistency_rate < 0.8:  # 80% 이상 일관성 요구
-                print(f"❌ 답변 일관성이 낮습니다: {consistency_rate:.2%}")
-                return False
+            # 균형잡힌 분배 검증 (Yes/No 비율 확인)
+            yes_count = sum(1 for q in result.questions if q.expected_answer.value == 'Yes')
+            no_count = sum(1 for q in result.questions if q.expected_answer.value == 'No')
+            
+            # 균형도 계산 (0.4 이상이면 허용 - 4:6 비율까지 허용)
+            if max(yes_count, no_count) > 0:
+                balance_ratio = min(yes_count, no_count) / max(yes_count, no_count)
+                if balance_ratio < 0.4:  # 40% 미만이면 너무 불균형
+                    print(f"❌ 답변 분배가 불균형합니다: Yes {yes_count}개, No {no_count}개 (균형도: {balance_ratio:.2f})")
+                    return False
             
             return True
             
@@ -245,7 +302,10 @@ GT 질문: {gt_question}
             data = json.loads(json_str)
             
             # TenLevelYesNoQuestions 객체 생성
-            from core.schemas.yesno_question_schemas import GenerationMetadata
+            try:
+                from liberty_agent.b_rag.core.schemas.yesno_question_schemas import GenerationMetadata
+            except ImportError:
+                from core.schemas.yesno_question_schemas import GenerationMetadata
             
             questions = []
             for q_data in data.get("questions", []):
@@ -327,40 +387,57 @@ GT 질문: {gt_question}
         gt_question: str, 
         document_content: str
     ) -> TenLevelYesNoQuestions:
-        """Fallback 질문 생성"""
-        print("🔧 Fallback 질문 생성 중...")
-        
-        # 기본 Yes/No 질문 템플릿
-        base_question = f"{gt_question}에 대한 답변이 긍정적인가요?"
+        """개선된 Fallback 질문 생성 - 균형잡힌 Yes/No 분배"""
+        print("🔧 개선된 Fallback 질문 생성 중...")
         
         fallback_questions = []
+        
+        # GT 질문에서 핵심 키워드 추출
+        gt_lower = gt_question.lower()
+        is_negative_question = any(neg in gt_lower for neg in ["아니", "않", "없", "못", "안"])
+        
         for level in range(1, 11):
             audience = SAMPLE_TARGET_AUDIENCES[level].value
             
-            # 레벨에 따라 질문 복잡도 조정
-            if level <= 3:
-                question = f"이 법률 문제에 대한 답변이 '예'인가요?"
-            elif level <= 6:
-                question = f"이 상황에서 법적으로 긍정적인 결과가 나오나요?"
-            else:
-                question = f"이것이 맞는 일인가요?"
+            # 균형잡힌 Yes/No 분배: 홀수 레벨은 Yes, 짝수 레벨은 No
+            if level % 2 == 1:  # 홀수 레벨 (1,3,5,7,9) - Yes 답변
+                expected_answer = YesNoAnswer.YES
+                if level <= 3:
+                    question = f"이 법률 문제에서 긍정적인 결론이 도출되는가?"
+                elif level <= 6:
+                    question = f"이 상황에서 법적으로 인정되는 부분이 있나요?"
+                else:
+                    question = f"이것이 법적으로 맞는 일인가요?"
+            else:  # 짝수 레벨 (2,4,6,8,10) - No 답변
+                expected_answer = YesNoAnswer.NO
+                if level <= 3:
+                    question = f"이 법률 문제에서 부정적인 결론이 도출되는가?"
+                elif level <= 6:
+                    question = f"이 상황에서 법적으로 문제가 되는 부분이 있나요?"
+                else:
+                    question = f"이것이 법적으로 문제가 되는 일인가요?"
+            
+
             
             fallback_questions.append(LevelQuestion(
                 level=level,
                 question=question,
                 target_audience=audience,
-                reasoning=f"Fallback 질문 - Level {level}",
-                expected_answer=YesNoAnswer.YES,
-                confidence=0.5
+                reasoning=f"개선된 Fallback 질문 - Level {level} ({expected_answer.value} 답변)",
+                expected_answer=expected_answer,
+                confidence=0.6  # 개선된 확신도
             ))
         
-        from core.schemas.yesno_question_schemas import GenerationMetadata
+        try:
+            from liberty_agent.b_rag.core.schemas.yesno_question_schemas import GenerationMetadata
+        except ImportError:
+            from core.schemas.yesno_question_schemas import GenerationMetadata
         
         return TenLevelYesNoQuestions(
             gt_question=gt_question,
-            document_summary="Fallback 모드로 생성된 요약",
+            document_summary="개선된 Fallback 모드로 생성된 요약 - 균형잡힌 Yes/No 분배",
             questions=fallback_questions,
-            semantic_consistency="Fallback 모드에서 생성된 기본 질문들",
+            semantic_consistency="개선된 Fallback 모드에서 생성된 균형잡힌 질문들",
             generation_metadata=GenerationMetadata(
                 total_questions=10,
                 difficulty_range="1-10",

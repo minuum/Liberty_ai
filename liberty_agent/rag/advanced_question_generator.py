@@ -333,6 +333,7 @@ class AdvancedQuestionGenerator:
         if policy_instruction_template:
             try:
                 policy_instruction = policy_instruction_template.format(keywords_to_consider=', '.join(keywords_to_consider))
+                logger.info(f"정책 프롬프트 포맷팅 성공: {policy_instruction}")
             except KeyError as e:
                 logger.warning(f"정책 프롬프트 '{policy_level_key}' 포맷팅 중 오류 발생 (KeyError: {e}). 키워드가 누락되었을 수 있습니다. 기본 지시사항 사용 시도.")
                 # 기본값 또는 level_else 프롬프트로 fallback 시도
@@ -415,7 +416,7 @@ class AdvancedQuestionGenerator:
         # DifficultyLevel enum 객체일 경우 .value를, 그렇지 않으면 문자열로 변환
         formatted_complexity_level = analysis_result.complexity_level.value if hasattr(analysis_result.complexity_level, 'value') else str(analysis_result.complexity_level)
 
-
+        
         if boost_strategy == "analytical_depth":
             system_prompt_content = self._load_prompt_content("boosted_analytical_system")
             human_prompt_template = self._load_prompt_content("boosted_analytical_human")

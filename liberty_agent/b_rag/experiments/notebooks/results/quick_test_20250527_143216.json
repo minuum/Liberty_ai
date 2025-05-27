@@ -1,0 +1,517 @@
+{
+  "experiment_info": {
+    "name": "quick_test",
+    "start_time": "2025-05-27T14:32:16.265271",
+    "config": {
+      "question_generation": {
+        "model_name": "gpt-4o-2024-08-06",
+        "temperature": 0.1,
+        "questions_per_level": 1,
+        "total_levels": 3,
+        "min_consistency_rate": 0.8,
+        "max_retries": 1
+      },
+      "rag_experiment": {
+        "embedding_model": "solar-embedding-1-large",
+        "llm_model": "gpt-4o-2024-08-06",
+        "llm_temperature": 0.1,
+        "top_k": 2,
+        "similarity_threshold": 0.7,
+        "max_boost_iterations": 2,
+        "confidence_threshold": 0.9
+      },
+      "pipeline": {
+        "experiment_name": "quick_test",
+        "output_dir": "results",
+        "run_question_generation": true,
+        "run_standard_rag": true,
+        "run_boost_rag": true,
+        "run_comparison_analysis": true,
+        "target_metrics": {
+          "question_consistency_rate": 0.8,
+          "boost_rag_improvement": 0.1,
+          "yes_answer_increase": 2
+        }
+      }
+    },
+    "end_time": "2025-05-27T14:33:49.590768",
+    "duration_seconds": 93.325497
+  },
+  "question_generation_results": {
+    "document_1": {
+      "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+      "document_summary": "대법원 판결에 따르면, 단순한 동업관계만으로는 채권의 준점유자로 볼 수 없다. 민법 제470조에 의하면 채권의 준점유자에게 변제한 경우에도 변제자가 선의이고 과실이 없으면 유효한 변제가 되지만, 동업자는 이에 해당하지 않는다.",
+      "generated_questions": [
+        {
+          "level": 1,
+          "question": "민법 제470조에 의거하여 동업자가 채권의 준점유자로 인정되지 않는가?",
+          "target_audience": "법률 전문가",
+          "expected_answer": "Yes",
+          "confidence": 1.0
+        },
+        {
+          "level": 2,
+          "question": "동업자가 민법 제470조에 따른 채권의 준점유자에 해당하지 않는다고 볼 수 있는가?",
+          "target_audience": "법학 연구자",
+          "expected_answer": "Yes",
+          "confidence": 1.0
+        },
+        {
+          "level": 3,
+          "question": "동업자가 채권의 준점유자로서 민법 제470조의 보호를 받을 수 없는가?",
+          "target_audience": "법률 실무자",
+          "expected_answer": "Yes",
+          "confidence": 1.0
+        },
+        {
+          "level": 4,
+          "question": "동업 관계에 있는 사람이 법적으로 채권의 준점유자가 될 수 없나요?",
+          "target_audience": "법률에 관심 있는 일반인",
+          "expected_answer": "Yes",
+          "confidence": 1.0
+        },
+        {
+          "level": 5,
+          "question": "동업자가 채권의 준점유자(실제 권리자처럼 보이는 사람)가 될 수 없나요?",
+          "target_audience": "일반 대중",
+          "expected_answer": "Yes",
+          "confidence": 1.0
+        },
+        {
+          "level": 6,
+          "question": "동업 관계에 있는 사람이 채권의 준점유자로 인정받지 못하나요?",
+          "target_audience": "일반 독자",
+          "expected_answer": "Yes",
+          "confidence": 1.0
+        },
+        {
+          "level": 7,
+          "question": "같이 일하는 사람이 법적으로 돈 받을 권리가 없나요?",
+          "target_audience": "고등학생",
+          "expected_answer": "Yes",
+          "confidence": 1.0
+        },
+        {
+          "level": 8,
+          "question": "동업자가 돈 받을 수 있는 권리가 없나요?",
+          "target_audience": "중학생",
+          "expected_answer": "Yes",
+          "confidence": 1.0
+        },
+        {
+          "level": 9,
+          "question": "같이 일하는 사람이 돈 받을 수 없나요?",
+          "target_audience": "초등학생",
+          "expected_answer": "Yes",
+          "confidence": 1.0
+        },
+        {
+          "level": 10,
+          "question": "동업자가 돈 받을 수 없나요?",
+          "target_audience": "특수교육 대상자",
+          "expected_answer": "Yes",
+          "confidence": 1.0
+        }
+      ],
+      "consistency_rate": 1.0,
+      "semantic_consistency": "모든 질문은 동업자가 채권의 준점유자로 인정되지 않는다는 동일한 의미를 전달하고 있습니다."
+    }
+  },
+  "rag_experiment_results": {
+    "standard_rag": {
+      "results": [
+        {
+          "question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+          "answer": "Yes",
+          "confidence": 1.0,
+          "processing_time": 2.061295986175537,
+          "metadata": {
+            "document": "document_1",
+            "level": 0,
+            "question_type": "gt",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?"
+          }
+        },
+        {
+          "question": "민법 제470조에 의거하여 동업자가 채권의 준점유자로 인정되지 않는가?",
+          "answer": "Yes",
+          "confidence": 1.0,
+          "processing_time": 2.453852891921997,
+          "metadata": {
+            "document": "document_1",
+            "level": 1,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업자가 민법 제470조에 따른 채권의 준점유자에 해당하지 않는다고 볼 수 있는가?",
+          "answer": "Yes",
+          "confidence": 0.9,
+          "processing_time": 2.473878860473633,
+          "metadata": {
+            "document": "document_1",
+            "level": 2,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업자가 채권의 준점유자로서 민법 제470조의 보호를 받을 수 없는가?",
+          "answer": "Yes",
+          "confidence": 0.9,
+          "processing_time": 2.1712350845336914,
+          "metadata": {
+            "document": "document_1",
+            "level": 3,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업 관계에 있는 사람이 법적으로 채권의 준점유자가 될 수 없나요?",
+          "answer": "Yes",
+          "confidence": 0.9,
+          "processing_time": 2.1530606746673584,
+          "metadata": {
+            "document": "document_1",
+            "level": 4,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업자가 채권의 준점유자(실제 권리자처럼 보이는 사람)가 될 수 없나요?",
+          "answer": "Yes",
+          "confidence": 0.9,
+          "processing_time": 1.7908909320831299,
+          "metadata": {
+            "document": "document_1",
+            "level": 5,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업 관계에 있는 사람이 채권의 준점유자로 인정받지 못하나요?",
+          "answer": "Yes",
+          "confidence": 1.0,
+          "processing_time": 1.6874449253082275,
+          "metadata": {
+            "document": "document_1",
+            "level": 6,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "같이 일하는 사람이 법적으로 돈 받을 권리가 없나요?",
+          "answer": "Yes",
+          "confidence": 0.9,
+          "processing_time": 2.6617040634155273,
+          "metadata": {
+            "document": "document_1",
+            "level": 7,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업자가 돈 받을 수 있는 권리가 없나요?",
+          "answer": "Yes",
+          "confidence": 0.9,
+          "processing_time": 2.4675121307373047,
+          "metadata": {
+            "document": "document_1",
+            "level": 8,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "같이 일하는 사람이 돈 받을 수 없나요?",
+          "answer": "Yes",
+          "confidence": 0.9,
+          "processing_time": 2.1417388916015625,
+          "metadata": {
+            "document": "document_1",
+            "level": 9,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업자가 돈 받을 수 없나요?",
+          "answer": "Yes",
+          "confidence": 0.9,
+          "processing_time": 2.193416118621826,
+          "metadata": {
+            "document": "document_1",
+            "level": 10,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        }
+      ],
+      "total_questions": 11,
+      "avg_confidence": 0.9272727272727274,
+      "yes_count": 11
+    },
+    "boost_rag": {
+      "results": [
+        {
+          "question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+          "answer": "Yes",
+          "confidence": 0.95,
+          "processing_time": 2.413149833679199,
+          "metadata": {
+            "document": "document_1",
+            "level": 0,
+            "question_type": "gt",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?"
+          }
+        },
+        {
+          "question": "민법 제470조에 의거하여 동업자가 채권의 준점유자로 인정되지 않는가?",
+          "answer": "Yes",
+          "confidence": 0.95,
+          "processing_time": 4.111511945724487,
+          "metadata": {
+            "document": "document_1",
+            "level": 1,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업자가 민법 제470조에 따른 채권의 준점유자에 해당하지 않는다고 볼 수 있는가?",
+          "answer": "Yes",
+          "confidence": 0.95,
+          "processing_time": 4.696846961975098,
+          "metadata": {
+            "document": "document_1",
+            "level": 2,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업자가 채권의 준점유자로서 민법 제470조의 보호를 받을 수 없는가?",
+          "answer": "Yes",
+          "confidence": 0.95,
+          "processing_time": 3.346437931060791,
+          "metadata": {
+            "document": "document_1",
+            "level": 3,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업 관계에 있는 사람이 법적으로 채권의 준점유자가 될 수 없나요?",
+          "answer": "No",
+          "confidence": 0.95,
+          "processing_time": 3.780318021774292,
+          "metadata": {
+            "document": "document_1",
+            "level": 4,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업자가 채권의 준점유자(실제 권리자처럼 보이는 사람)가 될 수 없나요?",
+          "answer": "Yes",
+          "confidence": 0.95,
+          "processing_time": 3.7134389877319336,
+          "metadata": {
+            "document": "document_1",
+            "level": 5,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업 관계에 있는 사람이 채권의 준점유자로 인정받지 못하나요?",
+          "answer": "Yes",
+          "confidence": 0.95,
+          "processing_time": 4.55815577507019,
+          "metadata": {
+            "document": "document_1",
+            "level": 6,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "같이 일하는 사람이 법적으로 돈 받을 권리가 없나요?",
+          "answer": "Yes",
+          "confidence": 0.95,
+          "processing_time": 8.543300151824951,
+          "metadata": {
+            "document": "document_1",
+            "level": 7,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업자가 돈 받을 수 있는 권리가 없나요?",
+          "answer": "Yes",
+          "confidence": 0.95,
+          "processing_time": 6.471503019332886,
+          "metadata": {
+            "document": "document_1",
+            "level": 8,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "같이 일하는 사람이 돈 받을 수 없나요?",
+          "answer": "Yes",
+          "confidence": 0.95,
+          "processing_time": 7.800179958343506,
+          "metadata": {
+            "document": "document_1",
+            "level": 9,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        },
+        {
+          "question": "동업자가 돈 받을 수 없나요?",
+          "answer": "Yes",
+          "confidence": 0.95,
+          "processing_time": 3.1363139152526855,
+          "metadata": {
+            "document": "document_1",
+            "level": 10,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 1.0
+          }
+        }
+      ],
+      "total_questions": 11,
+      "avg_confidence": 0.95,
+      "yes_count": 10
+    },
+    "comparison": {}
+  },
+  "performance_analysis": {
+    "overall_performance": {
+      "confidence_improvement": 0.022727272727272596,
+      "yes_answer_improvement": -1,
+      "standard_yes_rate": 1.0,
+      "boost_yes_rate": 0.9090909090909091
+    },
+    "level_analysis": {
+      "level_1": {
+        "standard_yes_count": 1,
+        "boost_yes_count": 1,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_2": {
+        "standard_yes_count": 1,
+        "boost_yes_count": 1,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_3": {
+        "standard_yes_count": 1,
+        "boost_yes_count": 1,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_4": {
+        "standard_yes_count": 1,
+        "boost_yes_count": 0,
+        "improvement": -1,
+        "total_questions": 1
+      },
+      "level_5": {
+        "standard_yes_count": 1,
+        "boost_yes_count": 1,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_6": {
+        "standard_yes_count": 1,
+        "boost_yes_count": 1,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_7": {
+        "standard_yes_count": 1,
+        "boost_yes_count": 1,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_8": {
+        "standard_yes_count": 1,
+        "boost_yes_count": 1,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_9": {
+        "standard_yes_count": 1,
+        "boost_yes_count": 1,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_10": {
+        "standard_yes_count": 1,
+        "boost_yes_count": 1,
+        "improvement": 0,
+        "total_questions": 1
+      }
+    },
+    "target_achievement": {
+      "boost_improvement_achieved": false,
+      "yes_increase_achieved": false,
+      "confidence_improvement_actual": 0.022727272727272596,
+      "yes_improvement_actual": -1
+    }
+  }
+}

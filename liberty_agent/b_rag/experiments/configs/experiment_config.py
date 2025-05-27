@@ -11,7 +11,7 @@ from pathlib import Path
 class QuestionGenerationConfig:
     """질문 생성 설정"""
     # 모델 설정
-    model_name: str = "solar-1-mini-chat"
+    model_name: str = "gpt-4o-2024-08-06"
     temperature: float = 0.1
     
     # 질문 생성 파라미터
@@ -27,7 +27,7 @@ class RAGExperimentConfig:
     """RAG 실험 설정"""
     # 모델 설정
     embedding_model: str = "solar-embedding-1-large"
-    llm_model: str = "solar-1-mini-chat"
+    llm_model: str = "gpt-4o-2024-08-06"
     llm_temperature: float = 0.1
     
     # RAG 파라미터

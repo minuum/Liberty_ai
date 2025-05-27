@@ -54,7 +54,8 @@ class BRAGExperimentRunner:
         # 질문 생성기 초기화
         if self.config.pipeline.run_question_generation:
             self.question_generator = UnifiedYesNoQuestionGenerator(
-                model_name=self.config.question_generation.model_name
+                model_name=self.config.question_generation.model_name,
+                temperature=self.config.question_generation.temperature
             )
             print("✅ 질문 생성기 초기화 완료")
         
@@ -233,7 +234,7 @@ class BRAGExperimentRunner:
                 "results": standard_results,
                 "total_questions": len(standard_results),
                 "avg_confidence": sum(r["confidence"] for r in standard_results) / len(standard_results),
-                "yes_count": sum(1 for r in standard_results if r["answer"].strip().startswith("Yes"))
+                "yes_count": sum(1 for r in standard_results if r["answer"] == "Yes")
             }
         
         # Boost RAG 실험
@@ -260,7 +261,7 @@ class BRAGExperimentRunner:
                 "results": boost_results,
                 "total_questions": len(boost_results),
                 "avg_confidence": sum(r["confidence"] for r in boost_results) / len(boost_results),
-                "yes_count": sum(1 for r in boost_results if r["answer"].strip().startswith("Yes"))
+                "yes_count": sum(1 for r in boost_results if r["answer"] == "Yes")
             }
         
         return rag_results
@@ -297,8 +298,8 @@ class BRAGExperimentRunner:
                 ]
                 
                 if standard_level_results and boost_level_results:
-                    standard_yes = sum(1 for r in standard_level_results if r["answer"].strip().startswith("Yes"))
-                    boost_yes = sum(1 for r in boost_level_results if r["answer"].strip().startswith("Yes"))
+                    standard_yes = sum(1 for r in standard_level_results if r["answer"] == "Yes")
+                    boost_yes = sum(1 for r in boost_level_results if r["answer"] == "Yes")
                     
                     level_analysis[f"level_{level}"] = {
                         "standard_yes_count": standard_yes,
@@ -400,7 +401,11 @@ class BRAGExperimentRunner:
             
             if "target_achievement" in results["performance_analysis"]:
                 target = results["performance_analysis"]["target_achievement"]
-                print(f"🎯 목표 달성률: {sum(target.values()[:2])}/2")
+                achieved_count = sum([
+                    target.get("boost_improvement_achieved", False),
+                    target.get("yes_increase_achieved", False)
+                ])
+                print(f"🎯 목표 달성률: {achieved_count}/2")
 
 def main():
     """메인 실행 함수"""

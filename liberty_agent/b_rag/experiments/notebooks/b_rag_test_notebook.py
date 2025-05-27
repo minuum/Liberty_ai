@@ -47,7 +47,12 @@ if b_rag_dir:
 try:
     from core.question_generation.unified_yesno_question_generator import UnifiedYesNoQuestionGenerator
     from core.rag_system.yesno_rag_system import YesNoRAGSystem, YesNoRAGConfig
-    from core.schemas.yesno_question_schemas import TenLevelYesNoQuestions
+    from core.schemas.yesno_question_schemas import (
+        YesNoAnswer, 
+        TenLevelYesNoQuestions,
+        LevelQuestion,
+        SAMPLE_TARGET_AUDIENCES
+    )
     from experiments.configs.experiment_config import BRAGConfig, get_config
     from experiments.b_rag_experiment_runner import BRAGExperimentRunner
     
@@ -56,13 +61,29 @@ try:
 except ImportError as e:
     print(f"❌ Import 오류: {e}")
     print("\n현재 Python path:")
-    for path in sys.path:
-        print(f"  - {path}")
+    for i, path in enumerate(sys.path):
+        print(f"  {i}: {path}")
     
-    print("\n사용 가능한 모듈 확인:")
-    if b_rag_dir:
+    print(f"\n📁 B-RAG 디렉토리 내용 ({b_rag_dir}):")
+    if b_rag_dir and b_rag_dir.exists():
         for item in b_rag_dir.rglob("*.py"):
             print(f"  - {item.relative_to(b_rag_dir)}")
+    
+    # 개별 모듈 테스트
+    print("\n🔍 개별 모듈 import 테스트:")
+    modules_to_test = [
+        "core.schemas.yesno_question_schemas",
+        "core.question_generation.unified_yesno_question_generator", 
+        "core.rag_system.yesno_rag_system",
+        "experiments.configs.experiment_config"
+    ]
+    
+    for module in modules_to_test:
+        try:
+            __import__(module)
+            print(f"  ✅ {module}")
+        except ImportError as module_error:
+            print(f"  ❌ {module}: {module_error}")
 
 # =============================================================================
 # 셀 3: 빠른 테스트 - 질문 생성기

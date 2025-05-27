@@ -8,10 +8,10 @@ import json
 from pathlib import Path
 from typing import Optional, Dict, Any
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_upstage import ChatUpstage
+from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
-from .schemas.yesno_question_schemas import (
+from core.schemas.yesno_question_schemas import (
     TenLevelYesNoQuestions, 
     LevelQuestion, 
     YesNoAnswer,
@@ -24,26 +24,52 @@ load_dotenv()
 class UnifiedYesNoQuestionGenerator:
     """통합된 Yes/No 질문 생성기"""
     
-    def __init__(self, model_name: str = "solar-1-mini-chat"):
+    def __init__(self, 
+                 model_name: str = "gpt-4o-2024-08-06", 
+                 temperature: float = 0.1,
+                 openai_api_key: Optional[str] = None):
         """
         초기화
         
         Args:
-            model_name: 사용할 Upstage 모델명
+            model_name: 사용할 OpenAI 모델명
+            temperature: 모델 온도 설정
+            openai_api_key: OpenAI API 키 (환경변수에서 자동 로드)
         """
-        self.llm = ChatUpstage(model=model_name)
-        self.structured_llm = self.llm.with_structured_output(TenLevelYesNoQuestions)
+        self.llm = ChatOpenAI(
+            model=model_name, 
+            temperature=temperature, 
+            api_key=openai_api_key or os.getenv("OPENAI_API_KEY")
+        )
+        # function calling 방식으로 structured output 사용
+        try:
+            self.structured_llm = self.llm.with_structured_output(
+                TenLevelYesNoQuestions, 
+                method="function_calling", 
+                include_raw=False
+            )
+        except Exception as e:
+            print(f"⚠️ Structured output 설정 실패: {e}")
+            print("기본 LLM을 사용하고 JSON 파싱을 시도합니다.")
+            self.structured_llm = self.llm
         self.prompt_template = self._load_unified_prompt()
         
-        print(f"✅ UnifiedYesNoQuestionGenerator 초기화 완료 (모델: {model_name})")
+        print(f"✅ UnifiedYesNoQuestionGenerator 초기화 완료 (모델: {model_name}, 온도: {temperature})")
     
     def _load_unified_prompt(self) -> ChatPromptTemplate:
         """통합 프롬프트 로드"""
         try:
-            prompt_path = Path(__file__).parent / "prompts" / "minu" / "unified_yesno_question_generator.txt"
+            # 개선된 프롬프트 파일 우선 시도
+            prompt_path = Path(__file__).parent / "prompts" / "minu" / "unified_yesno_question_generator_v2.txt"
+            
+            if not prompt_path.exists():
+                # 기존 프롬프트 파일 사용
+                prompt_path = Path(__file__).parent / "prompts" / "minu" / "unified_yesno_question_generator.txt"
             
             with open(prompt_path, 'r', encoding='utf-8') as f:
                 system_prompt = f.read()
+                
+            print(f"✅ 프롬프트 로드 완료: {prompt_path.name}")
             
             # Few-shot 예시 추가
             few_shot_examples = self._get_few_shot_examples()
@@ -77,62 +103,47 @@ class UnifiedYesNoQuestionGenerator:
 
 GT 질문: "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?"
 
-예상 출력:
-```json
-{
-  "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
-  "document_summary": "동업자와 채권의 준점유자 개념에 관한 민법 제470조 관련 판례",
-  "questions": [
-    {
-      "level": 1,
-      "question": "민법 제470조에 따라 동업자가 채권의 준점유자로 인정되지 않는가?",
-      "target_audience": "전문가 및 전공자",
-      "reasoning": "법조문을 직접 인용하여 전문적 법리 해석을 요구",
-      "expected_answer": "Yes",
-      "confidence": 0.95
-    },
-    {
-      "level": 5,
-      "question": "동업 관계에 있는 사람이 채권의 준점유자(실제 권리자처럼 보이는 사람)가 될 수 있나요?",
-      "target_audience": "법학과 학부생 및 법무 실무진",
-      "reasoning": "법률 용어에 쉬운 설명을 병기하여 이해를 도움",
-      "expected_answer": "No",
-      "confidence": 0.90
-    },
-    {
-      "level": 10,
-      "question": "같이 일하는 사람이 돈 받을 수 있어요?",
-      "target_audience": "언어 발달 단계의 어린이 및 특수 교육",
-      "reasoning": "가장 기본적인 단어로 핵심 개념만 전달",
-      "expected_answer": "No",
-      "confidence": 0.80
-    }
-  ],
-  "semantic_consistency": "모든 질문은 동업자가 채권의 준점유자가 될 수 없다는 동일한 법리를 다루고 있으며, 각 레벨에 맞는 언어 수준으로 표현되었습니다.",
-  "generation_metadata": {
-    "total_questions": 10,
-    "difficulty_range": "1-10",
-    "question_type": "Yes/No",
-    "semantic_equivalence": true
-  }
-}
-```
+예상 출력 형식:
+- Level 1 (전문가): "민법 제470조에 따라 동업자가 채권의 준점유자로 인정되지 않는가?"
+- Level 5 (중급): "동업 관계에 있는 사람이 채권의 준점유자가 될 수 있나요?"  
+- Level 10 (초급): "같이 일하는 사람이 돈 받을 수 있어요?"
+
+모든 질문의 예상 답변은 동일해야 하며, 각 레벨에 맞는 언어 수준으로 표현되어야 합니다.
 """
     
     def _create_default_prompt(self) -> ChatPromptTemplate:
         """기본 프롬프트 생성"""
         system_prompt = """
-        당신은 법률 질문 생성 전문가입니다. 
-        주어진 GT 질문과 판결문을 바탕으로 의미론적으로 동일하지만 
-        난이도가 다른 10개의 Yes/No 질문을 생성해야 합니다.
+당신은 법률 질문 생성 전문가입니다. 주어진 GT 질문과 판결문을 바탕으로 의미론적으로 동일하지만 난이도가 다른 10개 레벨의 Yes/No 질문을 생성해야 합니다.
+
+핵심 원칙:
+1. 모든 질문은 GT 질문과 정확히 같은 의미를 가져야 합니다
+2. 모든 질문은 Yes 또는 No로만 답변 가능해야 합니다
+3. 레벨 1(전문가)부터 레벨 10(특수교육)까지 언어 수준을 조정합니다
+4. 모든 질문의 예상 답변은 동일해야 합니다
+
+레벨별 가이드:
+- Level 1-3: 법조문 인용, 전문 용어 사용
+- Level 4-6: 법률 용어에 간단한 설명 병기
+- Level 7-10: 일상 언어로 핵심 개념만 전달
+
+반드시 JSON 형식으로 응답하세요.
+        """
         
-        모든 질문은 Yes 또는 No로만 답변 가능해야 하며,
-        GT 질문과 의미론적으로 완전히 동일해야 합니다.
+        human_prompt = """
+GT 질문: {gt_question}
+
+판결문 내용:
+{document_content}
+
+참고 키워드: {keywords_to_consider}
+
+위 정보를 바탕으로 GT 질문과 의미론적으로 동일한 10개 레벨의 Yes/No 질문을 JSON 형식으로 생성해주세요.
         """
         
         return ChatPromptTemplate.from_messages([
             ("system", system_prompt),
-            ("human", "GT 질문: {gt_question}\n판결문: {document_content}\n키워드: {keywords_to_consider}")
+            ("human", human_prompt)
         ])
     
     def generate_ten_level_questions(
@@ -164,11 +175,17 @@ GT 질문: "동업자가 채권의 준점유자에 해당하지 아니 한다고
             chain = self.prompt_template | self.structured_llm
             
             # 질문 생성 실행
-            result = chain.invoke({
+            response = chain.invoke({
                 "gt_question": gt_question,
                 "document_content": document_content,
                 "keywords_to_consider": keywords_to_consider
             })
+            
+            # Structured output이 실패한 경우 JSON 파싱 시도
+            if isinstance(response, str):
+                result = self._parse_json_response(response, gt_question, document_content)
+            else:
+                result = response
             
             # 결과 검증
             if not self._validate_result(result):
@@ -209,6 +226,56 @@ GT 질문: "동업자가 채권의 준점유자에 해당하지 아니 한다고
         except Exception as e:
             print(f"❌ 결과 검증 중 오류: {e}")
             return False
+    
+    def _parse_json_response(self, response: str, gt_question: str, document_content: str) -> TenLevelYesNoQuestions:
+        """JSON 응답 파싱"""
+        try:
+            import json
+            import re
+            
+            # JSON 블록 추출
+            json_match = re.search(r'```json\s*(.*?)\s*```', response, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(1)
+            else:
+                # JSON 블록이 없으면 전체 응답에서 JSON 찾기
+                json_str = response
+            
+            # JSON 파싱
+            data = json.loads(json_str)
+            
+            # TenLevelYesNoQuestions 객체 생성
+            from core.schemas.yesno_question_schemas import GenerationMetadata
+            
+            questions = []
+            for q_data in data.get("questions", []):
+                questions.append(LevelQuestion(
+                    level=q_data["level"],
+                    question=q_data["question"],
+                    target_audience=q_data["target_audience"],
+                    reasoning=q_data["reasoning"],
+                    expected_answer=YesNoAnswer(q_data["expected_answer"]),
+                    confidence=q_data["confidence"]
+                ))
+            
+            metadata = data.get("generation_metadata", {})
+            return TenLevelYesNoQuestions(
+                gt_question=data.get("gt_question", gt_question),
+                document_summary=data.get("document_summary", "AI 생성 요약"),
+                questions=questions,
+                semantic_consistency=data.get("semantic_consistency", "AI 생성 일관성 설명"),
+                generation_metadata=GenerationMetadata(
+                    total_questions=metadata.get("total_questions", len(questions)),
+                    difficulty_range=metadata.get("difficulty_range", "1-10"),
+                    question_type=metadata.get("question_type", "Yes/No"),
+                    semantic_equivalence=metadata.get("semantic_equivalence", True)
+                )
+            )
+            
+        except Exception as e:
+            print(f"❌ JSON 파싱 실패: {e}")
+            print(f"응답 내용: {response[:200]}...")
+            return self._create_fallback_questions(gt_question, document_content)
     
     def _is_yesno_question(self, question: str) -> bool:
         """Yes/No 질문인지 확인"""
@@ -287,17 +354,19 @@ GT 질문: "동업자가 채권의 준점유자에 해당하지 아니 한다고
                 confidence=0.5
             ))
         
+        from core.schemas.yesno_question_schemas import GenerationMetadata
+        
         return TenLevelYesNoQuestions(
             gt_question=gt_question,
             document_summary="Fallback 모드로 생성된 요약",
             questions=fallback_questions,
             semantic_consistency="Fallback 모드에서 생성된 기본 질문들",
-            generation_metadata={
-                "total_questions": 10,
-                "difficulty_range": "1-10",
-                "question_type": "Yes/No",
-                "semantic_equivalence": False  # Fallback이므로 False
-            }
+            generation_metadata=GenerationMetadata(
+                total_questions=10,
+                difficulty_range="1-10",
+                question_type="Yes/No",
+                semantic_equivalence=False  # Fallback이므로 False
+            )
         )
     
     def save_questions_to_file(
@@ -346,8 +415,11 @@ if __name__ == "__main__":
     그러나 단순한 동업관계만으로는 채권의 준점유자로 볼 수 없다.
     """
     
-    # 질문 생성기 초기화
-    generator = UnifiedYesNoQuestionGenerator()
+    # 질문 생성기 초기화 (OpenAI 모델 사용)
+    generator = UnifiedYesNoQuestionGenerator(
+        model_name="gpt-4o-2024-08-06",
+        temperature=0.1
+    )
     
     # 질문 생성
     result = generator.generate_ten_level_questions(

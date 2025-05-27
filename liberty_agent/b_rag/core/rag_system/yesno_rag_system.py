@@ -11,20 +11,29 @@ from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 from datetime import datetime
 
-from langchain_upstage import ChatUpstage, UpstageEmbeddings
+from langchain_openai import ChatOpenAI
+from langchain_upstage import UpstageEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.documents import Document
+from langchain_core.pydantic_v1 import BaseModel, Field
 from dotenv import load_dotenv
 
 # 환경 변수 로드
 load_dotenv()
+
+class YesNoAnswer(BaseModel):
+    """구조화된 Yes/No 답변"""
+    answer: str = Field(..., description="Yes 또는 No")
+    reasoning: str = Field(..., description="답변의 근거 설명")
+    confidence: float = Field(..., description="확신도 (0.0-1.0)")
+    key_evidence: List[str] = Field(default_factory=list, description="핵심 증거 문장들")
 
 @dataclass
 class YesNoRAGConfig:
     """Yes/No RAG 시스템 설정"""
     # 모델 설정
     embedding_model: str = "solar-embedding-1-large"
-    llm_model: str = "solar-1-mini-chat"
+    llm_model: str = "gpt-4o-2024-08-06"
     llm_temperature: float = 0.1
     
     # RAG 설정
@@ -39,8 +48,10 @@ class YesNoRAGConfig:
 class RAGResult:
     """RAG 시스템 결과"""
     question: str
-    answer: str
+    answer: str  # Yes 또는 No
+    reasoning: str  # 답변 근거
     confidence: float
+    key_evidence: List[str]  # 핵심 증거
     retrieved_docs: List[str]
     retrieval_scores: List[float]
     processing_time: float
@@ -49,20 +60,32 @@ class RAGResult:
 class YesNoRAGSystem:
     """B-RAG 프로젝트 전용 Yes/No RAG 시스템"""
     
-    def __init__(self, config: YesNoRAGConfig, faiss_index_path: Optional[str] = None):
+    def __init__(self, config: YesNoRAGConfig, faiss_index_path: Optional[str] = None, openai_api_key: Optional[str] = None):
         """
         초기화
         
         Args:
             config: RAG 시스템 설정
             faiss_index_path: FAISS 인덱스 경로 (옵션)
+            openai_api_key: OpenAI API 키 (환경변수에서 자동 로드)
         """
         self.config = config
         self.faiss_index_path = faiss_index_path
         
         # 모델 초기화
         self.embeddings = UpstageEmbeddings(model=config.embedding_model)
-        self.llm = ChatUpstage(model=config.llm_model, temperature=config.llm_temperature)
+        self.llm = ChatOpenAI(
+            model=config.llm_model, 
+            temperature=config.llm_temperature,
+            api_key=openai_api_key or os.getenv("OPENAI_API_KEY")
+        )
+        
+        # Structured output을 위한 LLM 설정
+        self.structured_llm = self.llm.with_structured_output(
+            YesNoAnswer, 
+            method="function_calling", 
+            include_raw=False
+        )
         
         # 프롬프트 템플릿 설정
         self.standard_prompt = self._create_standard_prompt()
@@ -76,16 +99,16 @@ class YesNoRAGSystem:
     def _create_standard_prompt(self) -> ChatPromptTemplate:
         """Standard RAG 프롬프트 생성"""
         system_prompt = """
-당신은 법률 전문가입니다. 주어진 법률 문서를 바탕으로 Yes 또는 No로 명확하게 답변해주세요.
+당신은 법률 전문가입니다. 주어진 법률 문서를 바탕으로 구조화된 Yes/No 답변을 제공해주세요.
 
 답변 규칙:
-1. 반드시 "Yes" 또는 "No"로 시작하세요
-2. 주어진 문서 내용만을 근거로 답변하세요
-3. 답변 근거를 간결하게 제시하세요
-4. 불확실한 경우 "No"로 답변하세요
+1. answer: 반드시 "Yes" 또는 "No"만 입력
+2. reasoning: 답변의 근거를 명확하고 간결하게 설명
+3. confidence: 답변에 대한 확신도 (0.0-1.0)
+4. key_evidence: 답변을 뒷받침하는 핵심 문장들을 배열로 제공
+5. 불확실한 경우 "No"로 답변하고 확신도를 낮게 설정
 
-답변 형식:
-Yes/No - [근거 설명]
+주어진 문서 내용만을 근거로 답변하세요.
 """
         
         human_prompt = """
@@ -94,7 +117,7 @@ Yes/No - [근거 설명]
 
 질문: {question}
 
-답변:"""
+위 문서를 바탕으로 구조화된 답변을 제공해주세요."""
         
         return ChatPromptTemplate.from_messages([
             ("system", system_prompt),
@@ -104,17 +127,17 @@ Yes/No - [근거 설명]
     def _create_boost_prompt(self) -> ChatPromptTemplate:
         """Boost RAG 프롬프트 생성 (재작성 루프용)"""
         system_prompt = """
-당신은 고급 법률 전문가입니다. 주어진 법률 문서를 심층 분석하여 Yes 또는 No로 정확하게 답변해주세요.
+당신은 고급 법률 전문가입니다. 주어진 법률 문서를 심층 분석하여 구조화된 Yes/No 답변을 제공해주세요.
 
 고급 답변 규칙:
-1. 반드시 "Yes" 또는 "No"로 시작하세요
-2. 문서의 모든 관련 내용을 종합적으로 검토하세요
-3. 법리적 쟁점을 체계적으로 분석하세요
-4. 예외 상황이나 특수한 조건도 고려하세요
-5. 답변의 확신도를 함께 제시하세요
+1. answer: 반드시 "Yes" 또는 "No"만 입력
+2. reasoning: 문서의 모든 관련 내용을 종합적으로 검토한 상세한 법리적 근거
+3. confidence: 심층 분석을 통한 정확한 확신도 (0.0-1.0)
+4. key_evidence: 법리적 판단의 핵심이 되는 증거 문장들
+5. 예외 상황이나 특수한 조건도 고려하여 분석
+6. 이전 분석 결과가 있다면 이를 개선하여 더 정확한 답변 제공
 
-답변 형식:
-Yes/No - [상세한 법리적 근거] (확신도: X%)
+법리적 쟁점을 체계적으로 분석하고 모든 관련 내용을 종합하여 답변하세요.
 """
         
         human_prompt = """
@@ -125,7 +148,7 @@ Yes/No - [상세한 법리적 근거] (확신도: X%)
 
 이전 분석 결과 (있는 경우): {previous_analysis}
 
-심층 분석 답변:"""
+위 정보를 바탕으로 심층 분석한 구조화된 답변을 제공해주세요."""
         
         return ChatPromptTemplate.from_messages([
             ("system", system_prompt),
@@ -161,24 +184,29 @@ Yes/No - [상세한 법리적 근거] (확신도: X%)
         scores = [doc.metadata.get("relevance", 0.5) for doc in mock_docs]
         return mock_docs[:self.config.top_k], scores[:self.config.top_k]
     
-    def generate_standard_answer(self, question: str, context_docs: List[Document]) -> str:
+    def generate_standard_answer(self, question: str, context_docs: List[Document]) -> YesNoAnswer:
         """Standard RAG 답변 생성"""
         context = "\n\n".join([
             f"문서 {i+1}: {doc.page_content}"
             for i, doc in enumerate(context_docs)
         ])
         
-        chain = self.standard_prompt | self.llm
+        chain = self.standard_prompt | self.structured_llm
         
         try:
             response = chain.invoke({
                 "context": context,
                 "question": question
             })
-            return response.content
+            return response
         except Exception as e:
             print(f"❌ Standard 답변 생성 오류: {e}")
-            return "No - 답변 생성 중 오류가 발생했습니다."
+            return YesNoAnswer(
+                answer="No",
+                reasoning="답변 생성 중 오류가 발생했습니다.",
+                confidence=0.0,
+                key_evidence=[]
+            )
     
     def generate_boost_answer(
         self, 
@@ -186,14 +214,14 @@ Yes/No - [상세한 법리적 근거] (확신도: X%)
         context_docs: List[Document], 
         scores: List[float],
         previous_analysis: str = ""
-    ) -> str:
+    ) -> YesNoAnswer:
         """Boost RAG 답변 생성 (재작성 루프)"""
         enhanced_context = "\n\n".join([
             f"문서 {i+1} (관련도: {scores[i]:.2f}): {doc.page_content}"
             for i, doc in enumerate(context_docs)
         ])
         
-        chain = self.boost_prompt | self.llm
+        chain = self.boost_prompt | self.structured_llm
         
         try:
             response = chain.invoke({
@@ -201,10 +229,15 @@ Yes/No - [상세한 법리적 근거] (확신도: X%)
                 "question": question,
                 "previous_analysis": previous_analysis
             })
-            return response.content
+            return response
         except Exception as e:
             print(f"❌ Boost 답변 생성 오류: {e}")
-            return "No - 답변 생성 중 오류가 발생했습니다."
+            return YesNoAnswer(
+                answer="No",
+                reasoning="답변 생성 중 오류가 발생했습니다.",
+                confidence=0.0,
+                key_evidence=[]
+            )
     
     def run_standard_rag(self, question: str) -> RAGResult:
         """Standard RAG 실행"""
@@ -214,17 +247,16 @@ Yes/No - [상세한 법리적 근거] (확신도: X%)
         docs, scores = self.retrieve_documents(question)
         
         # 답변 생성
-        answer = self.generate_standard_answer(question, docs)
-        
-        # 확신도 추출 (간단한 휴리스틱)
-        confidence = self._extract_confidence(answer, scores)
+        structured_answer = self.generate_standard_answer(question, docs)
         
         processing_time = time.time() - start_time
         
         return RAGResult(
             question=question,
-            answer=answer,
-            confidence=confidence,
+            answer=structured_answer.answer,
+            reasoning=structured_answer.reasoning,
+            confidence=structured_answer.confidence,
+            key_evidence=structured_answer.key_evidence,
             retrieved_docs=[doc.page_content for doc in docs],
             retrieval_scores=scores,
             processing_time=processing_time,
@@ -238,7 +270,7 @@ Yes/No - [상세한 법리적 근거] (확신도: X%)
         # 문서 검색
         docs, scores = self.retrieve_documents(question)
         
-        best_answer = ""
+        best_structured_answer = None
         best_confidence = 0.0
         previous_analysis = ""
         
@@ -246,53 +278,44 @@ Yes/No - [상세한 법리적 근거] (확신도: X%)
             print(f"🔄 Boost RAG 반복 {iteration + 1}/{max_iterations}")
             
             # 답변 생성
-            answer = self.generate_boost_answer(question, docs, scores, previous_analysis)
-            
-            # 확신도 계산
-            confidence = self._extract_confidence(answer, scores)
+            structured_answer = self.generate_boost_answer(question, docs, scores, previous_analysis)
             
             # 최고 성능 답변 업데이트
-            if confidence > best_confidence:
-                best_answer = answer
-                best_confidence = confidence
+            if structured_answer.confidence > best_confidence:
+                best_structured_answer = structured_answer
+                best_confidence = structured_answer.confidence
             
             # 조기 종료 조건 (높은 확신도)
-            if confidence > 0.9:
-                print(f"✅ 높은 확신도 달성 ({confidence:.2f}), 조기 종료")
+            if structured_answer.confidence > 0.9:
+                print(f"✅ 높은 확신도 달성 ({structured_answer.confidence:.2f}), 조기 종료")
                 break
             
-            previous_analysis = answer
+            previous_analysis = f"이전 답변: {structured_answer.answer}, 근거: {structured_answer.reasoning}"
         
         processing_time = time.time() - start_time
         
+        # 최고 답변이 없는 경우 기본값 설정
+        if best_structured_answer is None:
+            best_structured_answer = YesNoAnswer(
+                answer="No",
+                reasoning="적절한 답변을 생성할 수 없습니다.",
+                confidence=0.0,
+                key_evidence=[]
+            )
+        
         return RAGResult(
             question=question,
-            answer=best_answer,
-            confidence=best_confidence,
+            answer=best_structured_answer.answer,
+            reasoning=best_structured_answer.reasoning,
+            confidence=best_structured_answer.confidence,
+            key_evidence=best_structured_answer.key_evidence,
             retrieved_docs=[doc.page_content for doc in docs],
             retrieval_scores=scores,
             processing_time=processing_time,
             experiment_type="boost"
         )
     
-    def _extract_confidence(self, answer: str, retrieval_scores: List[float]) -> float:
-        """답변에서 확신도 추출 (휴리스틱)"""
-        # 답변에서 확신도 패턴 찾기
-        import re
-        confidence_pattern = r'확신도[:\s]*(\d+)%'
-        match = re.search(confidence_pattern, answer)
-        
-        if match:
-            return float(match.group(1)) / 100.0
-        
-        # 검색 점수 기반 확신도 계산
-        avg_retrieval_score = sum(retrieval_scores) / len(retrieval_scores) if retrieval_scores else 0.5
-        
-        # Yes/No 답변의 명확성 기반 조정
-        if answer.strip().startswith(("Yes", "No")):
-            return min(avg_retrieval_score + 0.1, 1.0)
-        else:
-            return max(avg_retrieval_score - 0.2, 0.0)
+
     
     def compare_rag_performance(self, questions: List[str]) -> Dict[str, Any]:
         """Standard RAG vs Boost RAG 성능 비교"""
@@ -308,12 +331,29 @@ Yes/No - [상세한 법리적 근거] (확신도: X%)
             standard_result = self.run_standard_rag(question)
             standard_results.append(standard_result)
             
+            print(f"  Standard RAG:")
+            print(f"    답변: {standard_result.answer}")
+            print(f"    근거: {standard_result.reasoning[:100]}...")
+            print(f"    확신도: {standard_result.confidence:.3f}")
+            print(f"    처리 시간: {standard_result.processing_time:.2f}초")
+            if standard_result.key_evidence:
+                print(f"    핵심 증거: {len(standard_result.key_evidence)}개")
+            
             # Boost RAG
             boost_result = self.run_boost_rag(question)
             boost_results.append(boost_result)
             
-            print(f"   Standard: {standard_result.confidence:.2f} 확신도")
-            print(f"   Boost: {boost_result.confidence:.2f} 확신도")
+            print(f"  Boost RAG:")
+            print(f"    답변: {boost_result.answer}")
+            print(f"    근거: {boost_result.reasoning[:100]}...")
+            print(f"    확신도: {boost_result.confidence:.3f}")
+            print(f"    처리 시간: {boost_result.processing_time:.2f}초")
+            if boost_result.key_evidence:
+                print(f"    핵심 증거: {len(boost_result.key_evidence)}개")
+            
+            # 개선도 계산
+            confidence_improvement = boost_result.confidence - standard_result.confidence
+            print(f"  📈 확신도 개선: {confidence_improvement:.3f}")
         
         # 성능 분석
         analysis = self._analyze_performance_comparison(standard_results, boost_results)
@@ -337,8 +377,8 @@ Yes/No - [상세한 법리적 근거] (확신도: X%)
         boost_times = [r.processing_time for r in boost_results]
         
         # Yes 답변 개수 계산
-        standard_yes_count = sum(1 for r in standard_results if r.answer.strip().startswith("Yes"))
-        boost_yes_count = sum(1 for r in boost_results if r.answer.strip().startswith("Yes"))
+        standard_yes_count = sum(1 for r in standard_results if r.answer == "Yes")
+        boost_yes_count = sum(1 for r in boost_results if r.answer == "Yes")
         
         return {
             "confidence_improvement": {
@@ -366,7 +406,9 @@ Yes/No - [상세한 법리적 근거] (확신도: X%)
             return {
                 "question": result.question,
                 "answer": result.answer,
+                "reasoning": result.reasoning,
                 "confidence": result.confidence,
+                "key_evidence": result.key_evidence,
                 "retrieved_docs": result.retrieved_docs,
                 "retrieval_scores": result.retrieval_scores,
                 "processing_time": result.processing_time,
@@ -396,10 +438,11 @@ if __name__ == "__main__":
     # 설정
     config = YesNoRAGConfig(
         top_k=3,
-        similarity_threshold=0.7
+        similarity_threshold=0.7,
+        llm_model="gpt-4o-2024-08-06"
     )
     
-    # RAG 시스템 초기화
+    # RAG 시스템 초기화 (OpenAI 모델 사용)
     rag_system = YesNoRAGSystem(config)
     
     # 테스트 질문들

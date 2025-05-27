@@ -1,0 +1,517 @@
+{
+  "experiment_info": {
+    "name": "quick_test",
+    "start_time": "2025-05-27T14:26:29.189141",
+    "config": {
+      "question_generation": {
+        "model_name": "solar-1-mini-chat",
+        "temperature": 0.1,
+        "questions_per_level": 1,
+        "total_levels": 3,
+        "min_consistency_rate": 0.8,
+        "max_retries": 1
+      },
+      "rag_experiment": {
+        "embedding_model": "solar-embedding-1-large",
+        "llm_model": "solar-1-mini-chat",
+        "llm_temperature": 0.1,
+        "top_k": 2,
+        "similarity_threshold": 0.7,
+        "max_boost_iterations": 2,
+        "confidence_threshold": 0.9
+      },
+      "pipeline": {
+        "experiment_name": "quick_test",
+        "output_dir": "results",
+        "run_question_generation": true,
+        "run_standard_rag": true,
+        "run_boost_rag": true,
+        "run_comparison_analysis": true,
+        "target_metrics": {
+          "question_consistency_rate": 0.8,
+          "boost_rag_improvement": 0.1,
+          "yes_answer_increase": 2
+        }
+      }
+    },
+    "end_time": "2025-05-27T14:26:42.040523",
+    "duration_seconds": 12.851382
+  },
+  "question_generation_results": {
+    "document_1": {
+      "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+      "document_summary": "Fallback 모드로 생성된 요약",
+      "generated_questions": [
+        {
+          "level": 1,
+          "question": "이 법률 문제에 대한 답변이 '예'인가요?",
+          "target_audience": "전문가 및 전공자",
+          "expected_answer": "Yes",
+          "confidence": 0.5
+        },
+        {
+          "level": 2,
+          "question": "이 법률 문제에 대한 답변이 '예'인가요?",
+          "target_audience": "대학생 및 직장인 중급자",
+          "expected_answer": "Yes",
+          "confidence": 0.5
+        },
+        {
+          "level": 3,
+          "question": "이 법률 문제에 대한 답변이 '예'인가요?",
+          "target_audience": "일반 성인 및 초심자",
+          "expected_answer": "Yes",
+          "confidence": 0.5
+        },
+        {
+          "level": 4,
+          "question": "이 상황에서 법적으로 긍정적인 결과가 나오나요?",
+          "target_audience": "학생 및 비전문가",
+          "expected_answer": "Yes",
+          "confidence": 0.5
+        },
+        {
+          "level": 5,
+          "question": "이 상황에서 법적으로 긍정적인 결과가 나오나요?",
+          "target_audience": "법학과 학부생 및 법무 실무진",
+          "expected_answer": "Yes",
+          "confidence": 0.5
+        },
+        {
+          "level": 6,
+          "question": "이 상황에서 법적으로 긍정적인 결과가 나오나요?",
+          "target_audience": "고등학생 및 일반 직장인",
+          "expected_answer": "Yes",
+          "confidence": 0.5
+        },
+        {
+          "level": 7,
+          "question": "이것이 맞는 일인가요?",
+          "target_audience": "중학생 및 법률 초심자",
+          "expected_answer": "Yes",
+          "confidence": 0.5
+        },
+        {
+          "level": 8,
+          "question": "이것이 맞는 일인가요?",
+          "target_audience": "초등학생 및 완전 초심자",
+          "expected_answer": "Yes",
+          "confidence": 0.5
+        },
+        {
+          "level": 9,
+          "question": "이것이 맞는 일인가요?",
+          "target_audience": "유치원생 및 법률 지식이 전혀 없는 사람",
+          "expected_answer": "Yes",
+          "confidence": 0.5
+        },
+        {
+          "level": 10,
+          "question": "이것이 맞는 일인가요?",
+          "target_audience": "언어 발달 단계의 어린이 및 특수 교육",
+          "expected_answer": "Yes",
+          "confidence": 0.5
+        }
+      ],
+      "consistency_rate": 1.0,
+      "semantic_consistency": "Fallback 모드에서 생성된 기본 질문들"
+    }
+  },
+  "rag_experiment_results": {
+    "standard_rag": {
+      "results": [
+        {
+          "question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.40195298194885254,
+          "metadata": {
+            "document": "document_1",
+            "level": 0,
+            "question_type": "gt",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?"
+          }
+        },
+        {
+          "question": "이 법률 문제에 대한 답변이 '예'인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.3874170780181885,
+          "metadata": {
+            "document": "document_1",
+            "level": 1,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이 법률 문제에 대한 답변이 '예'인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.38999509811401367,
+          "metadata": {
+            "document": "document_1",
+            "level": 2,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이 법률 문제에 대한 답변이 '예'인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.3853287696838379,
+          "metadata": {
+            "document": "document_1",
+            "level": 3,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이 상황에서 법적으로 긍정적인 결과가 나오나요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.34786391258239746,
+          "metadata": {
+            "document": "document_1",
+            "level": 4,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이 상황에서 법적으로 긍정적인 결과가 나오나요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.39023590087890625,
+          "metadata": {
+            "document": "document_1",
+            "level": 5,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이 상황에서 법적으로 긍정적인 결과가 나오나요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.36757397651672363,
+          "metadata": {
+            "document": "document_1",
+            "level": 6,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이것이 맞는 일인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.3901839256286621,
+          "metadata": {
+            "document": "document_1",
+            "level": 7,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이것이 맞는 일인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.3445930480957031,
+          "metadata": {
+            "document": "document_1",
+            "level": 8,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이것이 맞는 일인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.3820810317993164,
+          "metadata": {
+            "document": "document_1",
+            "level": 9,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이것이 맞는 일인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.3791632652282715,
+          "metadata": {
+            "document": "document_1",
+            "level": 10,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        }
+      ],
+      "total_questions": 11,
+      "avg_confidence": 0.0,
+      "yes_count": 0
+    },
+    "boost_rag": {
+      "results": [
+        {
+          "question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.7619667053222656,
+          "metadata": {
+            "document": "document_1",
+            "level": 0,
+            "question_type": "gt",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?"
+          }
+        },
+        {
+          "question": "이 법률 문제에 대한 답변이 '예'인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.7355890274047852,
+          "metadata": {
+            "document": "document_1",
+            "level": 1,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이 법률 문제에 대한 답변이 '예'인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.7298908233642578,
+          "metadata": {
+            "document": "document_1",
+            "level": 2,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이 법률 문제에 대한 답변이 '예'인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.7229189872741699,
+          "metadata": {
+            "document": "document_1",
+            "level": 3,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이 상황에서 법적으로 긍정적인 결과가 나오나요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.7290880680084229,
+          "metadata": {
+            "document": "document_1",
+            "level": 4,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이 상황에서 법적으로 긍정적인 결과가 나오나요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.7544641494750977,
+          "metadata": {
+            "document": "document_1",
+            "level": 5,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이 상황에서 법적으로 긍정적인 결과가 나오나요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.7247250080108643,
+          "metadata": {
+            "document": "document_1",
+            "level": 6,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이것이 맞는 일인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.7228801250457764,
+          "metadata": {
+            "document": "document_1",
+            "level": 7,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이것이 맞는 일인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.690234899520874,
+          "metadata": {
+            "document": "document_1",
+            "level": 8,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이것이 맞는 일인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.7482759952545166,
+          "metadata": {
+            "document": "document_1",
+            "level": 9,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        },
+        {
+          "question": "이것이 맞는 일인가요?",
+          "answer": "No",
+          "confidence": 0.0,
+          "processing_time": 0.7287342548370361,
+          "metadata": {
+            "document": "document_1",
+            "level": 10,
+            "question_type": "generated",
+            "original_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+            "expected_answer": "Yes",
+            "confidence": 0.5
+          }
+        }
+      ],
+      "total_questions": 11,
+      "avg_confidence": 0.0,
+      "yes_count": 0
+    },
+    "comparison": {}
+  },
+  "performance_analysis": {
+    "overall_performance": {
+      "confidence_improvement": 0.0,
+      "yes_answer_improvement": 0,
+      "standard_yes_rate": 0.0,
+      "boost_yes_rate": 0.0
+    },
+    "level_analysis": {
+      "level_1": {
+        "standard_yes_count": 0,
+        "boost_yes_count": 0,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_2": {
+        "standard_yes_count": 0,
+        "boost_yes_count": 0,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_3": {
+        "standard_yes_count": 0,
+        "boost_yes_count": 0,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_4": {
+        "standard_yes_count": 0,
+        "boost_yes_count": 0,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_5": {
+        "standard_yes_count": 0,
+        "boost_yes_count": 0,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_6": {
+        "standard_yes_count": 0,
+        "boost_yes_count": 0,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_7": {
+        "standard_yes_count": 0,
+        "boost_yes_count": 0,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_8": {
+        "standard_yes_count": 0,
+        "boost_yes_count": 0,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_9": {
+        "standard_yes_count": 0,
+        "boost_yes_count": 0,
+        "improvement": 0,
+        "total_questions": 1
+      },
+      "level_10": {
+        "standard_yes_count": 0,
+        "boost_yes_count": 0,
+        "improvement": 0,
+        "total_questions": 1
+      }
+    },
+    "target_achievement": {
+      "boost_improvement_achieved": false,
+      "yes_increase_achieved": false,
+      "confidence_improvement_actual": 0.0,
+      "yes_improvement_actual": 0
+    }
+  }
+}

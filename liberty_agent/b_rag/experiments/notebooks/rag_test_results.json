@@ -1,0 +1,106 @@
+{
+  "test_timestamp": "2025-05-28 16:13:07",
+  "question_source": "memory",
+  "total_questions": 11,
+  "successful_tests": 11,
+  "summary": {
+    "standard_yes_count": 2,
+    "boost_yes_count": 10,
+    "avg_standard_confidence": 0.7000000000000001,
+    "avg_boost_confidence": 0.95,
+    "confidence_improvement": 0.2499999999999999,
+    "improved_count": 10,
+    "same_count": 0,
+    "degraded_count": 1
+  },
+  "detailed_results": [
+    {
+      "question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+      "standard_answer": "Yes",
+      "standard_confidence": 1.0,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": -0.050000000000000044
+    },
+    {
+      "question": "이 법률 문제에서 긍정적인 결론이 도출되는가?",
+      "standard_answer": "No",
+      "standard_confidence": 0.8,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.1499999999999999
+    },
+    {
+      "question": "관련 법리에 따라 인정될 수 있는 부분이 있는가?",
+      "standard_answer": "No",
+      "standard_confidence": 0.8,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.1499999999999999
+    },
+    {
+      "question": "이 상황에서 법리상 유효한 주장이 가능한가?",
+      "standard_answer": "No",
+      "standard_confidence": 0.8,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.1499999999999999
+    },
+    {
+      "question": "판례나 법적으로 지지되는 견해가 있는가?",
+      "standard_answer": "No",
+      "standard_confidence": 0.3,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.6499999999999999
+    },
+    {
+      "question": "법적 요건이 충족되는 경우가 있나요?",
+      "standard_answer": "Yes",
+      "standard_confidence": 0.9,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.04999999999999993
+    },
+    {
+      "question": "이런 상황에서 법적 보호를 받을 수 있나요?",
+      "standard_answer": "No",
+      "standard_confidence": 0.8,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.1499999999999999
+    },
+    {
+      "question": "이것이 법적으로 인정받을 수 있는 일인가요?",
+      "standard_answer": "No",
+      "standard_confidence": 0.8,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.1499999999999999
+    },
+    {
+      "question": "이런 경우에 권리를 제한받을 수 있어요?",
+      "standard_answer": "No",
+      "standard_confidence": 0.3,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.6499999999999999
+    },
+    {
+      "question": "이것이 법적으로 틀린 일인가요?",
+      "standard_answer": "No",
+      "standard_confidence": 0.9,
+      "boost_answer": "No",
+      "boost_confidence": 0.95,
+      "improvement": 0.04999999999999993
+    },
+    {
+      "question": "이런 상황이 법적으로 문제가 되나요?",
+      "standard_answer": "No",
+      "standard_confidence": 0.3,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.6499999999999999
+    }
+  ]
+}

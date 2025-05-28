@@ -1,0 +1,92 @@
+{
+  "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+  "generation_timestamp": "2025-05-28 10:42:05",
+  "questions": [
+    {
+      "level": 1,
+      "question": "동업자가 채권의 준점유자로 인정될 수 있는 법적 근거가 존재하는가?",
+      "target_audience": "법률 전문가",
+      "reasoning": "법률 전문가들은 법적 근거와 판례를 통해 동업자가 채권의 준점유자로 인정될 수 있는지를 판단할 수 있다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    },
+    {
+      "level": 2,
+      "question": "동업자가 채권의 준점유자로 인정되지 않는다는 판례가 있는가?",
+      "target_audience": "법률 전문가",
+      "reasoning": "법률 전문가들은 기존 판례를 통해 동업자가 채권의 준점유자로 인정되지 않는 사례를 찾을 수 있다.",
+      "expected_answer": "No",
+      "confidence": 0.8
+    },
+    {
+      "level": 3,
+      "question": "동업자가 채권의 준점유자로 인정되기 위해서는 특정한 법적 요건을 충족해야 하는가?",
+      "target_audience": "법학도",
+      "reasoning": "법학도는 법적 요건을 이해하고 이를 통해 동업자가 채권의 준점유자로 인정될 수 있는지를 분석할 수 있다.",
+      "expected_answer": "Yes",
+      "confidence": 0.85
+    },
+    {
+      "level": 4,
+      "question": "동업자가 채권의 준점유자로 인정되기 위해서는 동업 계약서에 명시된 조항이 필수적인가?",
+      "target_audience": "법학도",
+      "reasoning": "법학도는 동업 계약서의 조항이 채권의 준점유자 인정에 필수적인지를 검토할 수 있다.",
+      "expected_answer": "No",
+      "confidence": 0.75
+    },
+    {
+      "level": 5,
+      "question": "동업자가 채권의 준점유자로 인정될 수 있는 상황이 존재하는가?",
+      "target_audience": "법률 실무자",
+      "reasoning": "법률 실무자는 다양한 상황에서 동업자가 채권의 준점유자로 인정될 수 있는지를 판단할 수 있다.",
+      "expected_answer": "Yes",
+      "confidence": 0.8
+    },
+    {
+      "level": 6,
+      "question": "동업자가 채권의 준점유자로 인정되지 않는 경우, 법적 책임이 발생하는가?",
+      "target_audience": "법률 실무자",
+      "reasoning": "법률 실무자는 동업자가 채권의 준점유자로 인정되지 않을 때 발생할 수 있는 법적 책임을 고려해야 한다.",
+      "expected_answer": "No",
+      "confidence": 0.7
+    },
+    {
+      "level": 7,
+      "question": "동업자가 채권의 준점유자로 인정되면, 채권에 대한 권리를 행사할 수 있는가?",
+      "target_audience": "일반인",
+      "reasoning": "일반인도 동업자가 채권의 준점유자로 인정될 경우 권리 행사가 가능한지를 이해할 수 있다.",
+      "expected_answer": "Yes",
+      "confidence": 0.85
+    },
+    {
+      "level": 8,
+      "question": "동업자가 채권의 준점유자로 인정되지 않으면, 채권에 대한 권리를 전혀 행사할 수 없는가?",
+      "target_audience": "일반인",
+      "reasoning": "일반인은 동업자가 채권의 준점유자로 인정되지 않을 경우 권리 행사에 제한이 있는지를 이해할 수 있다.",
+      "expected_answer": "No",
+      "confidence": 0.8
+    },
+    {
+      "level": 9,
+      "question": "동업자가 채권의 준점유자로 인정되면, 법적으로 보호받을 수 있는가?",
+      "target_audience": "일반 대중",
+      "reasoning": "일반 대중은 동업자가 채권의 준점유자로 인정될 경우 법적 보호를 받을 수 있는지를 쉽게 이해할 수 있다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    },
+    {
+      "level": 10,
+      "question": "동업자가 채권의 준점유자로 인정되지 않으면, 법적 보호를 받을 수 없는가?",
+      "target_audience": "일반 대중",
+      "reasoning": "일반 대중은 동업자가 채권의 준점유자로 인정되지 않을 경우 법적 보호가 불가능한지를 쉽게 이해할 수 있다.",
+      "expected_answer": "No",
+      "confidence": 0.85
+    }
+  ],
+  "summary": {
+    "total_questions": 10,
+    "yes_count": 5,
+    "no_count": 5,
+    "balance_ratio": 1.0
+  }
+}

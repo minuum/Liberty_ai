@@ -1,0 +1,87 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Jupyter Notebook Development Rules
+
+## 노트북 파일 작성 규칙
+
+### 1. 완전한 코드 제공
+- 노트북 파일(.ipynb) 작성 시 **절대 툴이나 에이전트 도구를 사용하지 말 것**
+- 사용자가 **복사-붙여넣기**로 바로 사용할 수 있는 **완전한 코드**를 제공
+- JSON 형식의 노트북 구조를 **전체 코드로 직접 작성**
+- 부분적인 코드나 생략된 코드는 절대 제공하지 말 것
+
+### 2. 모듈 Import 경로 설정
+```python
+# 표준 경로 설정 패턴
+import sys
+import os
+from pathlib import Path
+
+# 상위 디렉토리를 Python path에 추가
+current_dir = Path.cwd()
+parent_dir = current_dir.parent
+sys.path.append(str(parent_dir))
+
+# 프로젝트 루트까지 경로 추가
+project_root = current_dir.parent.parent
+sys.path.append(str(project_root))
+```
+
+### 3. 안전한 Import 패턴
+```python
+# Try-except로 안전한 import
+try:
+    from your_module import YourClass
+    print("✅ 모듈 import 성공!")
+except ImportError as e:
+    print(f"❌ Import 오류: {e}")
+    print("현재 Python path:")
+    for path in sys.path:
+        print(f"  - {path}")
+```
+
+### 4. 노트북 구조 표준
+- **마크다운 셀**: 명확한 제목과 설명
+- **코드 셀**: 단계별 실행 가능한 코드
+- **출력 확인**: 각 단계별 결과 검증
+- **에러 처리**: 예외 상황에 대한 대응
+
+### 5. 개발 환경 설정
+```python
+# 자동 리로드 설정 (개발 중 모듈 변경사항 반영)
+%load_ext autoreload
+%autoreload 2
+
+# 환경 변수 설정 (필요시)
+%env PYTHONPATH=/path/to/your/project
+```
+
+## B-RAG 프로젝트 특화 규칙
+
+### 1. 질문 생성 테스트 패턴
+- GT 질문과 생성된 질문의 의미적 동일성 검증
+- 10개 레벨별 질문 생성 결과 시각화
+- Yes/No 답변 일관성 검증
+
+### 2. RAG 실험 노트북 구조
+1. **환경 설정**: 경로, import, 초기화
+2. **데이터 준비**: 샘플 GT 질문, 판결문
+3. **질문 생성**: 10개 레벨 질문 생성
+4. **결과 분석**: 시각화, 통계, 검증
+5. **실험 저장**: JSON, CSV 파일 저장
+
+### 3. 성능 측정 표준
+- 답변 일관성 비율 (Consistency Rate)
+- 레벨별 확신도 분포
+- 질문 길이 분석
+- 의미적 유사도 측정
+
+## 금지 사항
+- ❌ 노트북 파일에 대한 툴 사용
+- ❌ 불완전한 코드 제공
+- ❌ 경로 설정 없는 import
+- ❌ 에러 처리 없는 코드
+- ❌ 결과 검증 없는 실험

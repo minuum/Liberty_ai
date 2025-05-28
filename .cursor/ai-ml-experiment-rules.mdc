@@ -1,0 +1,249 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# AI/ML Experiment Rules
+
+## 실험 설계 원칙
+
+### 1. 재현 가능성 (Reproducibility)
+```python
+# 시드 고정
+import random
+import numpy as np
+import torch
+
+def set_seed(seed: int = 42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+set_seed(42)
+```
+
+### 2. 실험 추적 (Experiment Tracking)
+```python
+import time
+from datetime import datetime
+
+class ExperimentTracker:
+    def __init__(self, experiment_name: str):
+        self.name = experiment_name
+        self.start_time = datetime.now()
+        self.metrics = {}
+        
+    def log_metric(self, name: str, value: float):
+        self.metrics[name] = value
+        print(f"📊 {name}: {value}")
+        
+    def save_results(self, output_dir: str):
+        timestamp = self.start_time.strftime("%Y%m%d_%H%M%S")
+        filename = f"{self.name}_{timestamp}.json"
+        # 결과 저장 로직
+```
+
+### 3. 데이터 검증
+- 입력 데이터 형식 검증
+- 누락된 값 처리
+- 데이터 분포 확인
+- 이상치 탐지
+
+## RAG 시스템 개발 규칙
+
+### 1. 질문-답변 쌍 검증
+```python
+def validate_qa_pair(question: str, answer: str, context: str) -> bool:
+    """QA 쌍의 유효성 검증"""
+    checks = [
+        len(question.strip()) > 0,
+        len(answer.strip()) > 0,
+        len(context.strip()) > 0,
+        question.endswith('?') or '인가' in question,
+        answer in ['Yes', 'No'] or answer in ['예', '아니오']
+    ]
+    return all(checks)
+```
+
+### 2. 임베딩 품질 측정
+```python
+def measure_embedding_quality(embeddings, labels):
+    """임베딩 품질 측정"""
+    from sklearn.metrics import silhouette_score
+    from sklearn.cluster import KMeans
+    
+    # 실루엣 스코어 계산
+    silhouette = silhouette_score(embeddings, labels)
+    
+    # 클러스터링 성능
+    kmeans = KMeans(n_clusters=len(set(labels)))
+    cluster_labels = kmeans.fit_predict(embeddings)
+    
+    return {
+        'silhouette_score': silhouette,
+        'cluster_accuracy': accuracy_score(labels, cluster_labels)
+    }
+```
+
+### 3. 검색 성능 평가
+- **Precision@K**: 상위 K개 결과 중 관련 문서 비율
+- **Recall@K**: 전체 관련 문서 중 상위 K개에 포함된 비율
+- **MRR (Mean Reciprocal Rank)**: 첫 번째 관련 문서의 순위 역수 평균
+
+## 모델 성능 측정
+
+### 1. 표준 메트릭
+```python
+def calculate_metrics(y_true, y_pred, y_prob=None):
+    """표준 분류 메트릭 계산"""
+    from sklearn.metrics import (
+        accuracy_score, precision_score, recall_score, 
+        f1_score, roc_auc_score, confusion_matrix
+    )
+    
+    metrics = {
+        'accuracy': accuracy_score(y_true, y_pred),
+        'precision': precision_score(y_true, y_pred, average='weighted'),
+        'recall': recall_score(y_true, y_pred, average='weighted'),
+        'f1': f1_score(y_true, y_pred, average='weighted')
+    }
+    
+    if y_prob is not None:
+        metrics['auc'] = roc_auc_score(y_true, y_prob)
+    
+    return metrics
+```
+
+### 2. 의미적 유사도 측정
+```python
+def semantic_similarity_metrics(embeddings1, embeddings2):
+    """의미적 유사도 메트릭"""
+    from scipy.spatial.distance import cosine, euclidean
+    import numpy as np
+    
+    # 코사인 유사도
+    cosine_sim = 1 - cosine(embeddings1, embeddings2)
+    
+    # 유클리드 거리
+    euclidean_dist = euclidean(embeddings1, embeddings2)
+    
+    # 맨하탄 거리
+    manhattan_dist = np.sum(np.abs(embeddings1 - embeddings2))
+    
+    return {
+        'cosine_similarity': cosine_sim,
+        'euclidean_distance': euclidean_dist,
+        'manhattan_distance': manhattan_dist
+    }
+```
+
+## 실험 결과 시각화
+
+### 1. 성능 비교 차트
+```python
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def plot_performance_comparison(results_dict):
+    """성능 비교 시각화"""
+    fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+    
+    # 정확도 비교
+    models = list(results_dict.keys())
+    accuracies = [results_dict[model]['accuracy'] for model in models]
+    
+    axes[0, 0].bar(models, accuracies)
+    axes[0, 0].set_title('모델별 정확도 비교')
+    axes[0, 0].set_ylabel('Accuracy')
+    
+    # 추가 메트릭 시각화...
+    plt.tight_layout()
+    plt.show()
+```
+
+### 2. 분포 분석
+```python
+def analyze_score_distribution(scores, title="Score Distribution"):
+    """점수 분포 분석"""
+    plt.figure(figsize=(12, 6))
+    
+    plt.subplot(1, 2, 1)
+    plt.hist(scores, bins=30, alpha=0.7, edgecolor='black')
+    plt.title(f'{title} - Histogram')
+    plt.xlabel('Score')
+    plt.ylabel('Frequency')
+    
+    plt.subplot(1, 2, 2)
+    plt.boxplot(scores)
+    plt.title(f'{title} - Box Plot')
+    plt.ylabel('Score')
+    
+    plt.tight_layout()
+    plt.show()
+    
+    # 통계 요약
+    print(f"📊 {title} 통계:")
+    print(f"  평균: {np.mean(scores):.4f}")
+    print(f"  표준편차: {np.std(scores):.4f}")
+    print(f"  최솟값: {np.min(scores):.4f}")
+    print(f"  최댓값: {np.max(scores):.4f}")
+```
+
+## 실험 관리
+
+### 1. 버전 관리
+- 모델 버전 추적
+- 데이터셋 버전 관리
+- 하이퍼파라미터 기록
+- 실험 결과 아카이브
+
+### 2. 실험 비교
+```python
+def compare_experiments(exp1_results, exp2_results):
+    """실험 결과 비교"""
+    comparison = {}
+    
+    for metric in exp1_results.keys():
+        if metric in exp2_results:
+            diff = exp2_results[metric] - exp1_results[metric]
+            improvement = (diff / exp1_results[metric]) * 100
+            
+            comparison[metric] = {
+                'exp1': exp1_results[metric],
+                'exp2': exp2_results[metric],
+                'difference': diff,
+                'improvement_pct': improvement
+            }
+    
+    return comparison
+```
+
+### 3. 실험 보고서 생성
+```python
+def generate_experiment_report(experiment_data):
+    """실험 보고서 자동 생성"""
+    report = f"""
+# 실험 보고서: {experiment_data['name']}
+
+## 실험 개요
+- 시작 시간: {experiment_data['start_time']}
+- 종료 시간: {experiment_data['end_time']}
+- 실행 시간: {experiment_data['duration']}
+
+## 주요 결과
+"""
+    
+    for metric, value in experiment_data['metrics'].items():
+        report += f"- {metric}: {value}\n"
+    
+    return report
+```
+
+## 금지 사항
+- ❌ 시드 고정 없는 랜덤 실험
+- ❌ 메트릭 기록 없는 실험
+- ❌ 결과 검증 없는 모델 배포
+- ❌ 베이스라인 비교 없는 성능 평가
+- ❌ 통계적 유의성 검증 없는 결론

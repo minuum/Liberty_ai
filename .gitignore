@@ -1,4 +1,5 @@
 .env
+pdfs
 data
 cache
 faiss_index

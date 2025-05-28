@@ -1,0 +1,133 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Python Development Standards
+
+## 코드 작성 표준
+
+### 1. 완전성 원칙
+- **모든 코드는 즉시 실행 가능해야 함**
+- 필요한 모든 import 문 포함
+- 의존성 및 환경 설정 명시
+- TODO, placeholder, 미완성 코드 금지
+
+### 2. 에러 처리 필수
+```python
+# 표준 에러 처리 패턴
+try:
+    # 위험할 수 있는 코드
+    result = risky_operation()
+except SpecificException as e:
+    print(f"❌ 오류 발생: {e}")
+    # 대안 처리 로직
+except Exception as e:
+    print(f"❌ 예상치 못한 오류: {e}")
+    raise
+```
+
+### 3. 로깅 및 피드백
+- 진행 상황을 명확히 표시 (🔄, ✅, ❌ 이모지 활용)
+- 중요한 단계마다 상태 출력
+- 결과 검증 및 요약 제공
+
+### 4. 타입 힌트 사용
+```python
+from typing import List, Dict, Optional, Union
+
+def process_data(
+    input_data: List[str], 
+    config: Dict[str, Any]
+) -> Optional[Dict[str, Union[str, int]]]:
+    """명확한 타입 힌트와 독스트링"""
+    pass
+```
+
+## 파일 구조 표준
+
+### 1. 프로젝트 구조 인식
+- 현재 작업 디렉토리 파악
+- 상대 경로와 절대 경로 구분
+- 모듈 import 경로 최적화
+
+### 2. 설정 파일 관리
+```python
+# 환경 변수 로드
+from dotenv import load_dotenv
+load_dotenv()
+
+# 설정 파일 경로
+CONFIG_PATH = Path(__file__).parent / "config"
+```
+
+### 3. 결과 저장 표준
+- 타임스탬프 포함 파일명
+- JSON, CSV 등 다양한 형식 지원
+- 백업 및 버전 관리
+
+## 실험 및 테스트 표준
+
+### 1. 실험 설계
+- 명확한 가설 설정
+- 재현 가능한 실험 환경
+- 결과 측정 지표 정의
+
+### 2. 성능 측정
+```python
+import time
+from functools import wraps
+
+def measure_time(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(f"⏱️ {func.__name__} 실행 시간: {end-start:.2f}초")
+        return result
+    return wrapper
+```
+
+### 3. 결과 검증
+- 예상 결과와 실제 결과 비교
+- 통계적 유의성 검증
+- 시각화를 통한 결과 분석
+
+## 코드 품질 표준
+
+### 1. 가독성
+- 명확한 변수명과 함수명
+- 적절한 주석과 독스트링
+- 일관된 코딩 스타일
+
+### 2. 모듈화
+- 단일 책임 원칙 준수
+- 재사용 가능한 함수/클래스 설계
+- 의존성 최소화
+
+### 3. 문서화
+```python
+def complex_function(param1: str, param2: int) -> Dict[str, Any]:
+    """
+    복잡한 함수의 예시
+    
+    Args:
+        param1: 첫 번째 매개변수 설명
+        param2: 두 번째 매개변수 설명
+        
+    Returns:
+        결과 딕셔너리
+        
+    Raises:
+        ValueError: 잘못된 입력값일 때
+    """
+    pass
+```
+
+## 금지 사항
+- ❌ 하드코딩된 경로나 값
+- ❌ 전역 변수 남용
+- ❌ 예외 처리 없는 위험한 코드
+- ❌ 테스트 없는 복잡한 로직
+- ❌ 문서화 없는 공개 API

@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-05-27T15:55:58.569259",
+  "experiment_summary": {},
+  "performance_metrics": {},
+  "issues_identified": [
+    "확신도 개선이 미미함 (0.000)"
+  ],
+  "recommendations": [
+    "Boost RAG 반복 횟수 증가 고려",
+    "더 정교한 질문 재구성 로직 필요"
+  ],
+  "detailed_analysis": {}
+}

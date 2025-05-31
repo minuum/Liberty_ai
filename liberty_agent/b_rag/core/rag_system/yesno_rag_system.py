@@ -127,28 +127,48 @@ class YesNoRAGSystem:
     def _create_boost_prompt(self) -> ChatPromptTemplate:
         """Boost RAG 프롬프트 생성 (재작성 루프용)"""
         system_prompt = """
-당신은 고급 법률 전문가입니다. 주어진 법률 문서를 심층 분석하여 구조화된 Yes/No 답변을 제공해주세요.
+당신은 최고 수준의 법률 전문가입니다. 주어진 법률 문서를 다각적으로 심층 분석하여 구조화된 Yes/No 답변을 제공해주세요.
 
-고급 답변 규칙:
-1. answer: 반드시 "Yes" 또는 "No"만 입력
-2. reasoning: 문서의 모든 관련 내용을 종합적으로 검토한 상세한 법리적 근거
-3. confidence: 심층 분석을 통한 정확한 확신도 (0.0-1.0)
-4. key_evidence: 법리적 판단의 핵심이 되는 증거 문장들
-5. 예외 상황이나 특수한 조건도 고려하여 분석
-6. 이전 분석 결과가 있다면 이를 개선하여 더 정확한 답변 제공
+🔬 심층 분석 프로세스:
+1. **문헌 검토**: 모든 제공 문서의 관련도 점수를 고려하여 가중치 적용
+2. **법리 분석**: 직접적 조문, 판례, 법리적 원칙을 체계적으로 검토
+3. **예외 검토**: 특수한 조건, 예외 상황, 반대 해석 가능성 분석
+4. **종합 판단**: 모든 증거를 종합하여 최종 결론 도출
 
-법리적 쟁점을 체계적으로 분석하고 모든 관련 내용을 종합하여 답변하세요.
+🎯 고급 답변 기준:
+1. answer: "Yes" 또는 "No" (매우 신중한 판단)
+2. reasoning: 
+   - 핵심 법리적 근거 (최소 2가지 이상)
+   - 관련 조문이나 판례의 구체적 인용
+   - 반대 의견이 있다면 그에 대한 반박
+   - 결론에 이르는 논리적 추론 과정
+3. confidence: 
+   - 0.90+ : 명확한 법률 조문이나 확립된 판례 근거
+   - 0.80-0.89 : 강력한 법리적 근거, 일부 해석 여지
+   - 0.70-0.79 : 일반적 법리, 예외 가능성 존재
+   - 0.70미만 : 불확실성 높음
+4. key_evidence: 판단의 핵심이 되는 구체적 법조문, 판례 문구
+
+🚨 특별 지침:
+- 이전 분석 결과가 있다면 반드시 비교 검토하고 개선점 명시
+- 답변 변경 시에는 변경 이유를 상세히 설명
+- 확신도는 보수적으로 평가하되, 명확한 근거가 있을 때만 높게 설정
+- 애매한 경우 "No"로 답변하고 그 이유를 명확히 설명
+
+법률 해석의 정확성과 논리적 일관성을 최우선으로 하여 답변하세요.
 """
         
         human_prompt = """
-참고 문서 (관련도 점수 포함):
+📋 제공 문서 (관련도 점수 포함):
 {enhanced_context}
 
-질문: {question}
+❓ 법률 질문: {question}
 
-이전 분석 결과 (있는 경우): {previous_analysis}
+🔍 이전 분석 내용 (있는 경우): 
+{previous_analysis}
 
-위 정보를 바탕으로 심층 분석한 구조화된 답변을 제공해주세요."""
+위 정보를 바탕으로 다각적 심층 분석을 통한 구조화된 답변을 제공해주세요.
+특히 이전 분석이 있다면 이를 개선하여 더 정확하고 신뢰할 수 있는 답변을 생성해주세요."""
         
         return ChatPromptTemplate.from_messages([
             ("system", system_prompt),
@@ -285,12 +305,25 @@ class YesNoRAGSystem:
                 best_structured_answer = structured_answer
                 best_confidence = structured_answer.confidence
             
-            # 조기 종료 조건 (높은 확신도)
-            if structured_answer.confidence > 0.9:
-                print(f"✅ 높은 확신도 달성 ({structured_answer.confidence:.2f}), 조기 종료")
+            # 개선된 조기 종료 조건
+            # 1. 첫 번째 반복에서는 조기 종료 금지
+            # 2. 매우 높은 확신도(0.95 이상)에서만 조기 종료
+            # 3. 최소 2회 반복 보장
+            if iteration >= 1 and structured_answer.confidence >= 0.95:
+                print(f"✅ 매우 높은 확신도 달성 ({structured_answer.confidence:.3f}), 조기 종료")
                 break
+            elif iteration == 0 and structured_answer.confidence >= 0.95:
+                print(f"🔄 첫 반복에서 높은 확신도({structured_answer.confidence:.3f}) 달성, 추가 개선 시도")
             
-            previous_analysis = f"이전 답변: {structured_answer.answer}, 근거: {structured_answer.reasoning}"
+            # 답변 변경 시 특별 추가 분석
+            if iteration > 0 and best_structured_answer:
+                if best_structured_answer.answer != structured_answer.answer:
+                    print(f"⚠️ 답변 변경 감지: {best_structured_answer.answer} → {structured_answer.answer}")
+                    previous_analysis = f"답변 변경됨 - 이전: {best_structured_answer.answer}({best_structured_answer.confidence:.3f}), 현재: {structured_answer.answer}({structured_answer.confidence:.3f}). 변경 근거를 명확히 설명하고 더 정확한 분석 필요."
+                else:
+                    previous_analysis = f"이전 답변: {structured_answer.answer}, 근거: {structured_answer.reasoning}, 확신도: {structured_answer.confidence:.3f}. 추가 개선 가능한 부분 검토."
+            else:
+                previous_analysis = f"첫 번째 분석 - 답변: {structured_answer.answer}, 근거: {structured_answer.reasoning}"
         
         processing_time = time.time() - start_time
         
@@ -314,8 +347,6 @@ class YesNoRAGSystem:
             processing_time=processing_time,
             experiment_type="boost"
         )
-    
-
     
     def compare_rag_performance(self, questions: List[str]) -> Dict[str, Any]:
         """Standard RAG vs Boost RAG 성능 비교"""
@@ -369,7 +400,7 @@ class YesNoRAGSystem:
         standard_results: List[RAGResult], 
         boost_results: List[RAGResult]
     ) -> Dict[str, Any]:
-        """성능 비교 분석"""
+        """성능 비교 분석 (개선된 버전)"""
         standard_confidences = [r.confidence for r in standard_results]
         boost_confidences = [r.confidence for r in boost_results]
         
@@ -380,11 +411,53 @@ class YesNoRAGSystem:
         standard_yes_count = sum(1 for r in standard_results if r.answer == "Yes")
         boost_yes_count = sum(1 for r in boost_results if r.answer == "Yes")
         
+        # 개별 개선도 분석
+        improvements = []
+        answer_changes = []
+        confidence_improvements = []
+        
+        for std_r, boost_r in zip(standard_results, boost_results):
+            conf_improvement = boost_r.confidence - std_r.confidence
+            confidence_improvements.append(conf_improvement)
+            improvements.append({
+                "question": std_r.question[:50] + "...",
+                "standard_answer": std_r.answer,
+                "boost_answer": boost_r.answer,
+                "standard_confidence": std_r.confidence,
+                "boost_confidence": boost_r.confidence,
+                "confidence_improvement": conf_improvement,
+                "answer_changed": std_r.answer != boost_r.answer,
+                "time_overhead": boost_r.processing_time - std_r.processing_time
+            })
+            
+            if std_r.answer != boost_r.answer:
+                answer_changes.append({
+                    "question": std_r.question[:50] + "...",
+                    "change": f"{std_r.answer} → {boost_r.answer}",
+                    "confidence_change": f"{std_r.confidence:.3f} → {boost_r.confidence:.3f}"
+                })
+        
+        # 개선 효과 분류
+        significant_improvements = sum(1 for imp in confidence_improvements if imp >= 0.1)
+        moderate_improvements = sum(1 for imp in confidence_improvements if 0.05 <= imp < 0.1)
+        minor_improvements = sum(1 for imp in confidence_improvements if 0.01 <= imp < 0.05)
+        no_change = sum(1 for imp in confidence_improvements if abs(imp) < 0.01)
+        degradations = sum(1 for imp in confidence_improvements if imp < -0.01)
+        
         return {
             "confidence_improvement": {
                 "standard_avg": sum(standard_confidences) / len(standard_confidences),
                 "boost_avg": sum(boost_confidences) / len(boost_confidences),
-                "improvement": sum(boost_confidences) / len(boost_confidences) - sum(standard_confidences) / len(standard_confidences)
+                "improvement": sum(boost_confidences) / len(boost_confidences) - sum(standard_confidences) / len(standard_confidences),
+                "max_improvement": max(confidence_improvements),
+                "min_improvement": min(confidence_improvements),
+                "improvement_distribution": {
+                    "significant_improvements": significant_improvements,
+                    "moderate_improvements": moderate_improvements,
+                    "minor_improvements": minor_improvements,
+                    "no_change": no_change,
+                    "degradations": degradations
+                }
             },
             "processing_time": {
                 "standard_avg": sum(standard_times) / len(standard_times),
@@ -396,8 +469,34 @@ class YesNoRAGSystem:
                 "boost": boost_yes_count,
                 "improvement": boost_yes_count - standard_yes_count
             },
+            "answer_changes": {
+                "total_changes": len(answer_changes),
+                "change_details": answer_changes
+            },
+            "detailed_improvements": improvements,
+            "quality_assessment": {
+                "improvement_success_rate": (significant_improvements + moderate_improvements + minor_improvements) / len(confidence_improvements),
+                "answer_stability": 1 - (len(answer_changes) / len(standard_results)),
+                "overall_score": self._calculate_overall_score(confidence_improvements, answer_changes, standard_results)
+            },
             "total_questions": len(standard_results)
         }
+    
+    def _calculate_overall_score(self, confidence_improvements: List[float], answer_changes: List[Dict], standard_results: List[RAGResult]) -> float:
+        """전체 성능 점수 계산 (0-100점)"""
+        # 확신도 개선 점수 (0-60점)
+        avg_improvement = sum(confidence_improvements) / len(confidence_improvements)
+        confidence_score = min(60, avg_improvement * 600)  # 0.1 개선 = 60점
+        
+        # 안정성 점수 (0-30점) - 답변 변경이 적을수록 높은 점수
+        stability_rate = 1 - (len(answer_changes) / len(standard_results))
+        stability_score = stability_rate * 30
+        
+        # 일관성 점수 (0-10점) - 개선 분포가 고른 정도
+        positive_improvements = sum(1 for imp in confidence_improvements if imp > 0)
+        consistency_score = (positive_improvements / len(confidence_improvements)) * 10
+        
+        return confidence_score + stability_score + consistency_score
     
     def save_results(self, results: Dict[str, Any], output_path: str) -> None:
         """실험 결과 저장"""

@@ -1,14 +1,14 @@
 {
-  "test_timestamp": "2025-05-29 13:07:40",
-  "question_source": "memory",
+  "test_timestamp": "2025-06-01 03:25:37",
+  "question_source": "file",
   "total_questions": 11,
   "successful_tests": 11,
   "summary": {
-    "standard_yes_count": 10,
+    "standard_yes_count": 9,
     "boost_yes_count": 9,
-    "avg_standard_confidence": 0.9272727272727274,
+    "avg_standard_confidence": 0.9181818181818183,
     "avg_boost_confidence": 0.95,
-    "confidence_improvement": 0.022727272727272596,
+    "confidence_improvement": 0.031818181818181634,
     "improved_count": 8,
     "same_count": 0,
     "degraded_count": 3
@@ -31,44 +31,60 @@
       "improvement": 0.04999999999999993
     },
     {
-      "question": "법리상 동업자는 채권의 준점유자로 볼 수 없는가?",
-      "standard_answer": "Yes",
-      "standard_confidence": 0.9,
-      "boost_answer": "Yes",
-      "boost_confidence": 0.95,
-      "improvement": 0.04999999999999993
-    },
-    {
-      "question": "동업자가 채권의 준점유자로 간주되지 않는 이유가 법률에 명시되어 있는가?",
-      "standard_answer": "Yes",
-      "standard_confidence": 0.9,
-      "boost_answer": "Yes",
-      "boost_confidence": 0.95,
-      "improvement": 0.04999999999999993
-    },
-    {
-      "question": "동업자가 채권의 준점유자로 인정되지 않는다는 법적 해석이 일반적인가?",
-      "standard_answer": "Yes",
-      "standard_confidence": 0.9,
-      "boost_answer": "Yes",
-      "boost_confidence": 0.95,
-      "improvement": 0.04999999999999993
-    },
-    {
-      "question": "동업자가 채권의 준점유자로 간주되지 않는다는 것이 법적 관행인가?",
-      "standard_answer": "Yes",
-      "standard_confidence": 0.9,
-      "boost_answer": "Yes",
-      "boost_confidence": 0.95,
-      "improvement": 0.04999999999999993
-    },
-    {
-      "question": "동업자가 채권의 준점유자로 인정되지 않는다는 것이 법적 원칙에 부합하는가?",
+      "question": "법률상 동업자는 채권의 준점유자로 간주되지 않는가?",
       "standard_answer": "Yes",
       "standard_confidence": 1.0,
       "boost_answer": "Yes",
       "boost_confidence": 0.95,
       "improvement": -0.050000000000000044
+    },
+    {
+      "question": "동업자가 채권의 준점유자로서의 권리를 주장할 수 없는가?",
+      "standard_answer": "Yes",
+      "standard_confidence": 1.0,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": -0.050000000000000044
+    },
+    {
+      "question": "동업자가 채권의 준점유자로 인정될 수 있는 예외 상황이 존재하는가?",
+      "standard_answer": "No",
+      "standard_confidence": 0.8,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.1499999999999999
+    },
+    {
+      "question": "동업자가 채권의 준점유자로서 법적 보호를 받을 수 없는가?",
+      "standard_answer": "Yes",
+      "standard_confidence": 0.9,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.04999999999999993
+    },
+    {
+      "question": "동업자가 채권의 준점유자로 간주되지 않는 이유가 법리적으로 명확한가?",
+      "standard_answer": "Yes",
+      "standard_confidence": 0.9,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.04999999999999993
+    },
+    {
+      "question": "동업자가 채권의 준점유자로 인정되지 않는 것이 일반적인가?",
+      "standard_answer": "Yes",
+      "standard_confidence": 0.9,
+      "boost_answer": "Yes",
+      "boost_confidence": 0.95,
+      "improvement": 0.04999999999999993
+    },
+    {
+      "question": "동업자가 채권의 준점유자로 인정될 가능성이 있는가?",
+      "standard_answer": "No",
+      "standard_confidence": 0.9,
+      "boost_answer": "No",
+      "boost_confidence": 0.95,
+      "improvement": 0.04999999999999993
     },
     {
       "question": "동업자는 채권의 준점유자가 아닌가요?",
@@ -79,24 +95,8 @@
       "improvement": 0.04999999999999993
     },
     {
-      "question": "동업자가 채권의 준점유자로 여겨지지 않나요?",
+      "question": "동업자가 채권의 준점유자가 될 수 없나요?",
       "standard_answer": "Yes",
-      "standard_confidence": 1.0,
-      "boost_answer": "Yes",
-      "boost_confidence": 0.95,
-      "improvement": -0.050000000000000044
-    },
-    {
-      "question": "동업자는 채권을 가진 사람으로 안 보나요?",
-      "standard_answer": "Yes",
-      "standard_confidence": 0.9,
-      "boost_answer": "No",
-      "boost_confidence": 0.95,
-      "improvement": 0.04999999999999993
-    },
-    {
-      "question": "동업자는 채권을 가진 사람인가요?",
-      "standard_answer": "No",
       "standard_confidence": 0.9,
       "boost_answer": "No",
       "boost_confidence": 0.95,

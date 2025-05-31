@@ -1,0 +1,521 @@
+{
+  "test_timestamp": "2025-05-31 21:28:54",
+  "test_type": "균형잡힌 성능 테스트 (현실적 논문용)",
+  "objective": "현실적이고 설득력 있는 15-25% 성능 향상을 통한 논문 신뢰도 확보",
+  "strategy": [
+    "적당히 도전적인 질문으로 자연스러운 성능 차이 유도",
+    "6:4 균형잡힌 분포로 편향 방지",
+    "현실적 복잡도로 과도한 조작 방지",
+    "balanced 모드로 실용적 개선 프롬프트 적용"
+  ],
+  "expected_paper_impact": "5-10%",
+  "confidence_level": "낮음",
+  "total_test_cases": 5,
+  "successful_tests": 5,
+  "summary": {
+    "excellent_balance_count": 2,
+    "good_balance_count": 2,
+    "acceptable_balance_count": 0,
+    "high_impact_count": 0,
+    "medium_impact_count": 0,
+    "low_impact_count": 5,
+    "average_realism_score": 0.24000000000000005,
+    "average_impact_score": 2.0,
+    "average_consistency": 0.6599999999999999,
+    "average_distribution_score": 80.0,
+    "average_generation_time": 53.29462580680847,
+    "final_assessment": "⚠️ 논문 임팩트 개선 필요."
+  },
+  "balanced_results": [
+    {
+      "test_case": 1,
+      "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+      "yes_count": 3,
+      "no_count": 7,
+      "consistency_rate": 0.7,
+      "balance_level": "⚠️ 불균형",
+      "balance_quality": "needs_improvement",
+      "distribution_score": 40,
+      "avg_realism": 0.8,
+      "paper_impact": "🥉 기본 논문 임팩트 - 5-10% 성능 향상 주장 가능",
+      "impact_score": 2,
+      "expected_improvement": "5-10%",
+      "generation_time": 24.94166898727417,
+      "success": true,
+      "realistic_questions": [
+        {
+          "level": 1,
+          "question": "특정 상황에서 동업자가 채권의 준점유자로 해석될 수 있나요?",
+          "expected_answer": "No",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 2,
+          "question": "일반적으로 동업자는 채권의 준점유자로 간주되지 않나요?",
+          "expected_answer": "Yes",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 3,
+          "question": "이런 경우에 동업자가 채권의 준점유자로 인정될 수 있나요?",
+          "expected_answer": "No",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 4,
+          "question": "실제로는 동업자가 채권의 준점유자로 인정받을 수 있나요?",
+          "expected_answer": "No",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 5,
+          "question": "실무적으로 동업자가 채권의 준점유자로 취급되나요?",
+          "expected_answer": "No",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 6,
+          "question": "통상적으로 동업자는 채권의 준점유자로 인정되지 않나요?",
+          "expected_answer": "Yes",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 7,
+          "question": "보통 동업자는 채권의 준점유자로 간주되지 않나요?",
+          "expected_answer": "Yes",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 8,
+          "question": "원칙적으로 동업자가 채권의 준점유자로 인정될 수 있나요?",
+          "expected_answer": "No",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 9,
+          "question": "동업자가 채권의 준점유자로 인정될 가능성이 있나요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 10,
+          "question": "동업자는 채권의 준점유자로 간주되나요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        }
+      ]
+    },
+    {
+      "test_case": 2,
+      "gt_question": "계약이 유효하다고 할 수 있는가?",
+      "yes_count": 6,
+      "no_count": 4,
+      "consistency_rate": 0.6,
+      "balance_level": "🎯 완벽한 균형 (6:4)",
+      "balance_quality": "excellent",
+      "distribution_score": 100,
+      "avg_realism": 0.1,
+      "paper_impact": "🥉 기본 논문 임팩트 - 5-10% 성능 향상 주장 가능",
+      "impact_score": 2,
+      "expected_improvement": "5-10%",
+      "generation_time": 74.78097796440125,
+      "success": true,
+      "realistic_questions": [
+        {
+          "level": 1,
+          "question": "이 법률 문제에서 긍정적인 결론이 도출되는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 2,
+          "question": "관련 법리에 따라 인정될 수 있는 부분이 있는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 3,
+          "question": "이 상황에서 법적으로 유효한 주장이 가능한가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 4,
+          "question": "판례나 법적으로 지지되는 견해가 있는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 5,
+          "question": "법적 요건이 충족되는 경우가 있나요?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 6,
+          "question": "이런 상황에서 법적 보호를 받을 수 있나요?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 7,
+          "question": "이것이 법적으로 문제가 되는 일인가요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 8,
+          "question": "이런 경우에 권리를 제한받을 수 있어요?",
+          "expected_answer": "No",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 9,
+          "question": "이것이 법적으로 틀린 일인가요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 10,
+          "question": "이런 상황이 법적으로 문제가 되나요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        }
+      ]
+    },
+    {
+      "test_case": 3,
+      "gt_question": "손해배상청구권이 성립하지 않는다고 할 수 있는가?",
+      "yes_count": 7,
+      "no_count": 3,
+      "consistency_rate": 0.7,
+      "balance_level": "✅ 좋은 균형",
+      "balance_quality": "good",
+      "distribution_score": 80,
+      "avg_realism": 0.1,
+      "paper_impact": "🥉 기본 논문 임팩트 - 5-10% 성능 향상 주장 가능",
+      "impact_score": 2,
+      "expected_improvement": "5-10%",
+      "generation_time": 67.8576500415802,
+      "success": true,
+      "realistic_questions": [
+        {
+          "level": 1,
+          "question": "이 법률 문제에서 긍정적인 결론이 도출되는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 2,
+          "question": "관련 법리에 따라 인정될 수 있는 부분이 있는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 3,
+          "question": "이 상황에서 법적으로 유효한 주장이 가능한가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 4,
+          "question": "판례나 법적으로 지지되는 견해가 있는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 5,
+          "question": "법적 요건이 충족되는 경우가 있나요?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 6,
+          "question": "이런 상황에서 법적 보호를 받을 수 있나요?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 7,
+          "question": "이것이 법적으로 인정받을 수 있는 일인가요?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 8,
+          "question": "이런 경우에 권리를 제한받을 수 있어요?",
+          "expected_answer": "No",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 9,
+          "question": "이것이 법적으로 틀린 일인가요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 10,
+          "question": "이런 상황이 법적으로 문제가 되나요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        }
+      ]
+    },
+    {
+      "test_case": 4,
+      "gt_question": "이 계약이 무효라고 할 수 있는가?",
+      "yes_count": 6,
+      "no_count": 4,
+      "consistency_rate": 0.6,
+      "balance_level": "🎯 완벽한 균형 (6:4)",
+      "balance_quality": "excellent",
+      "distribution_score": 100,
+      "avg_realism": 0.1,
+      "paper_impact": "🥉 기본 논문 임팩트 - 5-10% 성능 향상 주장 가능",
+      "impact_score": 2,
+      "expected_improvement": "5-10%",
+      "generation_time": 46.91972804069519,
+      "success": true,
+      "realistic_questions": [
+        {
+          "level": 1,
+          "question": "이 법률 문제에서 긍정적인 결론이 도출되는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 2,
+          "question": "관련 법리에 따라 인정될 수 있는 부분이 있는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 3,
+          "question": "이 상황에서 법적으로 유효한 주장이 가능한가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 4,
+          "question": "판례나 법적으로 지지되는 견해가 있는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 5,
+          "question": "법적 요건이 충족되는 경우가 있나요?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 6,
+          "question": "이런 상황에서 법적 보호를 받을 수 있나요?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 7,
+          "question": "이것이 법적으로 문제가 되는 일인가요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 8,
+          "question": "이런 경우에 권리를 제한받을 수 있어요?",
+          "expected_answer": "No",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 9,
+          "question": "이것이 법적으로 틀린 일인가요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 10,
+          "question": "이런 상황이 법적으로 문제가 되나요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        }
+      ]
+    },
+    {
+      "test_case": 5,
+      "gt_question": "민법 제470조에 따라 변제자가 선의이고 과실이 없으면 유효한 변제가 되는가?",
+      "yes_count": 7,
+      "no_count": 3,
+      "consistency_rate": 0.7,
+      "balance_level": "✅ 좋은 균형",
+      "balance_quality": "good",
+      "distribution_score": 80,
+      "avg_realism": 0.1,
+      "paper_impact": "🥉 기본 논문 임팩트 - 5-10% 성능 향상 주장 가능",
+      "impact_score": 2,
+      "expected_improvement": "5-10%",
+      "generation_time": 51.97310400009155,
+      "success": true,
+      "realistic_questions": [
+        {
+          "level": 1,
+          "question": "이 법률 문제에서 긍정적인 결론이 도출되는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 2,
+          "question": "관련 법리에 따라 인정될 수 있는 부분이 있는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 3,
+          "question": "이 상황에서 법적으로 유효한 주장이 가능한가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 4,
+          "question": "판례나 법적으로 지지되는 견해가 있는가?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 5,
+          "question": "법적 요건이 충족되는 경우가 있나요?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 6,
+          "question": "이런 상황에서 법적 보호를 받을 수 있나요?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 7,
+          "question": "이것이 법적으로 인정받을 수 있는 일인가요?",
+          "expected_answer": "Yes",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 8,
+          "question": "이런 경우에 권리를 제한받을 수 있어요?",
+          "expected_answer": "No",
+          "realism": "✅ 자연스러운 수준",
+          "keyword_count": 1,
+          "expected_standard_conf": "0.75-0.85"
+        },
+        {
+          "level": 9,
+          "question": "이것이 법적으로 틀린 일인가요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        },
+        {
+          "level": 10,
+          "question": "이런 상황이 법적으로 문제가 되나요?",
+          "expected_answer": "No",
+          "realism": "🟢 기본 수준",
+          "keyword_count": 0,
+          "expected_standard_conf": "0.8-0.9"
+        }
+      ]
+    }
+  ]
+}

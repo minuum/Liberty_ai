@@ -1,0 +1,48 @@
+# IntegratedKnowledgeManifest_SKF/1.4 LA
+# SourceDocs: [requests-None]
+# GenerationTimestamp: 2025-05-30T05:05:43+00:00
+# PrimaryNamespace: requests
+
+# SECTION: DEFINITIONS (Prefix: D)
+# Format_PrimaryDef: Dxxx:Gxxx_Entity [DEF_TYP] [NAMESPACE "relative.path"] [OPERATIONS {op1:RetT(p1N:p1T); op2_static:RetT()}] [ATTRIBUTES {attr1:AttrT1("Def:Val","RO")}] [CONSTANTS {c1:ValT1("Val")}] ("Note")
+# ---"
+D001:G001 [ModDef] [NAMESPACE "."] [OPERATIONS {get:G003(url:Str, auth:Opt[Uni[Tuple[Str,Str],G008]])}]
+D002:G002 [Function] [NAMESPACE "."]
+D003:G003 [CompDef] [NAMESPACE "."] [OPERATIONS {json:Any()}] [ATTRIBUTES {status_code:Int; headers:G010; encoding:Str; text:Str}]
+D004:G004 [CompDef] [NAMESPACE "."]
+D005:G005 [CompDef] [NAMESPACE "."]
+D006:G006 [CompDef] [NAMESPACE "."]
+D007:G007 [DTDef] [NAMESPACE "."]
+D008:G008 [IfceDef] [NAMESPACE "."]
+D009:G009 [DTDef] [NAMESPACE "."]
+D010:G010 [DTDef] [NAMESPACE "."]
+D011:G011 [CompDef] [NAMESPACE "."]
+D012:G012 [Function] [NAMESPACE "."]
+
+# SECTION: INTERACTIONS (Prefix: I)
+# Format: Ixxx:Source_Ref INT_VERB Target_Ref_Or_Literal ("Note_Conditions_Error(Gxxx_ErrorType)")
+# ---"
+I001:G001 INVOKES G002 ("requests.get(...) call")
+I002:G002 CONFIGURED_BY G008 ("auth parameter in requests.get")
+I003:G002 DATA_FLOW G003 ("requests.get returns Response object")
+I004:G003 READS_FROM G003.status_code ("Accessing r.status_code")
+I005:G003 READS_FROM G003.headers ("Accessing r.headers")
+I006:G010 READS_FROM Literal("content-type") ("Accessing r.headers['content-type']")
+I007:G003 READS_FROM G003.encoding ("Accessing r.encoding")
+I008:G003 READS_FROM G003.text ("Accessing r.text")
+I009:G003 INVOKES G003.json ("Calling r.json()")
+
+# SECTION: USAGE_PATTERNS (Prefix: U)
+# Format: U_Name:PatternTitleKeyword
+#         U_Name.N:[Actor_Or_Ref] ACTION_KEYWORD (Target_Or_Data_Involving_Ref) -> [Result_Or_State_Change_Involving_Ref]
+# ACTION_KEYWORD Enum: CREATE (instance), CONFIGURE (object/settings), INVOKE (operation/method), GET_ATTR (read attribute/property), SET_ATTR (write attribute/property), PROCESS_DATA, CHECK_STATE, ITERATE (over a collection/stream, e.g., async for), RAISE_ERR, HANDLE_ERR(Gxxx_ErrorType)
+---
+U_BasicAuthGetAndInspectResponse:QuickstartGetAuthResponse
+U_BasicAuthGetAndInspectResponse.1:[User] INVOKE (G001.get with url:Str, auth:Tuple[Str,Str]) -> [G003] (Response object)
+U_BasicAuthGetAndInspectResponse.2:[User] GET_ATTR (G003.status_code) -> [Int] (HTTP status code)
+U_BasicAuthGetAndInspectResponse.3:[User] GET_ATTR (G003.headers) -> [G010] (Response headers)
+U_BasicAuthGetAndInspectResponse.4:[User] GET_ATTR (G003.encoding) -> [Str] (Response encoding)
+U_BasicAuthGetAndInspectResponse.5:[User] GET_ATTR (G003.text) -> [Str] (Response body text)
+U_BasicAuthGetAndInspectResponse.6:[User] INVOKE (G003.json) -> [Any] (JSON parsed body)
+
+# END_OF_MANIFEST

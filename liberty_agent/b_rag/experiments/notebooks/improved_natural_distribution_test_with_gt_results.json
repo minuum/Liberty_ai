@@ -1,0 +1,201 @@
+{
+  "test_timestamp": "2025-05-31 21:56:26",
+  "test_type": "개선된 자연스러운 분포 테스트 (실제 GT 데이터 사용)",
+  "gt_data_source": "샘플 데이터 사용",
+  "total_gt_cases_processed": 2,
+  "successful_generation_cases": 2,
+  "results_per_gt_case": [
+    {
+      "test_case_index": 1,
+      "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+      "original_document_summary": "민법 제470조는 채권의 준점유자에 대한 변제는 변제자가 선의이며 과실없는 때에 한하여 효력이 있다고 규정하고 있다......",
+      "original_keywords": "채권, 준점유자, 민법 제470조, 동업자",
+      "yes_count": 8,
+      "no_count": 2,
+      "consistency_rate": 0.8,
+      "distribution_type": "✨ 자연스러운 분포 (8:2)",
+      "quality_level": "⚠️ 개선 필요",
+      "total_quality_score": 2.6666666666666665,
+      "generation_time": 13.999216318130493,
+      "success": true,
+      "generated_questions_details": [
+        {
+          "level": 1,
+          "question": "민법 제470조에 따르면 동업자는 채권의 준점유자로 간주되지 않는가?",
+          "expected_answer": "Yes",
+          "confidence": 0.95,
+          "target_audience": "법률 전문가",
+          "reasoning": "민법 제470조의 해석에 따라 동업자가 채권의 준점유자로 간주되지 않는다는 결론을 도출할 수 있다."
+        },
+        {
+          "level": 2,
+          "question": "동업자가 채권의 준점유자에 해당하지 않는다는 법적 해석이 가능한가?",
+          "expected_answer": "Yes",
+          "confidence": 0.9,
+          "target_audience": "법학 연구자",
+          "reasoning": "법적 해석을 통해 동업자가 채권의 준점유자가 아님을 논증할 수 있다."
+        },
+        {
+          "level": 3,
+          "question": "동업자는 일반적으로 채권의 준점유자로 인정되지 않는가?",
+          "expected_answer": "Yes",
+          "confidence": 0.85,
+          "target_audience": "법학도",
+          "reasoning": "일반적인 법적 해석에 따르면 동업자는 채권의 준점유자로 인정되지 않는다."
+        },
+        {
+          "level": 4,
+          "question": "채권의 준점유자에 대한 변제 효력 규정에 따라 동업자는 준점유자가 아닌가?",
+          "expected_answer": "Yes",
+          "confidence": 0.9,
+          "target_audience": "법률 실무자",
+          "reasoning": "변제 효력 규정에 따라 동업자가 준점유자가 아님을 확인할 수 있다."
+        },
+        {
+          "level": 5,
+          "question": "동업자가 채권의 준점유자에 해당하지 않는 경우가 일반적인가?",
+          "expected_answer": "Yes",
+          "confidence": 0.8,
+          "target_audience": "법률 상담가",
+          "reasoning": "일반적인 법률 상담에서 동업자가 채권의 준점유자가 아님을 설명할 수 있다."
+        },
+        {
+          "level": 6,
+          "question": "동업자가 채권의 준점유자로 인정될 가능성이 있는가?",
+          "expected_answer": "No",
+          "confidence": 0.6,
+          "target_audience": "법률 실무자",
+          "reasoning": "특수한 상황에서는 동업자가 채권의 준점유자로 인정될 가능성을 고려할 수 있다."
+        },
+        {
+          "level": 7,
+          "question": "동업자는 채권의 준점유자로 보기 어려운가?",
+          "expected_answer": "Yes",
+          "confidence": 0.75,
+          "target_audience": "일반인",
+          "reasoning": "일반적인 이해로는 동업자가 채권의 준점유자로 보기 어렵다."
+        },
+        {
+          "level": 8,
+          "question": "동업자가 채권의 준점유자가 아닌 경우가 많은가?",
+          "expected_answer": "Yes",
+          "confidence": 0.7,
+          "target_audience": "일반인",
+          "reasoning": "일반적인 경우를 설명할 때 동업자가 채권의 준점유자가 아님을 쉽게 이해할 수 있다."
+        },
+        {
+          "level": 9,
+          "question": "동업자는 채권의 준점유자가 아닌가요?",
+          "expected_answer": "Yes",
+          "confidence": 0.65,
+          "target_audience": "일반인",
+          "reasoning": "간단한 표현으로 동업자가 채권의 준점유자가 아님을 설명할 수 있다."
+        },
+        {
+          "level": 10,
+          "question": "동업자가 채권의 준점유자일 수 있나요?",
+          "expected_answer": "No",
+          "confidence": 0.55,
+          "target_audience": "일반인",
+          "reasoning": "일반적인 상황에서는 동업자가 채권의 준점유자가 아니지만, 가능성을 열어두는 질문이다."
+        }
+      ]
+    },
+    {
+      "test_case_index": 2,
+      "gt_question": "계약이 유효하다고 할 수 있는가?",
+      "original_document_summary": "계약의 유효성은 의사표시의 합치, 법률행위의 목적, 내용 등을 종합적으로 고려하여 판단된다......",
+      "original_keywords": "계약, 유효성, 의사표시, 법률행위",
+      "yes_count": 9,
+      "no_count": 1,
+      "consistency_rate": 0.9,
+      "distribution_type": "🌟 매우 자연스러운 분포 (9:1)",
+      "quality_level": "⚠️ 개선 필요",
+      "total_quality_score": 4.333333333333333,
+      "generation_time": 14.32313084602356,
+      "success": true,
+      "generated_questions_details": [
+        {
+          "level": 1,
+          "question": "계약의 유효성을 판단할 때 의사표시의 합치가 중요한 요소인가?",
+          "expected_answer": "Yes",
+          "confidence": 0.95,
+          "target_audience": "법률 전문가",
+          "reasoning": "의사표시의 합치는 계약의 유효성을 판단하는 핵심 요소 중 하나로, 법률 전문가들이 이를 이해하는 것이 중요하다."
+        },
+        {
+          "level": 2,
+          "question": "법률행위의 목적이 불법적이라면 계약은 유효하지 않은가?",
+          "expected_answer": "Yes",
+          "confidence": 0.95,
+          "target_audience": "법률 전문가",
+          "reasoning": "법률행위의 목적이 불법적일 경우 계약은 무효가 되므로, 법률 전문가들은 이를 명확히 이해해야 한다."
+        },
+        {
+          "level": 3,
+          "question": "계약의 내용이 불명확하면 계약이 무효가 될 수 있는가?",
+          "expected_answer": "Yes",
+          "confidence": 0.9,
+          "target_audience": "법률 학습자",
+          "reasoning": "계약의 내용이 불명확할 경우 계약의 유효성에 영향을 미칠 수 있으므로, 법률 학습자들이 이를 이해하는 것이 중요하다."
+        },
+        {
+          "level": 4,
+          "question": "계약이 유효하려면 모든 당사자가 계약의 내용을 이해하고 동의해야 하는가?",
+          "expected_answer": "Yes",
+          "confidence": 0.9,
+          "target_audience": "법률 학습자",
+          "reasoning": "계약의 유효성은 당사자 간의 합의와 이해를 기반으로 하므로, 학습자들이 이를 이해하는 것이 중요하다."
+        },
+        {
+          "level": 5,
+          "question": "계약의 유효성을 판단할 때 법률행위의 목적이 고려되어야 하는가?",
+          "expected_answer": "Yes",
+          "confidence": 0.9,
+          "target_audience": "법률 실무자",
+          "reasoning": "법률행위의 목적은 계약의 유효성을 판단하는 중요한 요소이므로, 실무자들이 이를 고려해야 한다."
+        },
+        {
+          "level": 6,
+          "question": "계약의 유효성을 결정할 때 계약 당사자 중 한 명이 미성년자라면 계약이 무효가 될 수 있는가?",
+          "expected_answer": "Yes",
+          "confidence": 0.85,
+          "target_audience": "법률 실무자",
+          "reasoning": "미성년자가 계약 당사자인 경우, 계약의 유효성에 영향을 미칠 수 있으므로 실무자들이 이를 이해해야 한다."
+        },
+        {
+          "level": 7,
+          "question": "계약의 유효성을 위해서는 계약서에 명시된 모든 조건이 합법적이어야 하는가?",
+          "expected_answer": "Yes",
+          "confidence": 0.85,
+          "target_audience": "일반인",
+          "reasoning": "계약서의 조건이 합법적이어야 계약이 유효하다는 것을 일반인들이 이해할 수 있도록 설명한다."
+        },
+        {
+          "level": 8,
+          "question": "계약이 유효하려면 계약의 목적이 사회적 통념에 반하지 않아야 하는가?",
+          "expected_answer": "Yes",
+          "confidence": 0.8,
+          "target_audience": "일반인",
+          "reasoning": "계약의 목적이 사회적 통념에 반할 경우 유효성이 부정될 수 있음을 일반인들이 이해할 수 있도록 한다."
+        },
+        {
+          "level": 9,
+          "question": "계약이 유효하지 않으려면 계약 당사자 간에 명백한 의사 불일치가 있어야 하는가?",
+          "expected_answer": "No",
+          "confidence": 0.75,
+          "target_audience": "일반인",
+          "reasoning": "계약의 유효성을 부정하기 위해서는 의사 불일치가 필요하다는 점을 일반인들이 이해할 수 있도록 한다."
+        },
+        {
+          "level": 10,
+          "question": "계약이 유효하지 않다면 계약 당사자 중 한 명이 계약 내용을 이해하지 못했을 가능성이 있는가?",
+          "expected_answer": "Yes",
+          "confidence": 0.7,
+          "target_audience": "일반인",
+          "reasoning": "계약의 유효성을 부정하는 경우, 당사자가 계약 내용을 이해하지 못했을 가능성을 설명한다."
+        }
+      ]
+    }
+  ]
+}

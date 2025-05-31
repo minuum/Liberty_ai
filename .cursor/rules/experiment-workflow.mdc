@@ -3,3 +3,223 @@ description:
 globs:
 alwaysApply: false
 ---
+# B-RAG 실험 워크플로우 가이드
+
+## 실험 환경 구조
+
+### 노트북 기반 실험 시스템
+- [b_rag_test_notebook.ipynb](mdc:liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb) - 메인 통합 테스트
+- [truly_natural_experiment.ipynb](mdc:liberty_agent/b_rag/experiments/notebooks/truly_natural_experiment.ipynb) - 자연분포 전용 실험
+
+### 개별 테스트 스크립트
+- [enhanced_b_rag_test.py](mdc:liberty_agent/b_rag/experiments/notebooks/enhanced_b_rag_test.py) - 개선된 테스트
+- [smart_simple_test.py](mdc:liberty_agent/b_rag/experiments/notebooks/smart_simple_test.py) - 간단한 테스트
+- [final_b_rag_test_cell.py](mdc:liberty_agent/b_rag/experiments/notebooks/final_b_rag_test_cell.py) - 최종 테스트
+
+## 표준 실험 워크플로우
+
+### 1단계: 환경 설정
+```python
+# 셀 1: 환경 설정 및 Import
+import sys, os, json, time
+sys.path.append('/Users/minu/dev/Liberty/Liberty_ai')
+from liberty_agent.b_rag.core.question_generation.unified_yesno_question_generator import UnifiedYesNoQuestionGenerator
+```
+
+### 2단계: 질문 생성 테스트
+```python
+# 셀 3: 자연스러운 분포 테스트
+test_cases = [
+    {"question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?", ...},
+    {"question": "계약이 유효하다고 할 수 있는가?", ...}
+]
+```
+
+### 3단계: RAG 성능 테스트
+```python
+# 셀 5: RAG 시스템 통합 테스트
+# Standard RAG vs B-RAG 성능 비교
+```
+
+### 4단계: 결과 분석
+- 분포 패턴 분석
+- 일관성 지표 계산
+- 품질 점수 평가
+- JSON 결과 저장
+
+## 테스트 케이스 설계
+
+### 표준 테스트 세트
+```python
+standard_test_cases = [
+    # 부정형 질문들
+    "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+    "손해배상청구권이 성립하지 않는다고 할 수 있는가?", 
+    "이 계약이 무효라고 할 수 있는가?",
+    
+    # 긍정형 질문들  
+    "계약이 유효하다고 할 수 있는가?",
+    "권리가 인정된다고 할 수 있는가?"
+]
+```
+
+### 테스트 케이스 분류
+| 유형 | 예상 분포 | 특징 |
+|------|-----------|------|
+| 부정형 | 8:2, 9:1 Yes | "~하지 아니한다", "~않는다" |
+| 긍정형 | 7:3, 8:2 Yes | "~한다", "~유효하다" |
+| 중립형 | 6:4, 7:3 | 문맥 의존적 |
+
+## 실험 결과 평가 기준
+
+### 1. 분포 품질 평가 (5단계)
+```python
+distribution_scoring = {
+    "9:1": 5,  # 🌟 매우 자연스러운 분포
+    "8:2": 4,  # ✨ 자연스러운 분포  
+    "7:3": 3,  # ✅ 적절한 분포
+    "6:4": 2,  # 📊 균형적 분포
+    "5:5": 1,  # ⚖️ 완전 균형 분포
+    "10:0": 0  # ❌ 완전 편향 (실패)
+}
+```
+
+### 2. 일관성 품질 평가 (5단계)
+```python
+consistency_scoring = {
+    "90%+": 5,  # 🎯 매우 높은 일관성
+    "80%+": 4,  # ✅ 높은 일관성
+    "70%+": 3,  # 📊 적절한 일관성
+    "65%+": 2,  # ⚠️ 낮은 일관성
+    "65%-": 1   # ❌ 매우 낮은 일관성
+}
+```
+
+### 3. 개선 효과 평가 (5단계)
+```python
+improvement_scoring = {
+    "8:2": 5,   # ✅ 최고 개선
+    "9:1": 4,   # 🎉 우수 개선  
+    "7:3": 3,   # 📊 적절한 개선
+    "6:4": 2,   # 균형적 개선
+    "10:0": 0   # ❌ 개선 실패
+}
+```
+
+### 4. 종합 품질 계산
+```python
+total_score = (distribution_score + consistency_score + improvement_score) / 3
+
+quality_levels = {
+    4.5: "🏆 최고 품질",
+    4.0: "🥇 우수 품질", 
+    3.5: "🥈 양호 품질",
+    3.0: "🥉 보통 품질",
+    0.0: "⚠️ 개선 필요"
+}
+```
+
+## 결과 파일 관리
+
+### JSON 결과 파일 구조
+```json
+{
+  "test_timestamp": "2024-XX-XX XX:XX:XX",
+  "test_type": "개선된 자연스러운 분포 테스트",
+  "total_test_cases": 4,
+  "successful_tests": 4,
+  "summary": {
+    "average_consistency": 0.90,
+    "average_total_score": 4.2,
+    "complete_bias_count": 0
+  },
+  "test_results": [...]
+}
+```
+
+### 결과 파일 위치
+- [improved_natural_distribution_test_results.json](mdc:liberty_agent/b_rag/experiments/notebooks/improved_natural_distribution_test_results.json) - 개선된 테스트 결과
+- [natural_distribution_test_results.json](mdc:liberty_agent/b_rag/experiments/notebooks/natural_distribution_test_results.json) - 기본 테스트 결과
+- [rag_test_results.json](mdc:liberty_agent/b_rag/experiments/notebooks/rag_test_results.json) - RAG 성능 테스트
+- [generated_questions.json](mdc:liberty_agent/b_rag/experiments/notebooks/generated_questions.json) - 생성된 질문들
+
+## 성능 벤치마크
+
+### 현재 달성 수준 (Enhanced v2)
+- **완전 편향 방지**: 100% (0/4 케이스)
+- **평균 일관성**: 90%
+- **자연분포 달성**: 75% (9:1, 8:2)
+- **전체 품질**: 4.2/5.0
+- **생성 속도**: 평균 45초
+
+### 목표 성능 지표
+- **완전 편향**: 0% (완전 제거)
+- **평균 일관성**: 85% 이상
+- **자연분포 비율**: 80% 이상
+- **전체 품질**: 4.0/5.0 이상
+- **생성 속도**: 30초 이하
+
+## 실험 체크리스트
+
+### 새 실험 실행 전 확인사항
+- [ ] 환경 변수 설정 (`PYTHONPATH`)
+- [ ] 필요한 모듈 import 확인
+- [ ] API 키 설정 (OpenAI, Upstage 등)
+- [ ] 테스트 케이스 정의
+- [ ] 결과 저장 경로 설정
+
+### 실험 실행 중 모니터링
+- [ ] 10:0 완전 편향 발생 여부
+- [ ] 재시도 및 Fallback 호출 빈도
+- [ ] 일관성 점수 변화 추이
+- [ ] 생성 시간 성능
+- [ ] 오류 발생 패턴
+
+### 실험 완료 후 검증
+- [ ] JSON 파일 정상 생성 확인
+- [ ] 분포 패턴 분석
+- [ ] 품질 지표 계산
+- [ ] 이전 결과와 비교 분석
+- [ ] 개선점 및 한계점 도출
+
+## A/B 테스트 방법론
+
+### 프롬프트 비교 실험
+```python
+# 동일한 테스트 케이스로 다른 프롬프트 비교
+prompt_modes = ["enhanced", "simple", "truly_natural"]
+for mode in prompt_modes:
+    # 각 모드별 성능 측정
+    results[mode] = run_test_with_mode(mode)
+```
+
+### 통계적 유의성 검증
+- 최소 10회 반복 실험
+- 평균, 표준편차 계산  
+- 개선 효과 통계적 검증
+- 신뢰구간 95% 기준
+
+## 디버깅 및 문제 해결
+
+### 자주 발생하는 문제들
+1. **10:0 완전 편향** → Enhanced 프롬프트 사용
+2. **JSON 파싱 오류** → LLM 응답 형식 확인
+3. **일관성 부족** → 재시도 메커니즘 확인
+4. **생성 속도 저하** → 모델 및 온도 설정 확인
+
+### 로그 분석 방법
+- 콘솔 출력에서 각 단계별 성공/실패 확인
+- 재시도 패턴 분석
+- Fallback 호출 원인 분석
+- 시간 소요 분석
+
+## 실험 결과 공유
+
+### 팀 공유용 요약 형식
+```markdown
+## 실험 결과 요약
+- **날짜**: 2024-XX-XX
+- **프롬프트**: Enhanced v2
+- **테스트 케이스**: 4개
+- **주요 성과**: 10:0 편향 완전 해결, 평균 일관성 90%
+- **한계점**: 법률 언어 이중 부정 해석 여전히 과제

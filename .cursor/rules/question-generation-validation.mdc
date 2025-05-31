@@ -3,3 +3,112 @@ description:
 globs:
 alwaysApply: false
 ---
+# 질문 생성 검증 시스템 가이드
+
+## 검증 시스템 개요
+B-RAG 시스템의 질문 생성은 5단계 검증 과정을 거칩니다.
+
+## 검증 프로세스 흐름
+
+### 1. 기본 구조 검증 (`validate_levels()`)
+```python
+# 레벨 1-10 완전성 확인
+if not result.validate_levels():
+    return False
+```
+- 위치: [yesno_question_schemas.py](mdc:liberty_agent/b_rag/core/schemas/yesno_question_schemas.py) line 57
+- 조건: `set(levels) == set(range(1, 11))`
+
+### 2. Yes/No 질문 형식 검증 (`_is_yesno_question()`)
+```python
+# 질문 형식 키워드 확인
+yesno_indicators = ["인가", "인지", "할 수 있", "가능한", "맞는", ...]
+```
+- 위치: [unified_yesno_question_generator.py](mdc:liberty_agent/b_rag/core/question_generation/unified_yesno_question_generator.py) line 465
+- 조건: 키워드 포함 또는 "?" 종료
+
+### 3. 의미적 일관성 검증 (`get_consistency_rate()`)
+```python
+# 65% 이상 일관성 요구 (기존 70%에서 완화)
+if consistency_rate < 0.65:
+    return False
+```
+- 위치: [unified_yesno_question_generator.py](mdc:liberty_agent/b_rag/core/question_generation/unified_yesno_question_generator.py) line 365
+- 계산: 첫 번째 답변과 일치하는 질문 수 / 전체 질문 수
+
+### 4. 극단적 편향 방지
+```python
+# 10:0 완전 편향 감지 및 거부
+if yes_count == 0 or no_count == 0:
+    print("❌ 완전 편향 감지")
+    return False
+```
+- 위치: [unified_yesno_question_generator.py](mdc:liberty_agent/b_rag/core/question_generation/unified_yesno_question_generator.py) line 375
+- 허용: 9:1, 8:2, 7:3 분포
+- 거부: 10:0, 0:10 분포
+
+### 5. 질문 다양성 검증
+```python
+# 최소 8개 고유 질문 요구
+unique_questions = set(q.question.lower().strip() for q in result.questions)
+if len(unique_questions) < 8:
+    return False
+```
+- 위치: [unified_yesno_question_generator.py](mdc:liberty_agent/b_rag/core/question_generation/unified_yesno_question_generator.py) line 390
+
+## 재시도 메커니즘
+
+### `_retry_generation()` 호출 조건
+1. 검증 실패 시 자동 호출
+2. 최대 2회 재시도
+3. 추가 지침 포함하여 재생성
+
+### Fallback 시스템 (`_create_fallback_questions()`)
+- 모든 재시도 실패 시 작동
+- GT 질문 의미 분석하여 분포 결정
+- 템플릿 기반 질문 생성
+- 위치: [unified_yesno_question_generator.py](mdc:liberty_agent/b_rag/core/question_generation/unified_yesno_question_generator.py) line 495
+
+## 분포 허용 기준 변화
+
+### 기존 시스템 (문제점)
+- 5:5 균형 강제
+- 홀수 레벨 Yes, 짝수 레벨 No 인위적 배정
+- 의미적 모순 발생
+
+### 개선된 시스템 (현재)
+| 분포 | 허용 여부 | 메시지 |
+|------|-----------|--------|
+| 10:0, 0:10 | ❌ 거부 | "완전 편향 감지" |
+| 9:1, 1:9 | ⚠️ 허용 | "편향된 분포이지만 허용" |
+| 8:2, 2:8 | ✅ 허용 | "적절한 분포" |
+| 7:3 ~ 5:5 | ✅ 허용 | "적절한/균형적 분포" |
+
+## 검증 실패 시나리오별 대응
+
+### 1. 레벨 누락 → 즉시 재시도
+### 2. 질문형식 오류 → 즉시 재시도  
+### 3. 일관성 부족 (< 65%) → 재시도
+### 4. 완전편향 (10:0) → 재시도
+### 5. 질문 중복 → 재시도
+### 6. 2회 재시도 실패 → Fallback 질문 생성
+
+## 테스트 케이스별 검증 결과
+
+### 실험 결과 파일
+- [improved_natural_distribution_test_results.json](mdc:liberty_agent/b_rag/experiments/notebooks/improved_natural_distribution_test_results.json)
+- [natural_distribution_test_results.json](mdc:liberty_agent/b_rag/experiments/notebooks/natural_distribution_test_results.json)
+
+### 성공 지표
+- 완전편향 0건 달성
+- 평균 일관성 75% 이상
+- 자연스러운 분포 75% 이상
+- 전체 품질 점수 3.5점 이상
+
+## 검증의 한계점
+
+### 현재 검증이 놓치는 부분
+- GT 질문과의 의미적 동등성
+- B-RAG 성능 향상 효과
+- 법률적 정확성과 교육적 가치
+- "할 수 있는가" 구조의 올바른 해석

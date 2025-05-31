@@ -3,3 +3,66 @@ description:
 globs:
 alwaysApply: false
 ---
+# B-RAG 시스템 구조 가이드
+
+## 개요
+Liberty AI의 B-RAG (Boost RAG) 시스템은 법률 문서에서 Yes/No 질문을 생성하고 RAG 성능을 향상시키는 시스템입니다.
+
+## 핵심 디렉토리 구조
+
+### 질문 생성 시스템
+- [unified_yesno_question_generator.py](mdc:liberty_agent/b_rag/core/question_generation/unified_yesno_question_generator.py) - 메인 질문 생성기
+- [truly_natural_question_generator.py](mdc:liberty_agent/b_rag/core/question_generation/truly_natural_question_generator.py) - 자연분포 질문 생성기
+
+### 프롬프트 관리
+- [unified_yesno_question_generator.txt](mdc:liberty_agent/b_rag/core/question_generation/prompts/minu/unified_yesno_question_generator.txt) - 기본 프롬프트
+- [unified_yesno_question_generator_v2.txt](mdc:liberty_agent/b_rag/core/question_generation/prompts/minu/unified_yesno_question_generator_v2.txt) - Enhanced 프롬프트
+- [truly_natural_yesno_generator.txt](mdc:liberty_agent/b_rag/core/question_generation/prompts/minu/truly_natural_yesno_generator.txt) - 자연분포 프롬프트
+
+### 실험 및 테스트
+- [b_rag_test_notebook.ipynb](mdc:liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb) - 메인 실험 노트북
+- [truly_natural_experiment.ipynb](mdc:liberty_agent/b_rag/experiments/notebooks/truly_natural_experiment.ipynb) - 자연분포 실험
+
+### 스키마 및 설정
+- [yesno_question_schemas.py](mdc:liberty_agent/b_rag/core/schemas/yesno_question_schemas.py) - 데이터 구조 정의
+
+## 핵심 기능
+
+### 1. 질문 생성 (UnifiedYesNoQuestionGenerator)
+- 10개 레벨의 Yes/No 질문 생성
+- 프롬프트 모드: enhanced, simple, minimal, truly_natural
+- 자동 검증 및 재시도 메커니즘
+
+### 2. 분포 최적화
+- 10:0 완전 편향 방지
+- 자연스러운 분포 (9:1, 8:2) 허용
+- 의미적 일관성 우선 (65% 이상)
+
+### 3. 품질 평가
+- 분포 평가: 9:1(5점) → 5:5(1점)
+- 일관성 평가: 90%+(5점) → 65%-미만(1점)
+- 개선 효과 평가: 다양성 확보 여부
+
+## 실행 방법
+
+### 기본 사용법
+```python
+generator = UnifiedYesNoQuestionGenerator(
+    model_name="gpt-4o-2024-08-06",
+    temperature=0.1,
+    prompt_mode="enhanced"
+)
+result = generator.generate_ten_level_questions(gt_question)
+```
+
+### 노트북 실행
+1. notebooks 디렉토리로 이동
+2. 셀 1: 환경 설정
+3. 셀 3: 자연분포 테스트 실행
+4. 결과: improved_natural_distribution_test_results.json 생성
+
+## 주요 성과
+- 10:0 완전 편향 문제 해결
+- 평균 일관성 90% 달성
+- 자연스러운 분포 생성 성공
+- B-RAG 성능 향상 확인

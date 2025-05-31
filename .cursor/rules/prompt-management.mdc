@@ -3,3 +3,134 @@ description:
 globs:
 alwaysApply: false
 ---
+# 프롬프트 관리 및 최적화 가이드
+
+## 프롬프트 파일 구조
+
+### 기본 프롬프트 세트
+- [unified_yesno_question_generator.txt](mdc:liberty_agent/b_rag/core/question_generation/prompts/minu/unified_yesno_question_generator.txt) - 기본 버전
+- [unified_yesno_question_generator_v2.txt](mdc:liberty_agent/b_rag/core/question_generation/prompts/minu/unified_yesno_question_generator_v2.txt) - Enhanced 버전 (권장)
+- [unified_yesno_question_generator_simple.txt](mdc:liberty_agent/b_rag/core/question_generation/prompts/minu/unified_yesno_question_generator_simple.txt) - 단순화 버전
+- [unified_yesno_question_generator_minimal.txt](mdc:liberty_agent/b_rag/core/question_generation/prompts/minu/unified_yesno_question_generator_minimal.txt) - 최소화 버전
+
+### 특수 프롬프트
+- [truly_natural_yesno_generator.txt](mdc:liberty_agent/b_rag/core/question_generation/prompts/minu/truly_natural_yesno_generator.txt) - 자연분포 전용
+- [advanced_unified_yesno_generator.txt](mdc:liberty_agent/b_rag/core/question_generation/prompts/minu/advanced_unified_yesno_generator.txt) - 고도화 버전
+
+## 프롬프트 모드별 특징
+
+### Enhanced 모드 (권장)
+```python
+prompt_mode="enhanced"  # v2.txt 사용
+```
+- **특징**: 10:0 완전 편향 방지 지침 포함
+- **핵심 지침**: "최소 1-2개의 질문은 다른 관점에서 접근"
+- **성공률**: 9:1 분포 안정적 달성
+- **사용 케이스**: 대부분의 일반적인 질문 생성
+
+### Truly Natural 모드
+```python
+from truly_natural_question_generator import TrulyNaturalQuestionGenerator
+```
+- **특징**: 하드코딩 없는 순수 LLM 기반 생성
+- **핵심**: 의미적 동등성 우선, 분포 조작 금지
+- **문제점**: 법률 언어의 이중 부정 구조 해석 한계
+- **사용 케이스**: 연구 목적의 순수 자연분포 실험
+
+### Simple/Minimal 모드
+```python
+prompt_mode="simple"    # 단순화
+prompt_mode="minimal"   # 최소화
+```
+- **특징**: GT 질문만 입력으로 사용
+- **장점**: 빠른 생성, 리소스 절약
+- **단점**: 품질 낮음, Fallback 빈발
+- **사용 케이스**: 빠른 프로토타이핑, 리소스 제약 환경
+
+## 핵심 프롬프트 개선사항
+
+### 1. 완전 편향 방지 (Enhanced v2)
+```markdown
+**중요한 제약사항:**
+- 10:0 완전 편향은 피해주세요
+- 최소 1-2개의 질문은 다른 관점에서 접근해주세요
+```
+
+### 2. 자연스러운 분포 허용
+```markdown
+**분포 지침:**
+- "균형잡힌 분배" → "자연스러운 분포" 변경
+- 의미적 일관성을 최우선으로 고려
+- 8:2, 9:1 등 자연스러운 분포 허용
+```
+
+### 3. 법률 언어 특성 고려
+```markdown
+**법률 질문 특성:**
+- "~라고 할 수 있는가?" 구조 이해
+- 이중 부정 표현의 올바른 해석
+- 판례와 법리에 기반한 질문 생성
+```
+
+## 프롬프트 선택 가이드
+
+### 상황별 권장 프롬프트
+
+| 상황 | 권장 모드 | 이유 |
+|------|-----------|------|
+| 일반 질문 생성 | enhanced | 안정적, 편향 방지 |
+| 연구/실험 | truly_natural | 순수 자연분포 |
+| 빠른 테스트 | simple | 속도 우선 |
+| 리소스 제약 | minimal | 최소 입력 |
+| 대량 생성 | enhanced | 품질-속도 균형 |
+
+### 품질 vs 속도 트레이드오프
+
+```
+품질 ←→ 속도
+advanced > enhanced > simple > minimal
+느림                              빠름
+```
+
+## 프롬프트 수정 가이드
+
+### 새 프롬프트 생성 시 체크리스트
+1. **편향 방지 지침** 포함 여부
+2. **의미적 일관성** 강조 여부  
+3. **법률 도메인** 특성 반영 여부
+4. **레벨별 난이도** 조정 지침 여부
+5. **JSON 출력 형식** 명시 여부
+
+### 프롬프트 테스트 방법
+1. [b_rag_test_notebook.ipynb](mdc:liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb) 셀 3 실행
+2. 4개 테스트 케이스로 검증
+3. 분포, 일관성, 품질 점수 확인
+4. 10:0 완전 편향 발생 여부 확인
+
+## 현재 성능 벤치마크
+
+### Enhanced v2 프롬프트 성과
+- **완전 편향 방지**: 100% 성공
+- **평균 일관성**: 90%
+- **자연분포 달성**: 75% (9:1, 8:2)
+- **전체 품질**: 4.7/5.0 (최고 품질)
+
+### 알려진 한계점
+- **"할 수 있는가" 해석**: LLM이 "할 수 있다"에 집중하여 Yes 편향
+- **이중 부정 구조**: "~하지 아니 한다고 할 수 있는가?" 복잡한 해석
+- **법률 문맥 의존성**: 도메인 특수성으로 인한 일반화 한계
+
+## 프롬프트 버전 관리
+
+### 명명 규칙
+- 기본: `unified_yesno_question_generator.txt`
+- 개선: `unified_yesno_question_generator_v2.txt`
+- 특수: `truly_natural_yesno_generator.txt`
+- 단순: `_simple.txt`, `_minimal.txt`
+
+### 변경 이력 추적
+프롬프트 수정 시 반드시 다음을 기록:
+1. 변경 이유 및 목적
+2. 수정된 주요 지침
+3. 테스트 결과 비교
+4. 성능 개선/악화 여부

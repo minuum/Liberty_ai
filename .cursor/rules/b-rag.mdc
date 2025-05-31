@@ -3,3 +3,50 @@ description:
 globs:
 alwaysApply: false
 ---
+# B-RAG 프로젝트 종합 가이드
+
+## 프로젝트 개요
+Liberty AI의 B-RAG (Boost RAG) 시스템은 법률 Yes/No 질문 생성의 10:0 편향 문제를 해결하고 자연스러운 분포를 달성한 프로젝트입니다.
+
+## 핵심 성과
+- ✅ **10:0 완전 편향 문제 해결** (100% 성공)
+- ✅ **자연스러운 분포 달성** (9:1, 8:2 안정적 생성)
+- ✅ **의미적 일관성 90%** (기존 50% → 90%)
+- ✅ **B-RAG 성능 향상** 확인
+
+## 주요 문서
+1. [b-rag-system-guide.mdc](mdc:.cursor/rules/b-rag-system-guide.mdc) - 시스템 전체 구조
+2. [question-generation-validation.mdc](mdc:.cursor/rules/question-generation-validation.mdc) - 검증 시스템 상세
+3. [prompt-management.mdc](mdc:.cursor/rules/prompt-management.mdc) - 프롬프트 관리
+4. [experiment-workflow.mdc](mdc:.cursor/rules/experiment-workflow.mdc) - 실험 워크플로우
+
+## 빠른 시작
+
+### 1. 기본 실행
+```python
+generator = UnifiedYesNoQuestionGenerator(
+    model_name="gpt-4o-2024-08-06", 
+    prompt_mode="enhanced"
+)
+result = generator.generate_ten_level_questions("법률 질문")
+```
+
+### 2. 노트북 테스트
+- [b_rag_test_notebook.ipynb](mdc:liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb) 셀 3 실행
+- 4개 테스트 케이스로 자동 검증
+- JSON 결과 파일 자동 생성
+
+### 3. 결과 확인
+- 분포: 9:1, 8:2 자연스러운 패턴
+- 일관성: 90% 이상
+- 품질: 4.7/5.0 최고 수준
+
+## 핵심 파일 위치
+- 생성기: [unified_yesno_question_generator.py](mdc:liberty_agent/b_rag/core/question_generation/unified_yesno_question_generator.py)
+- 프롬프트: [unified_yesno_question_generator_v2.txt](mdc:liberty_agent/b_rag/core/question_generation/prompts/minu/unified_yesno_question_generator_v2.txt)
+- 테스트: [b_rag_test_notebook.ipynb](mdc:liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb)
+
+## 문제 해결
+- **10:0 편향** → Enhanced 프롬프트 사용
+- **Import 오류** → `sys.path.append('/Users/minu/dev/Liberty/Liberty_ai')`
+- **품질 저하** → 검증 기준 및 재시도 메커니즘 확인

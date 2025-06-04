@@ -1,0 +1,42 @@
+{
+  "metadata": {
+    "cell_number": 8,
+    "cell_name": "결과 분석 및 리포트",
+    "execution_timestamp": "2025-06-02T11:50:24.577518",
+    "execution_time_from_session_start": 2184.3261063098907,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "결과 분석 및 리포트 완료\n- 리포트 생성: 성공\n- 주요 발견사항: 2개\n- 권고사항: 2개\n- 평균 성능 개선: +0.067",
+  "results": {
+    "test_type": "comprehensive_analysis_report",
+    "report_generated": true,
+    "key_findings": [
+      "Boost RAG가 Standard RAG 대비 유의미한 확신도 개선을 보임",
+      "Boost RAG가 2개 더 많은 Yes 답변 생성"
+    ],
+    "recommendations": [
+      "더 많은 테스트 케이스로 통계적 신뢰성 확보 권장",
+      "다양한 법률 도메인에서의 성능 검증 필요"
+    ],
+    "report_file": "b_rag_analysis_report_20250602_115024.md",
+    "analysis_data": {
+      "rag_performance": {
+        "total_questions": 3,
+        "standard_avg_confidence": 0.8333333333333334,
+        "boost_avg_confidence": 0.9,
+        "avg_improvement": 0.06666666666666665,
+        "standard_yes_count": 1,
+        "boost_yes_count": 3,
+        "yes_change": 2,
+        "improvement_rate": 66.66666666666666
+      },
+      "question_generation": {
+        "total_questions": 10,
+        "yes_count": 7,
+        "no_count": 3,
+        "yes_ratio": 70.0
+      }
+    }
+  }
+}

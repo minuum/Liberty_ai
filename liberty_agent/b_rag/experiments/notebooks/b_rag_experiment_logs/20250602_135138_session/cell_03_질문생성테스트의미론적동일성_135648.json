@@ -1,0 +1,95 @@
+{
+  "metadata": {
+    "cell_number": 3,
+    "cell_name": "질문 생성 테스트 (의미론적 동일성)",
+    "execution_timestamp": "2025-06-02T13:56:48.961298",
+    "execution_time_from_session_start": 310.1621079444885,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "질문 생성 테스트 완료\n- FAISS 로드: 성공\n- 테스트 케이스: 2개\n- 질문 생성: 1개 완료\n- 전체 질문 저장: 완료",
+  "results": {
+    "test_type": "question_generation_with_semantic_consistency",
+    "faiss_loaded": true,
+    "test_cases_generated": 2,
+    "question_generation_results": [
+      {
+        "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+        "questions_generated": 10,
+        "yes_count": 7,
+        "no_count": 3,
+        "consistency_rate": 0.7,
+        "success": true,
+        "all_questions": [
+          {
+            "level": 1,
+            "question": "이 법률 문제에서 긍정적인 결론이 도출되는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 2,
+            "question": "관련 법리에 따라 인정될 수 있는 부분이 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 3,
+            "question": "이 상황에서 법적으로 유효한 주장이 가능한가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 4,
+            "question": "판례나 법적으로 지지되는 견해가 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 5,
+            "question": "법적 요건이 충족되는 경우가 있나요?",
+            "answer": "Yes"
+          },
+          {
+            "level": 6,
+            "question": "이런 상황에서 법적 보호를 받을 수 있나요?",
+            "answer": "Yes"
+          },
+          {
+            "level": 7,
+            "question": "이것이 법적으로 인정받을 수 있는 일인가요?",
+            "answer": "Yes"
+          },
+          {
+            "level": 8,
+            "question": "이런 경우에 권리를 제한받을 수 있어요?",
+            "answer": "No"
+          },
+          {
+            "level": 9,
+            "question": "이것이 법적으로 틀린 일인가요?",
+            "answer": "No"
+          },
+          {
+            "level": 10,
+            "question": "이런 상황이 법적으로 문제가 되나요?",
+            "answer": "No"
+          }
+        ],
+        "sample_questions": [
+          {
+            "level": 1,
+            "question": "이 법률 문제에서 긍정적인 결론이 도출되는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 2,
+            "question": "관련 법리에 따라 인정될 수 있는 부분이 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 3,
+            "question": "이 상황에서 법적으로 유효한 주장이 가능한가?",
+            "answer": "Yes"
+          }
+        ]
+      }
+    ]
+  }
+}

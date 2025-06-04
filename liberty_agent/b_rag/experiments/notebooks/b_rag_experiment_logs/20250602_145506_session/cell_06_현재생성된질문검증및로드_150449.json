@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "cell_number": 6,
+    "cell_name": "현재 생성된 질문 검증 및 로드",
+    "execution_timestamp": "2025-06-02T15:04:49.435967",
+    "execution_time_from_session_start": 583.3295471668243,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "현재 생성된 질문 로드 완료\n- 질문 발견: Yes\n- 질문 수: 10개\n- GT 질문: 올바르게 설정됨\n- 분포: Yes 7개, No 3개\n- 일관성: 70.0%\n- 다음 셀 준비: 완료",
+  "results": {
+    "test_type": "current_generated_questions_validation",
+    "questions_found": true,
+    "question_count": 10,
+    "gt_question_found": true,
+    "yes_count": 7,
+    "no_count": 3,
+    "consistency_rate": 0.7
+  }
+}

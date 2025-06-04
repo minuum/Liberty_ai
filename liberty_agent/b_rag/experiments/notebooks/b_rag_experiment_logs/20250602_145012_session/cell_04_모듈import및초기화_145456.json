@@ -1,0 +1,40 @@
+{
+  "metadata": {
+    "cell_number": 4,
+    "cell_name": "모듈 import 및 초기화",
+    "execution_timestamp": "2025-06-02T14:54:56.766631",
+    "execution_time_from_session_start": 284.587849855423,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "모듈 import 및 초기화 완료\n- 들여쓰기 수정: 실패\n- 프롬프트 생성: 성공\n- 성공한 import: 3개\n- 실패한 import: 1개\n- 사용 가능한 모듈: 11개",
+  "results": {
+    "imports": {
+      "question_generator": "failed: unexpected indent (unified_yesno_question_generator.py, line 373)",
+      "rag_system": "success",
+      "schemas": "success",
+      "libraries": "success"
+    },
+    "modules_available": [
+      "YesNoRAGSystem",
+      "YesNoRAGConfig",
+      "YesNoAnswer",
+      "TenLevelYesNoQuestions",
+      "LevelQuestion",
+      "FAISS",
+      "UpstageEmbeddings",
+      "pandas",
+      "matplotlib",
+      "seaborn",
+      "numpy"
+    ],
+    "import_errors": [
+      "질문 생성기: unexpected indent (unified_yesno_question_generator.py, line 373)"
+    ],
+    "prompt_files_created": true,
+    "indentation_fixed": false,
+    "global_variables_initialized": true,
+    "total_successful_imports": 3,
+    "total_failed_imports": 1
+  }
+}

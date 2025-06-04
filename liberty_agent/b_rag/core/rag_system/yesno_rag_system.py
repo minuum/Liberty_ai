@@ -58,11 +58,11 @@ class RAGResult:
     experiment_type: str  # "standard" or "boost"
 
 class YesNoRAGSystem:
-    """B-RAG 프로젝트 전용 Yes/No RAG 시스템"""
+    """B-RAG 프로젝트 전용 Yes/No RAG 시스템 (TXT 프롬프트 기반)"""
     
     def __init__(self, config: YesNoRAGConfig, faiss_index_path: Optional[str] = None, openai_api_key: Optional[str] = None):
         """
-        초기화
+        초기화 (TXT 프롬프트 파일 자동 로드)
         
         Args:
             config: RAG 시스템 설정
@@ -87,37 +87,80 @@ class YesNoRAGSystem:
             include_raw=False
         )
         
-        # 프롬프트 템플릿 설정
+        # 🎯 TXT 파일에서 프롬프트 로드
         self.standard_prompt = self._create_standard_prompt()
         self.boost_prompt = self._create_boost_prompt()
         
-        print(f"✅ YesNoRAGSystem 초기화 완료")
+        print(f"✅ YesNoRAGSystem 초기화 완료 (TXT 프롬프트 기반)")
         print(f"   - 임베딩 모델: {config.embedding_model}")
         print(f"   - LLM 모델: {config.llm_model}")
         print(f"   - Top-K: {config.top_k}")
+        print(f"   - 프롬프트 방식: TXT 파일 자동 로드")
+    
+    def _load_txt_prompt(self, prompt_type: str) -> str:
+        """TXT 파일에서 프롬프트 로드"""
+        # 프롬프트 파일 경로들 (우선순위 순)
+        prompt_paths = [
+            f"liberty_agent/b_rag/core/rag_system/prompts/{prompt_type}.txt",
+            f"core/rag_system/prompts/{prompt_type}.txt",
+            f"prompts/{prompt_type}.txt",
+            f"{prompt_type}.txt"
+        ]
+        
+        for prompt_path in prompt_paths:
+            try:
+                path = Path(prompt_path)
+                if path.exists():
+                    with open(path, 'r', encoding='utf-8') as f:
+                        content = f.read().strip()
+                        if content:
+                            print(f"✅ {prompt_type} 프롬프트 로드 성공: {prompt_path}")
+                            return content
+            except Exception as e:
+                print(f"⚠️ {prompt_path} 로드 실패: {e}")
+                continue
+        
+        # 모든 파일 로드 실패 시 fallback
+        print(f"⚠️ {prompt_type} TXT 파일을 찾을 수 없어 기본 프롬프트를 사용합니다.")
+        return self._get_fallback_prompt(prompt_type)
+    
+    def _get_fallback_prompt(self, prompt_type: str) -> str:
+        """TXT 파일 로드 실패 시 fallback 프롬프트"""
+        if prompt_type == "standard_rag_system":
+            return """당신은 법률 전문가입니다. 주어진 법률 문서를 바탕으로 정확하고 명확한 Yes/No 답변을 제공해주세요.
+
+답변 지침:
+1. 주어진 컨텍스트를 기반으로만 답변하세요
+2. 법률 용어는 정확하게 사용하세요
+3. 답변이 불분명한 경우, "주어진 정보만으로는 판단하기 어렵습니다"라고 명시하세요
+4. 예/아니오 질문의 경우 명확히 "Yes" 또는 "No"로 답변하세요
+5. 답변은 간결하되 충분한 근거를 제시하세요"""
+        
+        elif prompt_type == "boost_rag_system":
+            return """당신은 최고 수준의 법률 전문가입니다. 주어진 법률 문서를 다각적으로 심층 분석하여 구조화된 Yes/No 답변을 제공해주세요.
+
+심층 분석 프로세스:
+1. 문헌 검토: 모든 제공 문서의 관련도 점수를 고려하여 가중치 적용
+2. 법리 분석: 직접적 조문, 판례, 법리적 원칙을 체계적으로 검토
+3. 예외 검토: 특수한 조건, 예외 상황, 반대 해석 가능성 분석
+4. 종합 판단: 모든 증거를 종합하여 최종 결론 도출
+
+법률 해석의 정확성과 논리적 일관성을 최우선으로 하여 답변하세요."""
+        
+        else:
+            return "적절한 답변을 제공해주세요."
     
     def _create_standard_prompt(self) -> ChatPromptTemplate:
-        """Standard RAG 프롬프트 생성"""
-        system_prompt = """
-당신은 법률 전문가입니다. 주어진 법률 문서를 바탕으로 구조화된 Yes/No 답변을 제공해주세요.
-
-답변 규칙:
-1. answer: 반드시 "Yes" 또는 "No"만 입력
-2. reasoning: 답변의 근거를 명확하고 간결하게 설명
-3. confidence: 답변에 대한 확신도 (0.0-1.0)
-4. key_evidence: 답변을 뒷받침하는 핵심 문장들을 배열로 제공
-5. 불확실한 경우 "No"로 답변하고 확신도를 낮게 설정
-
-주어진 문서 내용만을 근거로 답변하세요.
-"""
+        """Standard RAG 프롬프트 생성 (TXT 파일 기반)"""
+        system_prompt = self._load_txt_prompt("standard_rag_system")
         
         human_prompt = """
-참고 문서:
+📋 참고 문서:
 {context}
 
-질문: {question}
+❓ 법률 질문: {question}
 
-위 문서를 바탕으로 구조화된 답변을 제공해주세요."""
+위 정보를 바탕으로 구조화된 Yes/No 답변을 제공해주세요."""
         
         return ChatPromptTemplate.from_messages([
             ("system", system_prompt),
@@ -125,41 +168,15 @@ class YesNoRAGSystem:
         ])
     
     def _create_boost_prompt(self) -> ChatPromptTemplate:
-        """Boost RAG 프롬프트 생성 (재작성 루프용)"""
-        system_prompt = """
-당신은 최고 수준의 법률 전문가입니다. 주어진 법률 문서를 다각적으로 심층 분석하여 구조화된 Yes/No 답변을 제공해주세요.
-
-🔬 심층 분석 프로세스:
-1. **문헌 검토**: 모든 제공 문서의 관련도 점수를 고려하여 가중치 적용
-2. **법리 분석**: 직접적 조문, 판례, 법리적 원칙을 체계적으로 검토
-3. **예외 검토**: 특수한 조건, 예외 상황, 반대 해석 가능성 분석
-4. **종합 판단**: 모든 증거를 종합하여 최종 결론 도출
-
-🎯 고급 답변 기준:
-1. answer: "Yes" 또는 "No" (매우 신중한 판단)
-2. reasoning: 
-   - 핵심 법리적 근거 (최소 2가지 이상)
-   - 관련 조문이나 판례의 구체적 인용
-   - 반대 의견이 있다면 그에 대한 반박
-   - 결론에 이르는 논리적 추론 과정
-3. confidence: 
-   - 0.90+ : 명확한 법률 조문이나 확립된 판례 근거
-   - 0.80-0.89 : 강력한 법리적 근거, 일부 해석 여지
-   - 0.70-0.79 : 일반적 법리, 예외 가능성 존재
-   - 0.70미만 : 불확실성 높음
-4. key_evidence: 판단의 핵심이 되는 구체적 법조문, 판례 문구
-
-🚨 특별 지침:
-- 이전 분석 결과가 있다면 반드시 비교 검토하고 개선점 명시
-- 답변 변경 시에는 변경 이유를 상세히 설명
-- 확신도는 보수적으로 평가하되, 명확한 근거가 있을 때만 높게 설정
-- 애매한 경우 "No"로 답변하고 그 이유를 명확히 설명
-
-법률 해석의 정확성과 논리적 일관성을 최우선으로 하여 답변하세요.
-"""
+        """Boost RAG 프롬프트 생성 (TXT 파일 기반)"""
+        system_prompt = self._load_txt_prompt("boost_rag_system")
         
-        human_prompt = """
-📋 제공 문서 (관련도 점수 포함):
+        # Human 프롬프트도 TXT 파일에서 로드 시도
+        human_prompt_from_file = self._load_txt_prompt("boost_rag_human")
+        if "TXT 파일을 찾을 수 없어" not in human_prompt_from_file:
+            human_prompt = human_prompt_from_file
+        else:
+            human_prompt = """📋 제공 문서 (관련도 점수 포함):
 {enhanced_context}
 
 ❓ 법률 질문: {question}

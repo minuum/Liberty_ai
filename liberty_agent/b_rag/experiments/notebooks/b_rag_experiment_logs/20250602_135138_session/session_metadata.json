@@ -1,0 +1,27 @@
+{
+  "session_id": "20250602_135138",
+  "session_start_time": "2025-06-02T13:51:38.799166",
+  "total_cells": 3,
+  "completed_cells": [
+    {
+      "cell_number": 1,
+      "cell_name": "모듈 import 및 초기화",
+      "md_file": "cell_01_모듈import및초기화_135146.md",
+      "json_file": "cell_01_모듈import및초기화_135146.json"
+    },
+    {
+      "cell_number": 2,
+      "cell_name": "질문 생성 테스트 (의미론적 동일성)",
+      "md_file": "cell_02_질문생성테스트의미론적동일성_135210.md",
+      "json_file": "cell_02_질문생성테스트의미론적동일성_135210.json"
+    },
+    {
+      "cell_number": 3,
+      "cell_name": "질문 생성 테스트 (의미론적 동일성)",
+      "md_file": "cell_03_질문생성테스트의미론적동일성_135648.md",
+      "json_file": "cell_03_질문생성테스트의미론적동일성_135648.json"
+    }
+  ],
+  "failed_cells": [],
+  "notebook_path": "/Users/minu/dev/Liberty/Liberty_ai/liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb"
+}

@@ -1,0 +1,106 @@
+{
+  "metadata": {
+    "save_timestamp": "2025-06-02T15:13:34.189265",
+    "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+    "generation_mode": "확장 난이도",
+    "difficulty_range": "초등학생~법학박사",
+    "question_type": "enhanced_difficulty_questions",
+    "total_questions": 10,
+    "yes_count": 10,
+    "no_count": 0,
+    "consistency_rate": 1.0,
+    "api_execution_time": 16.51994299888611
+  },
+  "questions": [
+    {
+      "id": 1,
+      "level": 1,
+      "question": "같이 일하는 사람이 돈 받을 수 있는 사람이 아니야?",
+      "target_audience": "초등학생 (5-7세)",
+      "reasoning": "어린이들이 이해할 수 있도록 '동업자'와 '채권의 준점유자'를 일상적인 표현으로 바꾸었습니다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    },
+    {
+      "id": 2,
+      "level": 2,
+      "question": "함께 일하는 사람이 돈 받을 수 있는 사람이 아닌가요?",
+      "target_audience": "초등학생 (8-10세)",
+      "reasoning": "조금 더 나이 많은 어린이들이 이해할 수 있도록 문장을 약간 복잡하게 만들었습니다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    },
+    {
+      "id": 3,
+      "level": 3,
+      "question": "동업자가 돈 받을 권리가 없는 사람인가요?",
+      "target_audience": "중학생 (11-13세)",
+      "reasoning": "중학생들이 이해할 수 있도록 '채권의 준점유자'를 '돈 받을 권리'로 설명했습니다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    },
+    {
+      "id": 4,
+      "level": 4,
+      "question": "동업자가 돈 받을 수 있는 권리가 없는 사람이라고 할 수 있나요?",
+      "target_audience": "고등학생 (14-18세)",
+      "reasoning": "고등학생들이 이해할 수 있도록 문장을 조금 더 복잡하게 구성했습니다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    },
+    {
+      "id": 5,
+      "level": 5,
+      "question": "동업자가 준점유자에 해당하지 않는다고 할 수 있는가?",
+      "target_audience": "일반 성인 (19-30세)",
+      "reasoning": "일반 성인들이 이해할 수 있도록 법률 용어를 일부 사용했습니다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    },
+    {
+      "id": 6,
+      "level": 6,
+      "question": "동업자가 채권의 준점유자에 해당하지 않는다고 볼 수 있는가?",
+      "target_audience": "일반 성인 (31-50세)",
+      "reasoning": "일반 성인들이 이해할 수 있도록 법률 용어를 사용하고 문장을 명확히 했습니다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    },
+    {
+      "id": 7,
+      "level": 7,
+      "question": "민법 제470조에 따라 동업자가 채권의 준점유자에 해당하지 않는다고 해석할 수 있는가?",
+      "target_audience": "법학 전공자 (로스쿨 학생)",
+      "reasoning": "법학 전공자들이 이해할 수 있도록 법률 조항을 명시했습니다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    },
+    {
+      "id": 8,
+      "level": 8,
+      "question": "민법 제470조의 규정에 비추어 동업자가 채권의 준점유자에 해당하지 않는다고 판단할 수 있는가?",
+      "target_audience": "법학 전공자 (로스쿨 학생)",
+      "reasoning": "법학 전공자들이 이해할 수 있도록 법률 조항을 명시하고 문장을 복잡하게 구성했습니다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    },
+    {
+      "id": 9,
+      "level": 9,
+      "question": "채권의 준점유자에 대한 민법 제470조의 해석상 동업자가 그에 해당하지 않는다고 볼 수 있는가?",
+      "target_audience": "법조인 (변호사, 판사)",
+      "reasoning": "법조인들이 이해할 수 있도록 법률 조항과 해석을 강조했습니다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    },
+    {
+      "id": 10,
+      "level": 10,
+      "question": "채권준점유제도의 입법취지와 민법 제470조의 해석론상 동업관계 성립만으로는 준점유자 요건을 충족하지 못한다고 보는바, 동업자는 채권의 준점유자에 해당하지 아니한다고 보는 것이 법리상 타당한가?",
+      "target_audience": "법학 박사 (학자)",
+      "reasoning": "법학 박사들이 이해할 수 있도록 법리적 해석과 입법취지를 포함하여 복잡하게 구성했습니다.",
+      "expected_answer": "Yes",
+      "confidence": 0.9
+    }
+  ]
+}

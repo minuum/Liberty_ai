@@ -1,0 +1,21 @@
+{
+  "session_id": "20250602_144937",
+  "session_start_time": "2025-06-02T14:49:37.677551",
+  "total_cells": 2,
+  "completed_cells": [
+    {
+      "cell_number": 1,
+      "cell_name": "모듈 import 및 초기화",
+      "md_file": "cell_01_모듈import및초기화_144940.md",
+      "json_file": "cell_01_모듈import및초기화_144940.json"
+    },
+    {
+      "cell_number": 2,
+      "cell_name": "모듈 import 및 초기화",
+      "md_file": "cell_02_모듈import및초기화_145007.md",
+      "json_file": "cell_02_모듈import및초기화_145007.json"
+    }
+  ],
+  "failed_cells": [],
+  "notebook_path": "/Users/minu/dev/Liberty/Liberty_ai/liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb"
+}

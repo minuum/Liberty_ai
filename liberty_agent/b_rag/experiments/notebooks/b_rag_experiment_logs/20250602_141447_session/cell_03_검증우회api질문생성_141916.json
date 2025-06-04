@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "cell_number": 3,
+    "cell_name": "검증 우회 API 질문 생성",
+    "execution_timestamp": "2025-06-02T14:19:16.548373",
+    "execution_time_from_session_start": 268.85775780677795,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "검증 우회 API 질문 생성 완료\n- API 호출: 성공\n- 실행시간: 9.77초\n- 검증: 우회됨\n- 새로운 질문: Yes",
+  "results": {
+    "test_type": "bypass_validation_api_call",
+    "api_called": true,
+    "execution_time": 9.770771265029907,
+    "question_generation_results": [
+      {
+        "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+        "questions_generated": 10,
+        "yes_count": 10,
+        "no_count": 0,
+        "consistency_rate": 1.0,
+        "execution_time": 9.770771265029907,
+        "api_called": true,
+        "validation_bypassed": true,
+        "success": true,
+        "all_questions": [
+          {
+            "level": 1,
+            "question": "동업자가 민법 제470조상 채권의 준점유자에 해당하지 아니 한다고 볼 수 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 2,
+            "question": "동업자가 민법 제470조에 따라 채권의 준점유자가 아니라고 할 수 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 3,
+            "question": "동업자가 채권의 준점유자에 해당하지 않는다고 할 수 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 4,
+            "question": "동업자가 채권의 준점유자가 아니라고 할 수 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 5,
+            "question": "동업자가 준점유자에 해당하지 않는다고 할 수 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 6,
+            "question": "같이 사업하는 사람이 준점유자가 아니라고 할 수 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 7,
+            "question": "같이 사업하는 사람이 돈을 받을 권리가 있는 것처럼 보이는 사람에 해당하지 않는다고 할 수 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 8,
+            "question": "함께 일하는 사람이 돈을 받을 권리가 없다고 할 수 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 9,
+            "question": "함께 일하는 사람이 권리가 없다고 할 수 있는가?",
+            "answer": "Yes"
+          },
+          {
+            "level": 10,
+            "question": "같이 일하는 사람이 권리가 없다고 할 수 있는가?",
+            "answer": "Yes"
+          }
+        ]
+      }
+    ]
+  }
+}

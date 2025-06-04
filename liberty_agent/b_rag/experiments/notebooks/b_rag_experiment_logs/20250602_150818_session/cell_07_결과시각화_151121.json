@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "cell_number": 7,
+    "cell_name": "결과 시각화",
+    "execution_timestamp": "2025-06-02T15:11:21.501835",
+    "execution_time_from_session_start": 182.76506209373474,
+    "success": false,
+    "error_info": "TypeError: Object of type bool_ is not JSON serializable\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_74726/2026602600.py\", line 150, in <module>\n    log_cell_end(\"결과 시각화\", cell_start_time, cell_results, summary)\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_74726/3713360327.py\", line 152, in log_cell_end\n    save_cell_results(cell_name, results, summary)\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_74726/3713360327.py\", line 91, in save_cell_results\n    md_content += f\"```json\\n{json.dumps(value, ensure_ascii=False, indent=2)}\\n```\\n\\n\"\n                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/__init__.py\", line 238, in dumps\n    **kw).encode(obj)\n          ^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 202, in encode\n    chunks = list(chunks)\n             ^^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 432, in _iterencode\n    yield from _iterencode_dict(o, _current_indent_level)\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 406, in _iterencode_dict\n    yield from chunks\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 439, in _iterencode\n    o = _default(o)\n        ^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 180, in default\n    raise TypeError(f'Object of type {o.__class__.__name__} '\nTypeError: Object of type bool_ is not JSON serializable\n"
+  },
+  "summary": "실행 실패: Object of type bool_ is not JSON serializable",
+  "results": {
+    "error": "Object of type bool_ is not JSON serializable"
+  }
+}

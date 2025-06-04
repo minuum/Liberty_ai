@@ -1,0 +1,69 @@
+{
+  "session_id": "20250602_141447",
+  "session_start_time": "2025-06-02T14:14:47.690618",
+  "total_cells": 10,
+  "completed_cells": [
+    {
+      "cell_number": 1,
+      "cell_name": "실제 API 호출 질문 생성 테스트",
+      "md_file": "cell_01_실제api호출질문생성테스트_141519.md",
+      "json_file": "cell_01_실제api호출질문생성테스트_141519.json"
+    },
+    {
+      "cell_number": 2,
+      "cell_name": "검증 우회 API 질문 생성",
+      "md_file": "cell_02_검증우회api질문생성_141844.md",
+      "json_file": "cell_02_검증우회api질문생성_141844.json"
+    },
+    {
+      "cell_number": 3,
+      "cell_name": "검증 우회 API 질문 생성",
+      "md_file": "cell_03_검증우회api질문생성_141916.md",
+      "json_file": "cell_03_검증우회api질문생성_141916.json"
+    },
+    {
+      "cell_number": 4,
+      "cell_name": "RAG 시스템 테스트 (전체 질문)",
+      "md_file": "cell_04_rag시스템테스트전체질문_142154.md",
+      "json_file": "cell_04_rag시스템테스트전체질문_142154.json"
+    },
+    {
+      "cell_number": 5,
+      "cell_name": "RAG 시스템 테스트 (전체 질문)",
+      "md_file": "cell_05_rag시스템테스트전체질문_142357.md",
+      "json_file": "cell_05_rag시스템테스트전체질문_142357.json"
+    },
+    {
+      "cell_number": 6,
+      "cell_name": "RAG 시스템 테스트 (전체 질문)",
+      "md_file": "cell_06_rag시스템테스트전체질문_142549.md",
+      "json_file": "cell_06_rag시스템테스트전체질문_142549.json"
+    },
+    {
+      "cell_number": 7,
+      "cell_name": "RAG 시스템 테스트 (전체 질문)",
+      "md_file": "cell_07_rag시스템테스트전체질문_142839.md",
+      "json_file": "cell_07_rag시스템테스트전체질문_142839.json"
+    },
+    {
+      "cell_number": 8,
+      "cell_name": "RAG 시스템 테스트 (전체 질문)",
+      "md_file": "cell_08_rag시스템테스트전체질문_143157.md",
+      "json_file": "cell_08_rag시스템테스트전체질문_143157.json"
+    },
+    {
+      "cell_number": 9,
+      "cell_name": "개선 효과 분석",
+      "md_file": "cell_09_개선효과분석_143357.md",
+      "json_file": "cell_09_개선효과분석_143357.json"
+    }
+  ],
+  "failed_cells": [
+    {
+      "cell_number": 10,
+      "cell_name": "확장 난이도 질문 생성",
+      "error": "IndentationError: unexpected indent (unified_yesno_question_generator.py, line 373)\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_72681/1149987478.py\", line 26, in <module>\n    importlib.reload(unified_module)\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/importlib/__init__.py\", line 169, in reload\n    _bootstrap._exec(spec, module)\n  File \"<frozen importlib._bootstrap>\", line 621, in _exec\n  File \"<frozen importlib._bootstrap_external>\", line 936, in exec_module\n  File \"<frozen importlib._bootstrap_external>\", line 1074, in get_code\n  File \"<frozen importlib._bootstrap_external>\", line 1004, in source_to_code\n  File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed\n  File \"/Users/minu/dev/Liberty/Liberty_ai/liberty_agent/b_rag/core/question_generation/unified_yesno_question_generator.py\", line 373\n    return False\nIndentationError: unexpected indent\n"
+    }
+  ],
+  "notebook_path": "/Users/minu/dev/Liberty/Liberty_ai/liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb"
+}

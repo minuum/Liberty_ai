@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "cell_number": 6,
+    "cell_name": "RAG 시스템 테스트 (전체 질문)",
+    "execution_timestamp": "2025-06-02T14:25:49.504458",
+    "execution_time_from_session_start": 661.813533782959,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "RAG 시스템 전체 테스트 완료\n- RAG 시스템 사용: 불가\n- 총 테스트 질문: 0개\n- 성공한 테스트: 0개\n- Yes 답변 증가: +0개\n- 평균 확신도 개선: +0.000\n- 개선율: 0.0%",
+  "results": {
+    "test_type": "rag_system_standard_vs_boost_all_questions",
+    "rag_system_available": false,
+    "total_questions_available": 0,
+    "questions_tested": 0,
+    "successful_tests": 0,
+    "performance_comparison": {}
+  }
+}

@@ -1,0 +1,1099 @@
+{
+  "experiment_summary": {
+    "experiment_id": 1748823157,
+    "timestamp": "2025-06-02 09:12:37",
+    "total_test_cases": 5,
+    "successful_experiments": 5,
+    "success_rate": 1.0,
+    "experiment_type": "Advanced B-RAG with Recent Changes Integration"
+  },
+  "performance_metrics": {
+    "avg_confidence_improvement": 0.11188007622184978,
+    "avg_quality_score": 4.6,
+    "target_achievement_rate": 1.0
+  },
+  "detailed_results": [
+    {
+      "test_case": {
+        "question": "계약의 해제권이 발생하는가?",
+        "document_content": "\n            제목: 대법원 1992. 10. 13. 선고 91다34394 판결\n            사건: 건물철거등\n            내용: 원심판결 이유에 의하면 원심은, 원고와 피고가 1978. 2. 20. 원고 소유의 이 사건 토지 부분과 피고 소유의 (주소 생략) 전 604평방미터 중 원심판결 별지 제1도면 표시 (가)부분 4평방미터를 서로 교환하기로 하고, 그 무렵 그 경계선 위에 석축을 쌓아 교환 목적물을 인도하였다가...\n            ",
+        "keywords": "계약, 해제권, 채무불이행, 민법 제544조, 이행",
+        "category": "민사",
+        "expected_distribution": "6-7:3-4",
+        "difficulty_level": "medium",
+        "target_confidence_improvement": 0.12
+      },
+      "question_generation": {
+        "total_questions": 10,
+        "yes_count": 6,
+        "no_count": 4,
+        "consistency_rate": 0.7382620935583131,
+        "generation_time": 10.084995979660324,
+        "questions": [
+          {
+            "level": 1,
+            "question": "일반적으로 계약의 해제권이 발생하는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 2,
+            "question": "일반적으로 계약의 해제권이 발생하는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 3,
+            "question": "일반적으로 계약의 해제권이 발생하는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 4,
+            "question": "현재 상황에서 계약의 해제권이 발생하는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 5,
+            "question": "현재 상황에서 계약의 해제권이 발생하는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 6,
+            "question": "현재 상황에서 계약의 해제권이 발생하는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 7,
+            "question": "보통 계약의 해제권이 발생하는는 상황인가?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 8,
+            "question": "보통 계약의 해제권이 발생하는는 상황인가?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 9,
+            "question": "계약의 해제권이 발생하는는지 궁금한가요?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 10,
+            "question": "계약의 해제권이 발생하는는지 궁금한가요?",
+            "expected_answer": "No"
+          }
+        ],
+        "quality_assessment": {
+          "distribution_score": 5,
+          "distribution_label": "🎯 목표 균형 분포",
+          "consistency_score": 4,
+          "consistency_label": "✅ 양호한 일관성",
+          "total_score": 4.5,
+          "quality_level": "🏆 최고 품질"
+        }
+      },
+      "rag_comparison": {
+        "standard_rag": {
+          "results": [
+            {
+              "question": "계약의 해제권이 발생하는가?",
+              "answer": "No",
+              "confidence": 0.6814726399818337
+            },
+            {
+              "question": "일반적으로 계약의 해제권이 발생하는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.686260338925794
+            },
+            {
+              "question": "일반적으로 계약의 해제권이 발생하는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7089614582783874
+            },
+            {
+              "question": "일반적으로 계약의 해제권이 발생하는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7245799288165319
+            },
+            {
+              "question": "현재 상황에서 계약의 해제권이 발생하는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.724327815486791
+            },
+            {
+              "question": "현재 상황에서 계약의 해제권이 발생하는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6984637387618673
+            },
+            {
+              "question": "현재 상황에서 계약의 해제권이 발생하는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7243668728146242
+            },
+            {
+              "question": "보통 계약의 해제권이 발생하는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.7076477903579951
+            },
+            {
+              "question": "보통 계약의 해제권이 발생하는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.7730297714636989
+            },
+            {
+              "question": "계약의 해제권이 발생하는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.7428975856314
+            },
+            {
+              "question": "계약의 해제권이 발생하는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.7741663315353012
+            }
+          ],
+          "yes_count": 6,
+          "avg_confidence": 0.7223794792776569
+        },
+        "boost_rag": {
+          "results": [
+            {
+              "question": "계약의 해제권이 발생하는가?",
+              "answer": "No",
+              "confidence": 0.791101800641228
+            },
+            {
+              "question": "일반적으로 계약의 해제권이 발생하는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8249020311580315
+            },
+            {
+              "question": "일반적으로 계약의 해제권이 발생하는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8404949416720269
+            },
+            {
+              "question": "일반적으로 계약의 해제권이 발생하는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8362564544789304
+            },
+            {
+              "question": "현재 상황에서 계약의 해제권이 발생하는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8387589413259311
+            },
+            {
+              "question": "현재 상황에서 계약의 해제권이 발생하는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8235210148949988
+            },
+            {
+              "question": "현재 상황에서 계약의 해제권이 발생하는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8487769341275855
+            },
+            {
+              "question": "보통 계약의 해제권이 발생하는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.8178459077236592
+            },
+            {
+              "question": "보통 계약의 해제권이 발생하는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.9110173268368542
+            },
+            {
+              "question": "계약의 해제권이 발생하는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.8794821028871906
+            },
+            {
+              "question": "계약의 해제권이 발생하는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.8753823205644633
+            }
+          ],
+          "yes_count": 6,
+          "avg_confidence": 0.8443217978464453
+        },
+        "performance_metrics": {
+          "confidence_improvement": 0.12194231856878845,
+          "yes_answer_change": 0,
+          "improvement_rate": 0.1688064543177841,
+          "answer_change_rate": 0.0
+        }
+      },
+      "overall_metrics": {
+        "processing_time": 5.698204040527344e-05,
+        "success": true,
+        "quality_score": 4.5,
+        "performance_improvement": 0.12194231856878845,
+        "target_achievement": true
+      }
+    },
+    {
+      "test_case": {
+        "question": "소유권 이전의 효력이 인정되는가?",
+        "document_content": "\n            제목: 대법원 1991. 11. 22. 선고 91다28740 판결\n            사건: 토지소유권이전등기말소등\n            내용: 매도인으로부터 매수인으로 기재된 인감증명서까지 교부된 상태에 있는 부동산의 실질적 매수인이 따로 있는 사실을 잘 알고 있었음에도 그 부동산의 명의상의 매수인에 대한 개인적인 채권확보를 위하여 동인으로부터 위 부동산을 양수받았다면...\n            ",
+        "keywords": "소유권, 이전, 효력, 법률행위, 민법 제103조",
+        "category": "민사",
+        "expected_distribution": "6-7:3-4",
+        "difficulty_level": "high",
+        "target_confidence_improvement": 0.15
+      },
+      "question_generation": {
+        "total_questions": 10,
+        "yes_count": 6,
+        "no_count": 4,
+        "consistency_rate": 0.8437233639683637,
+        "generation_time": 13.205566017532995,
+        "questions": [
+          {
+            "level": 1,
+            "question": "일반적으로 소유권 이전의 효력이 인정되는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 2,
+            "question": "일반적으로 소유권 이전의 효력이 인정되는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 3,
+            "question": "일반적으로 소유권 이전의 효력이 인정되는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 4,
+            "question": "현재 상황에서 소유권 이전의 효력이 인정되는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 5,
+            "question": "현재 상황에서 소유권 이전의 효력이 인정되는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 6,
+            "question": "현재 상황에서 소유권 이전의 효력이 인정되는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 7,
+            "question": "보통 소유권 이전의 효력이 인정되는는 상황인가?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 8,
+            "question": "보통 소유권 이전의 효력이 인정되는는 상황인가?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 9,
+            "question": "소유권 이전의 효력이 인정되는는지 궁금한가요?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 10,
+            "question": "소유권 이전의 효력이 인정되는는지 궁금한가요?",
+            "expected_answer": "No"
+          }
+        ],
+        "quality_assessment": {
+          "distribution_score": 5,
+          "distribution_label": "🎯 목표 균형 분포",
+          "consistency_score": 5,
+          "consistency_label": "🎯 높은 일관성",
+          "total_score": 5.0,
+          "quality_level": "🏆 최고 품질"
+        }
+      },
+      "rag_comparison": {
+        "standard_rag": {
+          "results": [
+            {
+              "question": "소유권 이전의 효력이 인정되는가?",
+              "answer": "No",
+              "confidence": 0.7480175454876471
+            },
+            {
+              "question": "일반적으로 소유권 이전의 효력이 인정되는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6611200921887682
+            },
+            {
+              "question": "일반적으로 소유권 이전의 효력이 인정되는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.686457680545025
+            },
+            {
+              "question": "일반적으로 소유권 이전의 효력이 인정되는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6777065930753938
+            },
+            {
+              "question": "현재 상황에서 소유권 이전의 효력이 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6856480730489782
+            },
+            {
+              "question": "현재 상황에서 소유권 이전의 효력이 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.704675615733071
+            },
+            {
+              "question": "현재 상황에서 소유권 이전의 효력이 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6998806972776457
+            },
+            {
+              "question": "보통 소유권 이전의 효력이 인정되는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.7537154722520556
+            },
+            {
+              "question": "보통 소유권 이전의 효력이 인정되는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.7657676853468928
+            },
+            {
+              "question": "소유권 이전의 효력이 인정되는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.7466419473259861
+            },
+            {
+              "question": "소유권 이전의 효력이 인정되는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.7676683510771065
+            }
+          ],
+          "yes_count": 6,
+          "avg_confidence": 0.7179363412144154
+        },
+        "boost_rag": {
+          "results": [
+            {
+              "question": "소유권 이전의 효력이 인정되는가?",
+              "answer": "No",
+              "confidence": 0.8964607622474352
+            },
+            {
+              "question": "일반적으로 소유권 이전의 효력이 인정되는는 경우가 있는가?",
+              "answer": "No",
+              "confidence": 0.8222494153636889
+            },
+            {
+              "question": "일반적으로 소유권 이전의 효력이 인정되는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8325282799848382
+            },
+            {
+              "question": "일반적으로 소유권 이전의 효력이 인정되는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8436216298126074
+            },
+            {
+              "question": "현재 상황에서 소유권 이전의 효력이 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8365313993913374
+            },
+            {
+              "question": "현재 상황에서 소유권 이전의 효력이 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8418360275201522
+            },
+            {
+              "question": "현재 상황에서 소유권 이전의 효력이 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.83823147918453
+            },
+            {
+              "question": "보통 소유권 이전의 효력이 인정되는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.9069344667907567
+            },
+            {
+              "question": "보통 소유권 이전의 효력이 인정되는는 상황인가?",
+              "answer": "Yes",
+              "confidence": 0.9334184640547472
+            },
+            {
+              "question": "소유권 이전의 효력이 인정되는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.909320687441018
+            },
+            {
+              "question": "소유권 이전의 효력이 인정되는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.898491293324359
+            }
+          ],
+          "yes_count": 6,
+          "avg_confidence": 0.8690567186468608
+        },
+        "performance_metrics": {
+          "confidence_improvement": 0.15112037743244544,
+          "yes_answer_change": 0,
+          "improvement_rate": 0.21049272582694425,
+          "answer_change_rate": 0.0
+        }
+      },
+      "overall_metrics": {
+        "processing_time": 3.314018249511719e-05,
+        "success": true,
+        "quality_score": 5.0,
+        "performance_improvement": 0.15112037743244544,
+        "target_achievement": true
+      }
+    },
+    {
+      "test_case": {
+        "question": "행정처분이 위법하다고 할 수 있는가?",
+        "document_content": "\n            제목: 국민권익위원회 2005-05168, 2005. 8. 16.\n            사건: 개인택시운송사업면허취소처분취소청구\n            내용: 「여객자동차운수사업법」 제76조제1항제15호 및 동법 시행령 제29조·제31조제1항 및 별표 2의 구분란 제25호의 규정에 의하면, 개인택시운송사업자의 운전면허가 취소된 때에는 사업면허를 취소하도록 되어 있고...\n            ",
+        "keywords": "행정처분, 위법성, 행정절차법, 취소소송",
+        "category": "행정",
+        "expected_distribution": "6-7:3-4",
+        "difficulty_level": "medium",
+        "target_confidence_improvement": 0.1
+      },
+      "question_generation": {
+        "total_questions": 10,
+        "yes_count": 7,
+        "no_count": 3,
+        "consistency_rate": 0.7490983810892732,
+        "generation_time": 9.234474924038828,
+        "questions": [
+          {
+            "level": 1,
+            "question": "일반적으로 행정처분이 위법하다고 할 수 있는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 2,
+            "question": "일반적으로 행정처분이 위법하다고 할 수 있는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 3,
+            "question": "일반적으로 행정처분이 위법하다고 할 수 있는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 4,
+            "question": "현재 상황에서 행정처분이 위법하다고 할 수 있는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 5,
+            "question": "현재 상황에서 행정처분이 위법하다고 할 수 있는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 6,
+            "question": "현재 상황에서 행정처분이 위법하다고 할 수 있는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 7,
+            "question": "보통 행정처분이 위법하다고 할 수 있는는 상황인가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 8,
+            "question": "보통 행정처분이 위법하다고 할 수 있는는 상황인가?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 9,
+            "question": "행정처분이 위법하다고 할 수 있는는지 궁금한가요?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 10,
+            "question": "행정처분이 위법하다고 할 수 있는는지 궁금한가요?",
+            "expected_answer": "No"
+          }
+        ],
+        "quality_assessment": {
+          "distribution_score": 5,
+          "distribution_label": "🎯 목표 균형 분포",
+          "consistency_score": 4,
+          "consistency_label": "✅ 양호한 일관성",
+          "total_score": 4.5,
+          "quality_level": "🏆 최고 품질"
+        }
+      },
+      "rag_comparison": {
+        "standard_rag": {
+          "results": [
+            {
+              "question": "행정처분이 위법하다고 할 수 있는가?",
+              "answer": "No",
+              "confidence": 0.7448339404834521
+            },
+            {
+              "question": "일반적으로 행정처분이 위법하다고 할 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7069034848000235
+            },
+            {
+              "question": "일반적으로 행정처분이 위법하다고 할 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6791437347396005
+            },
+            {
+              "question": "일반적으로 행정처분이 위법하다고 할 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6849092066232763
+            },
+            {
+              "question": "현재 상황에서 행정처분이 위법하다고 할 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6835783880025701
+            },
+            {
+              "question": "현재 상황에서 행정처분이 위법하다고 할 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7118864672479592
+            },
+            {
+              "question": "현재 상황에서 행정처분이 위법하다고 할 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7055121610077164
+            },
+            {
+              "question": "보통 행정처분이 위법하다고 할 수 있는는 상황인가?",
+              "answer": "Yes",
+              "confidence": 0.7553353021795566
+            },
+            {
+              "question": "보통 행정처분이 위법하다고 할 수 있는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.7241695616355682
+            },
+            {
+              "question": "행정처분이 위법하다고 할 수 있는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.7758752409556854
+            },
+            {
+              "question": "행정처분이 위법하다고 할 수 있는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.7784126908593614
+            }
+          ],
+          "yes_count": 7,
+          "avg_confidence": 0.7227781980486154
+        },
+        "boost_rag": {
+          "results": [
+            {
+              "question": "행정처분이 위법하다고 할 수 있는가?",
+              "answer": "No",
+              "confidence": 0.8324449823501173
+            },
+            {
+              "question": "일반적으로 행정처분이 위법하다고 할 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8118254081647747
+            },
+            {
+              "question": "일반적으로 행정처분이 위법하다고 할 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7742255365158043
+            },
+            {
+              "question": "일반적으로 행정처분이 위법하다고 할 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7951920590486217
+            },
+            {
+              "question": "현재 상황에서 행정처분이 위법하다고 할 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7699144911291856
+            },
+            {
+              "question": "현재 상황에서 행정처분이 위법하다고 할 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7981442415786081
+            },
+            {
+              "question": "현재 상황에서 행정처분이 위법하다고 할 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8138831112446483
+            },
+            {
+              "question": "보통 행정처분이 위법하다고 할 수 있는는 상황인가?",
+              "answer": "Yes",
+              "confidence": 0.8500329435007823
+            },
+            {
+              "question": "보통 행정처분이 위법하다고 할 수 있는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.8342993980529457
+            },
+            {
+              "question": "행정처분이 위법하다고 할 수 있는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.8634869856001067
+            },
+            {
+              "question": "행정처분이 위법하다고 할 수 있는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.8908282135748091
+            }
+          ],
+          "yes_count": 7,
+          "avg_confidence": 0.8212979427964003
+        },
+        "performance_metrics": {
+          "confidence_improvement": 0.09851974474778491,
+          "yes_answer_change": 0,
+          "improvement_rate": 0.13630702339081663,
+          "answer_change_rate": 0.0
+        }
+      },
+      "overall_metrics": {
+        "processing_time": 3.0994415283203125e-05,
+        "success": true,
+        "quality_score": 4.5,
+        "performance_improvement": 0.09851974474778491,
+        "target_achievement": true
+      }
+    },
+    {
+      "test_case": {
+        "question": "절도죄가 성립한다고 볼 수 있는가?",
+        "document_content": "\n            형법 제329조(절도)는 타인의 재물을 절취한 자는 6년 이하의 징역 또는 1천만원 이하의 벌금에 처한다고 규정하고 있다. 절도죄의 성립요건은 (1) 타인의 재물, (2) 절취행위, (3) 불법영득의사 등이 있다.\n            ",
+        "keywords": "절도죄, 형법 제329조, 구성요건, 불법영득의사",
+        "category": "형사A(생활형)",
+        "expected_distribution": "6-7:3-4",
+        "difficulty_level": "low",
+        "target_confidence_improvement": 0.08
+      },
+      "question_generation": {
+        "total_questions": 10,
+        "yes_count": 6,
+        "no_count": 4,
+        "consistency_rate": 0.7198813636343302,
+        "generation_time": 8.562609628087893,
+        "questions": [
+          {
+            "level": 1,
+            "question": "일반적으로 절도죄가 성립한다고 볼 수 있는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 2,
+            "question": "일반적으로 절도죄가 성립한다고 볼 수 있는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 3,
+            "question": "일반적으로 절도죄가 성립한다고 볼 수 있는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 4,
+            "question": "현재 상황에서 절도죄가 성립한다고 볼 수 있는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 5,
+            "question": "현재 상황에서 절도죄가 성립한다고 볼 수 있는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 6,
+            "question": "현재 상황에서 절도죄가 성립한다고 볼 수 있는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 7,
+            "question": "보통 절도죄가 성립한다고 볼 수 있는는 상황인가?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 8,
+            "question": "보통 절도죄가 성립한다고 볼 수 있는는 상황인가?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 9,
+            "question": "절도죄가 성립한다고 볼 수 있는는지 궁금한가요?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 10,
+            "question": "절도죄가 성립한다고 볼 수 있는는지 궁금한가요?",
+            "expected_answer": "No"
+          }
+        ],
+        "quality_assessment": {
+          "distribution_score": 5,
+          "distribution_label": "🎯 목표 균형 분포",
+          "consistency_score": 4,
+          "consistency_label": "✅ 양호한 일관성",
+          "total_score": 4.5,
+          "quality_level": "🏆 최고 품질"
+        }
+      },
+      "rag_comparison": {
+        "standard_rag": {
+          "results": [
+            {
+              "question": "절도죄가 성립한다고 볼 수 있는가?",
+              "answer": "No",
+              "confidence": 0.7564930310739076
+            },
+            {
+              "question": "일반적으로 절도죄가 성립한다고 볼 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6875660064490238
+            },
+            {
+              "question": "일반적으로 절도죄가 성립한다고 볼 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7067773980162984
+            },
+            {
+              "question": "일반적으로 절도죄가 성립한다고 볼 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6843578646332648
+            },
+            {
+              "question": "현재 상황에서 절도죄가 성립한다고 볼 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7030450363500357
+            },
+            {
+              "question": "현재 상황에서 절도죄가 성립한다고 볼 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7249674953343276
+            },
+            {
+              "question": "현재 상황에서 절도죄가 성립한다고 볼 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7227987928431914
+            },
+            {
+              "question": "보통 절도죄가 성립한다고 볼 수 있는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.7367966803225868
+            },
+            {
+              "question": "보통 절도죄가 성립한다고 볼 수 있는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.7272576187413197
+            },
+            {
+              "question": "절도죄가 성립한다고 볼 수 있는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.7368592811672723
+            },
+            {
+              "question": "절도죄가 성립한다고 볼 수 있는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.7704434548141221
+            }
+          ],
+          "yes_count": 6,
+          "avg_confidence": 0.7233966054313954
+        },
+        "boost_rag": {
+          "results": [
+            {
+              "question": "절도죄가 성립한다고 볼 수 있는가?",
+              "answer": "No",
+              "confidence": 0.844877518197056
+            },
+            {
+              "question": "일반적으로 절도죄가 성립한다고 볼 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.760441796099401
+            },
+            {
+              "question": "일반적으로 절도죄가 성립한다고 볼 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7969018149794704
+            },
+            {
+              "question": "일반적으로 절도죄가 성립한다고 볼 수 있는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7678716954002613
+            },
+            {
+              "question": "현재 상황에서 절도죄가 성립한다고 볼 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7717203943346026
+            },
+            {
+              "question": "현재 상황에서 절도죄가 성립한다고 볼 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.803311502813711
+            },
+            {
+              "question": "현재 상황에서 절도죄가 성립한다고 볼 수 있는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7829716114773098
+            },
+            {
+              "question": "보통 절도죄가 성립한다고 볼 수 있는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.8161045665223535
+            },
+            {
+              "question": "보통 절도죄가 성립한다고 볼 수 있는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.8011984720959614
+            },
+            {
+              "question": "절도죄가 성립한다고 볼 수 있는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.8065625875835891
+            },
+            {
+              "question": "절도죄가 성립한다고 볼 수 있는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.8703281228853089
+            }
+          ],
+          "yes_count": 6,
+          "avg_confidence": 0.8020263711262751
+        },
+        "performance_metrics": {
+          "confidence_improvement": 0.07862976569487967,
+          "yes_answer_change": 0,
+          "improvement_rate": 0.10869523730760258,
+          "answer_change_rate": 0.0
+        }
+      },
+      "overall_metrics": {
+        "processing_time": 2.7894973754882812e-05,
+        "success": true,
+        "quality_score": 4.5,
+        "performance_improvement": 0.07862976569487967,
+        "target_achievement": true
+      }
+    },
+    {
+      "test_case": {
+        "question": "부당해고가 인정되는가?",
+        "document_content": "\n            근로기준법 제23조는 사용자는 근로자를 정당한 이유 없이 해고하지 못한다고 규정하고 있다. 정당한 이유는 근로자의 근로계약상 의무위반이나 사업상 필요에 의한 경우를 말한다.\n            ",
+        "keywords": "부당해고, 근로기준법 제23조, 정당한 이유",
+        "category": "근로자",
+        "expected_distribution": "6-7:3-4",
+        "difficulty_level": "medium",
+        "target_confidence_improvement": 0.11
+      },
+      "question_generation": {
+        "total_questions": 10,
+        "yes_count": 7,
+        "no_count": 3,
+        "consistency_rate": 0.7487529526241622,
+        "generation_time": 10.934775263394158,
+        "questions": [
+          {
+            "level": 1,
+            "question": "일반적으로 부당해고가 인정되는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 2,
+            "question": "일반적으로 부당해고가 인정되는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 3,
+            "question": "일반적으로 부당해고가 인정되는는 경우가 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 4,
+            "question": "현재 상황에서 부당해고가 인정되는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 5,
+            "question": "현재 상황에서 부당해고가 인정되는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 6,
+            "question": "현재 상황에서 부당해고가 인정되는라고 볼 수 있는가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 7,
+            "question": "보통 부당해고가 인정되는는 상황인가?",
+            "expected_answer": "Yes"
+          },
+          {
+            "level": 8,
+            "question": "보통 부당해고가 인정되는는 상황인가?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 9,
+            "question": "부당해고가 인정되는는지 궁금한가요?",
+            "expected_answer": "No"
+          },
+          {
+            "level": 10,
+            "question": "부당해고가 인정되는는지 궁금한가요?",
+            "expected_answer": "No"
+          }
+        ],
+        "quality_assessment": {
+          "distribution_score": 5,
+          "distribution_label": "🎯 목표 균형 분포",
+          "consistency_score": 4,
+          "consistency_label": "✅ 양호한 일관성",
+          "total_score": 4.5,
+          "quality_level": "🏆 최고 품질"
+        }
+      },
+      "rag_comparison": {
+        "standard_rag": {
+          "results": [
+            {
+              "question": "부당해고가 인정되는가?",
+              "answer": "No",
+              "confidence": 0.6998695505666996
+            },
+            {
+              "question": "일반적으로 부당해고가 인정되는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6922326170265211
+            },
+            {
+              "question": "일반적으로 부당해고가 인정되는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.6690090554854422
+            },
+            {
+              "question": "일반적으로 부당해고가 인정되는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7127862515668149
+            },
+            {
+              "question": "현재 상황에서 부당해고가 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7174375821741455
+            },
+            {
+              "question": "현재 상황에서 부당해고가 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7058651191488121
+            },
+            {
+              "question": "현재 상황에서 부당해고가 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7447221419761962
+            },
+            {
+              "question": "보통 부당해고가 인정되는는 상황인가?",
+              "answer": "Yes",
+              "confidence": 0.7446896614671009
+            },
+            {
+              "question": "보통 부당해고가 인정되는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.7361348348502774
+            },
+            {
+              "question": "부당해고가 인정되는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.7323170826170101
+            },
+            {
+              "question": "부당해고가 인정되는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.7598029357772184
+            }
+          ],
+          "yes_count": 7,
+          "avg_confidence": 0.7195333484232944
+        },
+        "boost_rag": {
+          "results": [
+            {
+              "question": "부당해고가 인정되는가?",
+              "answer": "Yes",
+              "confidence": 0.8094019724490961
+            },
+            {
+              "question": "일반적으로 부당해고가 인정되는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8047796068492556
+            },
+            {
+              "question": "일반적으로 부당해고가 인정되는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.7672977062263227
+            },
+            {
+              "question": "일반적으로 부당해고가 인정되는는 경우가 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8296055340850714
+            },
+            {
+              "question": "현재 상황에서 부당해고가 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8176256106308445
+            },
+            {
+              "question": "현재 상황에서 부당해고가 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8161077014622408
+            },
+            {
+              "question": "현재 상황에서 부당해고가 인정되는라고 볼 수 있는가?",
+              "answer": "Yes",
+              "confidence": 0.8746669604548415
+            },
+            {
+              "question": "보통 부당해고가 인정되는는 상황인가?",
+              "answer": "Yes",
+              "confidence": 0.8667171714193035
+            },
+            {
+              "question": "보통 부당해고가 인정되는는 상황인가?",
+              "answer": "No",
+              "confidence": 0.8379183892260623
+            },
+            {
+              "question": "부당해고가 인정되는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.842000080459629
+            },
+            {
+              "question": "부당해고가 인정되는는지 궁금한가요?",
+              "answer": "No",
+              "confidence": 0.8498160207124253
+            }
+          ],
+          "yes_count": 8,
+          "avg_confidence": 0.8287215230886449
+        },
+        "performance_metrics": {
+          "confidence_improvement": 0.10918817466535047,
+          "yes_answer_change": 1,
+          "improvement_rate": 0.15174859498119625,
+          "answer_change_rate": 0.09090909090909091
+        }
+      },
+      "overall_metrics": {
+        "processing_time": 2.6941299438476562e-05,
+        "success": true,
+        "quality_score": 4.5,
+        "performance_improvement": 0.10918817466535047,
+        "target_achievement": true
+      }
+    }
+  ],
+  "issues_identified": [],
+  "recommendations": [],
+  "improvement_analysis": {
+    "compared_to_original": "기존 실험 대비 환경 검증 및 에러 핸들링 강화",
+    "recent_changes_integration": "FAISS 기반 균형 분포 성공 패턴 적용",
+    "next_iteration_focus": "실제 LLM 모델 연동 및 프롬프트 최적화"
+  }
+}

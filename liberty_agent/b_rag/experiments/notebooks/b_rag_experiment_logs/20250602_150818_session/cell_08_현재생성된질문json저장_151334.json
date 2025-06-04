@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "cell_number": 8,
+    "cell_name": "현재 생성된 질문 JSON 저장",
+    "execution_timestamp": "2025-06-02T15:13:34.192607",
+    "execution_time_from_session_start": 315.4556369781494,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "현재 생성된 질문 JSON 저장 완료\n- 질문 발견: Yes\n- 저장된 질문 수: 10개\n- 파일 저장: 성공\n- 저장 경로: generated_questions_enhanced_difficulty_questions_20250602_151334.json\n- 질문 타입: 확장 난이도",
+  "results": {
+    "test_type": "save_generated_questions_to_json",
+    "questions_found": true,
+    "questions_saved": 10,
+    "file_saved": true,
+    "save_path": "generated_questions_enhanced_difficulty_questions_20250602_151334.json"
+  }
+}

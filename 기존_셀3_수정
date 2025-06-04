@@ -1,0 +1,16 @@
+# ===== 🎯 검증 우회 + 확장 난이도 옵션 =====
+# ... 기존 코드 ...
+
+# **STEP 2: 질문 생성기 초기화 (난이도 옵션 추가)**
+difficulty_mode = "enhanced"  # 🎓 옵션: "semantic", "enhanced", "extreme"
+
+print(f"🎯 검증 우회 + {difficulty_mode} 난이도 버전")
+print("⚠️  예상 소요시간: 5-15초 (실제 API 호출)")
+
+generator = UnifiedYesNoQuestionGenerator(
+    model_name="gpt-4o-2024-08-06",
+    temperature=0.2,
+    difficulty_mode=difficulty_mode  # 🎓 난이도 모드 설정
+)
+
+# ... 나머지 기존 코드 동일 ... 

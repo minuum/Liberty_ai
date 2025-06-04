@@ -1,0 +1,152 @@
+{
+  "session_info": {
+    "session_metadata": {
+      "session_id": "20250602_111400",
+      "session_start_time": "2025-06-02T11:14:00.251404",
+      "total_cells": 19,
+      "completed_cells": [
+        {
+          "cell_number": 1,
+          "cell_name": "모듈 import 및 초기화",
+          "md_file": "cell_01_모듈import및초기화_111436.md",
+          "json_file": "cell_01_모듈import및초기화_111436.json"
+        },
+        {
+          "cell_number": 2,
+          "cell_name": "질문 생성 테스트 (의미론적 동일성)",
+          "md_file": "cell_02_질문생성테스트의미론적동일성_112732.md",
+          "json_file": "cell_02_질문생성테스트의미론적동일성_112732.json"
+        },
+        {
+          "cell_number": 3,
+          "cell_name": "RAG 시스템 테스트",
+          "md_file": "cell_03_rag시스템테스트_114055.md",
+          "json_file": "cell_03_rag시스템테스트_114055.json"
+        },
+        {
+          "cell_number": 4,
+          "cell_name": "RAG 시스템 테스트",
+          "md_file": "cell_04_rag시스템테스트_114404.md",
+          "json_file": "cell_04_rag시스템테스트_114404.json"
+        },
+        {
+          "cell_number": 5,
+          "cell_name": "개선 효과 분석",
+          "md_file": "cell_05_개선효과분석_115007.md",
+          "json_file": "cell_05_개선효과분석_115007.json"
+        },
+        {
+          "cell_number": 8,
+          "cell_name": "결과 분석 및 리포트",
+          "md_file": "cell_08_결과분석및리포트_115024.md",
+          "json_file": "cell_08_결과분석및리포트_115024.json"
+        },
+        {
+          "cell_number": 9,
+          "cell_name": "추가 실험 및 커스터마이징",
+          "md_file": "cell_09_추가실험및커스터마이징_115030.md",
+          "json_file": "cell_09_추가실험및커스터마이징_115030.json"
+        },
+        {
+          "cell_number": 10,
+          "cell_name": "추가 실험 및 커스터마이징",
+          "md_file": "cell_10_추가실험및커스터마이징_115039.md",
+          "json_file": "cell_10_추가실험및커스터마이징_115039.json"
+        },
+        {
+          "cell_number": 11,
+          "cell_name": "추가 실험 및 커스터마이징",
+          "md_file": "cell_11_추가실험및커스터마이징_115040.md",
+          "json_file": "cell_11_추가실험및커스터마이징_115040.json"
+        },
+        {
+          "cell_number": 12,
+          "cell_name": "추가 실험 및 커스터마이징",
+          "md_file": "cell_12_추가실험및커스터마이징_115040.md",
+          "json_file": "cell_12_추가실험및커스터마이징_115040.json"
+        },
+        {
+          "cell_number": 13,
+          "cell_name": "추가 실험 및 커스터마이징",
+          "md_file": "cell_13_추가실험및커스터마이징_115041.md",
+          "json_file": "cell_13_추가실험및커스터마이징_115041.json"
+        },
+        {
+          "cell_number": 14,
+          "cell_name": "질문 생성 테스트 (의미론적 동일성)",
+          "md_file": "cell_14_질문생성테스트의미론적동일성_115916.md",
+          "json_file": "cell_14_질문생성테스트의미론적동일성_115916.json"
+        },
+        {
+          "cell_number": 15,
+          "cell_name": "RAG 시스템 테스트 (전체 질문)",
+          "md_file": "cell_15_rag시스템테스트전체질문_130323.md",
+          "json_file": "cell_15_rag시스템테스트전체질문_130323.json"
+        },
+        {
+          "cell_number": 16,
+          "cell_name": "개선 효과 분석",
+          "md_file": "cell_16_개선효과분석_130422.md",
+          "json_file": "cell_16_개선효과분석_130422.json"
+        },
+        {
+          "cell_number": 19,
+          "cell_name": "결과 분석 및 리포트",
+          "md_file": "cell_19_결과분석및리포트_130457.md",
+          "json_file": "cell_19_결과분석및리포트_130457.json"
+        }
+      ],
+      "failed_cells": [
+        {
+          "cell_number": 7,
+          "cell_name": "결과 시각화",
+          "error": "TypeError: Object of type bool_ is not JSON serializable\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_60275/2026602600.py\", line 150, in <module>\n    log_cell_end(\"결과 시각화\", cell_start_time, cell_results, summary)\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_60275/3713360327.py\", line 152, in log_cell_end\n    save_cell_results(cell_name, results, summary)\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_60275/3713360327.py\", line 91, in save_cell_results\n    md_content += f\"```json\\n{json.dumps(value, ensure_ascii=False, indent=2)}\\n```\\n\\n\"\n                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/__init__.py\", line 238, in dumps\n    **kw).encode(obj)\n          ^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 202, in encode\n    chunks = list(chunks)\n             ^^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 432, in _iterencode\n    yield from _iterencode_dict(o, _current_indent_level)\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 406, in _iterencode_dict\n    yield from chunks\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 439, in _iterencode\n    o = _default(o)\n        ^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 180, in default\n    raise TypeError(f'Object of type {o.__class__.__name__} '\nTypeError: Object of type bool_ is not JSON serializable\n"
+        },
+        {
+          "cell_number": 18,
+          "cell_name": "결과 시각화",
+          "error": "TypeError: Object of type bool_ is not JSON serializable\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_60275/2026602600.py\", line 150, in <module>\n    log_cell_end(\"결과 시각화\", cell_start_time, cell_results, summary)\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_60275/3713360327.py\", line 152, in log_cell_end\n    save_cell_results(cell_name, results, summary)\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_60275/3713360327.py\", line 91, in save_cell_results\n    md_content += f\"```json\\n{json.dumps(value, ensure_ascii=False, indent=2)}\\n```\\n\\n\"\n                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/__init__.py\", line 238, in dumps\n    **kw).encode(obj)\n          ^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 202, in encode\n    chunks = list(chunks)\n             ^^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 432, in _iterencode\n    yield from _iterencode_dict(o, _current_indent_level)\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 406, in _iterencode_dict\n    yield from chunks\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 439, in _iterencode\n    o = _default(o)\n        ^^^^^^^^^^^\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/json/encoder.py\", line 180, in default\n    raise TypeError(f'Object of type {o.__class__.__name__} '\nTypeError: Object of type bool_ is not JSON serializable\n"
+        }
+      ],
+      "notebook_path": "/Users/minu/dev/Liberty/Liberty_ai/liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb"
+    },
+    "total_execution_time": 6660.738325119019,
+    "session_success_rate": 78.94736842105263,
+    "available_results": {
+      "question_generation": "available",
+      "rag_comparison": "available",
+      "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?"
+    }
+  },
+  "additional_experiments": [
+    {
+      "name": "파라미터 최적화 실험",
+      "description": "온도, top_k, 반복 횟수 등 하이퍼파라미터 조정",
+      "code_snippet": "\n# 예시: 다른 파라미터로 테스트\nrag_config_optimized = YesNoRAGConfig(\n    embedding_model=\"solar-embedding-1-large\",\n    llm_model=\"gpt-4o-2024-08-06\", \n    llm_temperature=0.05,  # 더 낮은 온도\n    top_k=5,              # 더 많은 문서\n    similarity_threshold=0.6  # 더 낮은 임계값\n)"
+    },
+    {
+      "name": "다양한 질문 레벨 테스트",
+      "description": "특정 레벨의 질문들만 선별하여 RAG 성능 비교",
+      "code_snippet": "\n# 예시: 레벨 5 질문들만 테스트\nlevel_5_questions = [q.question for q in generated_questions.questions if q.level == 5]\n"
+    },
+    {
+      "name": "대량 배치 테스트",
+      "description": "100개 이상의 질문으로 대규모 성능 검증",
+      "code_snippet": "\n# 배치 처리용 함수 정의\ndef batch_rag_test(questions, batch_size=10):\n    results = []\n    for i in range(0, len(questions), batch_size):\n        batch = questions[i:i+batch_size]\n        # 배치 처리 로직\n        pass\n    return results\n"
+    }
+  ],
+  "customization_tips": [
+    "프롬프트 수정: TXT 파일을 편집하여 질문 생성 방식 조정",
+    "새로운 도메인: 다른 법률 분야 문서로 FAISS DB 교체",
+    "모델 변경: 다른 LLM 모델(Claude, Gemini 등)로 실험",
+    "평가 메트릭: 확신도 외에 다른 평가 지표 추가",
+    "시각화 개선: 더 상세한 차트와 분석 도구 추가"
+  ],
+  "next_steps": [
+    "실험 결과 검토 및 분석",
+    "추가 실험 계획 수립",
+    "프롬프트 최적화",
+    "대규모 테스트 준비",
+    "논문 작성을 위한 데이터 정리"
+  ]
+}

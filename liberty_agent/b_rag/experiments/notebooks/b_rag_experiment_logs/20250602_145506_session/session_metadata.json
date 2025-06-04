@@ -1,0 +1,45 @@
+{
+  "session_id": "20250602_145506",
+  "session_start_time": "2025-06-02T14:55:06.106402",
+  "total_cells": 6,
+  "completed_cells": [
+    {
+      "cell_number": 1,
+      "cell_name": "모듈 import 및 초기화",
+      "md_file": "cell_01_모듈import및초기화_145511.md",
+      "json_file": "cell_01_모듈import및초기화_145511.json"
+    },
+    {
+      "cell_number": 2,
+      "cell_name": "모듈 import 및 초기화",
+      "md_file": "cell_02_모듈import및초기화_145704.md",
+      "json_file": "cell_02_모듈import및초기화_145704.json"
+    },
+    {
+      "cell_number": 3,
+      "cell_name": "검증 우회 API 질문 생성",
+      "md_file": "cell_03_검증우회api질문생성_145742.md",
+      "json_file": "cell_03_검증우회api질문생성_145742.json"
+    },
+    {
+      "cell_number": 4,
+      "cell_name": "RAG 시스템 테스트 (전체 질문)",
+      "md_file": "cell_04_rag시스템테스트전체질문_145946.md",
+      "json_file": "cell_04_rag시스템테스트전체질문_145946.json"
+    },
+    {
+      "cell_number": 6,
+      "cell_name": "현재 생성된 질문 검증 및 로드",
+      "md_file": "cell_06_현재생성된질문검증및로드_150449.md",
+      "json_file": "cell_06_현재생성된질문검증및로드_150449.json"
+    }
+  ],
+  "failed_cells": [
+    {
+      "cell_number": 5,
+      "cell_name": "현재 생성된 질문 검증 및 로드",
+      "error": "AttributeError: 'obj' object has no attribute 'get_consistency_rate'\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_74191/1534682937.py\", line 31, in <module>\n    consistency_rate = current_questions.get_consistency_rate()\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'obj' object has no attribute 'get_consistency_rate'\n"
+    }
+  ],
+  "notebook_path": "/Users/minu/dev/Liberty/Liberty_ai/liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb"
+}

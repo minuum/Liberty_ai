@@ -1,0 +1,41 @@
+{
+  "metadata": {
+    "cell_number": 9,
+    "cell_name": "결과 분석 및 리포트",
+    "execution_timestamp": "2025-06-02T15:17:23.452266",
+    "execution_time_from_session_start": 544.7154748439789,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "결과 분석 및 리포트 완료\n- 리포트 생성: 성공\n- 주요 발견사항: 0개\n- 권고사항: 4개\n- 평균 성능 개선: -0.005",
+  "results": {
+    "test_type": "comprehensive_analysis_report",
+    "report_generated": true,
+    "key_findings": [],
+    "recommendations": [
+      "Boost RAG 반복 횟수 증가 또는 프롬프트 최적화 필요",
+      "개선 성공률이 낮음 - 질문 생성 방식 재검토 필요",
+      "더 많은 테스트 케이스로 통계적 신뢰성 확보 권장",
+      "다양한 법률 도메인에서의 성능 검증 필요"
+    ],
+    "report_file": "b_rag_analysis_report_20250602_151723.md",
+    "analysis_data": {
+      "rag_performance": {
+        "total_questions": 11,
+        "standard_avg_confidence": 0.9545454545454546,
+        "boost_avg_confidence": 0.9499999999999997,
+        "avg_improvement": -0.0045454545454546,
+        "standard_yes_count": 9,
+        "boost_yes_count": 9,
+        "yes_change": 0,
+        "improvement_rate": 45.45454545454545
+      },
+      "question_generation": {
+        "total_questions": 10,
+        "yes_count": 10,
+        "no_count": 0,
+        "yes_ratio": 100.0
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "cell_number": 8,
+    "cell_name": "RAG 시스템 테스트 (전체 질문)",
+    "execution_timestamp": "2025-06-02T14:31:57.696436",
+    "execution_time_from_session_start": 1030.005559682846,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "RAG 시스템 전체 테스트 완료\n- RAG 시스템 사용: 가능\n- 총 테스트 질문: 11개\n- 성공한 테스트: 11개\n- Yes 답변 증가: +0개\n- 평균 확신도 개선: -0.005\n- 개선율: 45.5%",
+  "results": {
+    "test_type": "rag_system_standard_vs_boost_all_questions",
+    "rag_system_available": true,
+    "total_questions_available": 10,
+    "questions_tested": 11,
+    "successful_tests": 11,
+    "performance_comparison": {
+      "total_tests": 11,
+      "successful_tests": 11,
+      "failed_tests": 0,
+      "standard_yes_count": 11,
+      "boost_yes_count": 11,
+      "yes_change": 0,
+      "yes_improvement_rate": 0.0,
+      "avg_standard_confidence": 0.9545454545454547,
+      "avg_boost_confidence": 0.95,
+      "confidence_improvement": -0.004545454545454741,
+      "improved_questions_count": 5,
+      "improvement_rate": 45.45454545454545
+    },
+    "question_source": "all_generated_questions"
+  }
+}

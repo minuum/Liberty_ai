@@ -1,0 +1,18 @@
+refactor(b_rag): 코드 정리 및 불필요한 파일 삭제
+
+B-RAG 실험 시스템 코드 정리 및 개선:
+
+- 🧹 불필요한 중복/구버전 테스트 파일 삭제
+- 📄 B-RAG 실험 가이드 문서 작성
+- 🔄 최신 실험 방법론 정리 및 문서화
+- 📊 자동 로깅 시스템 기반 실험 프로세스 표준화
+- 🚀 검증 우회 API 직접 호출 방식 적용
+- 📈 DataFrame 기반 상세 분석 추가
+- 📊 고급 시각화 및 통계 분석 개선
+
+주요 파일:
+- b_rag_test_notebook.ipynb: 주요 실험 노트북
+- improved_notebook_functions.py: 개선된 노트북 함수
+- improved_keyword_extraction.py: AI 기반 키워드 추출
+- advanced_b_rag_experiment.py: 고급 B-RAG 실험
+- B-RAG_실험_가이드.md: 실험 방법 가이드 

@@ -1,0 +1,27 @@
+{
+  "metadata": {
+    "cell_number": 5,
+    "cell_name": "개선 효과 분석",
+    "execution_timestamp": "2025-06-02T11:50:07.358833",
+    "execution_time_from_session_start": 2167.107433080673,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "개선 효과 분석 완료\n- 시각화 생성: 성공\n- 저장된 차트: 1개\n- 평균 확신도 개선: +0.067",
+  "results": {
+    "test_type": "improvement_effect_analysis",
+    "visualization_created": true,
+    "charts_saved": [
+      "rag_improvement_analysis_115006.png"
+    ],
+    "analysis_summary": {
+      "total_questions": 3,
+      "avg_confidence_improvement": 0.06666666666666665,
+      "positive_improvements": 2,
+      "negative_improvements": 0,
+      "no_change": 1,
+      "answer_changes": 2,
+      "yes_count_change": 2
+    }
+  }
+}

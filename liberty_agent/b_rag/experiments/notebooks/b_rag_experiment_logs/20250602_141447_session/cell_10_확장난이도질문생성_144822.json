@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "cell_number": 10,
+    "cell_name": "확장 난이도 질문 생성",
+    "execution_timestamp": "2025-06-02T14:48:22.091061",
+    "execution_time_from_session_start": 2014.400378704071,
+    "success": false,
+    "error_info": "IndentationError: unexpected indent (unified_yesno_question_generator.py, line 373)\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_72681/1149987478.py\", line 26, in <module>\n    importlib.reload(unified_module)\n  File \"/Users/minu/.pyenv/versions/3.11.10/lib/python3.11/importlib/__init__.py\", line 169, in reload\n    _bootstrap._exec(spec, module)\n  File \"<frozen importlib._bootstrap>\", line 621, in _exec\n  File \"<frozen importlib._bootstrap_external>\", line 936, in exec_module\n  File \"<frozen importlib._bootstrap_external>\", line 1074, in get_code\n  File \"<frozen importlib._bootstrap_external>\", line 1004, in source_to_code\n  File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed\n  File \"/Users/minu/dev/Liberty/Liberty_ai/liberty_agent/b_rag/core/question_generation/unified_yesno_question_generator.py\", line 373\n    return False\nIndentationError: unexpected indent\n"
+  },
+  "summary": "실행 실패: unexpected indent (unified_yesno_question_generator.py, line 373)",
+  "results": {
+    "error": "unexpected indent (unified_yesno_question_generator.py, line 373)"
+  }
+}

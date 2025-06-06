@@ -1,0 +1,101 @@
+{
+  "cell_name": "Enhanced Prompt Generator with Logging",
+  "timestamp": "2025-06-07 01:50:51",
+  "summary": "Enhanced Prompt Generator 실행 완료 - 6개 경로에 36개 파일 생성",
+  "results": {
+    "total_paths_attempted": 6,
+    "successful_paths": 6,
+    "total_files_created": 36,
+    "execution_time": 0.004079103469848633,
+    "prompt_files": [
+      "standard_rag_system.txt",
+      "boost_rag_system.txt",
+      "boost_rag_human.txt",
+      "unified_yesno_question_generator_enhanced_difficulty_v4.txt",
+      "unified_yesno_question_generator_extreme_difficulty_v2.txt",
+      "unified_yesno_question_generator_strict_balanced_v3.txt"
+    ],
+    "success_details": [
+      {
+        "path": "liberty_agent/b_rag/core/rag_system/prompts",
+        "success": true,
+        "created_files": [
+          "standard_rag_system.txt",
+          "boost_rag_system.txt",
+          "boost_rag_human.txt",
+          "unified_yesno_question_generator_enhanced_difficulty_v4.txt",
+          "unified_yesno_question_generator_extreme_difficulty_v2.txt",
+          "unified_yesno_question_generator_strict_balanced_v3.txt"
+        ],
+        "file_count": 6
+      },
+      {
+        "path": "liberty_agent/b_rag/core/question_generation/prompts/minu",
+        "success": true,
+        "created_files": [
+          "standard_rag_system.txt",
+          "boost_rag_system.txt",
+          "boost_rag_human.txt",
+          "unified_yesno_question_generator_enhanced_difficulty_v4.txt",
+          "unified_yesno_question_generator_extreme_difficulty_v2.txt",
+          "unified_yesno_question_generator_strict_balanced_v3.txt"
+        ],
+        "file_count": 6
+      },
+      {
+        "path": "core/rag_system/prompts",
+        "success": true,
+        "created_files": [
+          "standard_rag_system.txt",
+          "boost_rag_system.txt",
+          "boost_rag_human.txt",
+          "unified_yesno_question_generator_enhanced_difficulty_v4.txt",
+          "unified_yesno_question_generator_extreme_difficulty_v2.txt",
+          "unified_yesno_question_generator_strict_balanced_v3.txt"
+        ],
+        "file_count": 6
+      },
+      {
+        "path": "core/question_generation/prompts/minu",
+        "success": true,
+        "created_files": [
+          "standard_rag_system.txt",
+          "boost_rag_system.txt",
+          "boost_rag_human.txt",
+          "unified_yesno_question_generator_enhanced_difficulty_v4.txt",
+          "unified_yesno_question_generator_extreme_difficulty_v2.txt",
+          "unified_yesno_question_generator_strict_balanced_v3.txt"
+        ],
+        "file_count": 6
+      },
+      {
+        "path": "prompts",
+        "success": true,
+        "created_files": [
+          "standard_rag_system.txt",
+          "boost_rag_system.txt",
+          "boost_rag_human.txt",
+          "unified_yesno_question_generator_enhanced_difficulty_v4.txt",
+          "unified_yesno_question_generator_extreme_difficulty_v2.txt",
+          "unified_yesno_question_generator_strict_balanced_v3.txt"
+        ],
+        "file_count": 6
+      },
+      {
+        "path": ".",
+        "success": true,
+        "created_files": [
+          "standard_rag_system.txt",
+          "boost_rag_system.txt",
+          "boost_rag_human.txt",
+          "unified_yesno_question_generator_enhanced_difficulty_v4.txt",
+          "unified_yesno_question_generator_extreme_difficulty_v2.txt",
+          "unified_yesno_question_generator_strict_balanced_v3.txt"
+        ],
+        "file_count": 6
+      }
+    ]
+  },
+  "error_info": null,
+  "execution_success": true
+}

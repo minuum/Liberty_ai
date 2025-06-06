@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "cell_number": 6,
+    "cell_name": "최적화된 실제 RAG 비교 테스트",
+    "execution_timestamp": "2025-06-06T23:58:21.907122",
+    "execution_time_from_session_start": 1911.8414890766144,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "최적화된 실제 RAG 비교 테스트 완료\n- Standard RAG: 성공\n- Boost RAG: 성공\n- 테스트 질문: 50개\n- 처리 시간: 89.80초\n- 확신도 개선: +0.000\n- 속도 개선: -0.01초",
+  "results": {
+    "test_type": "optimized_real_rag_comparison",
+    "faiss_loaded": false,
+    "standard_rag_tested": true,
+    "boost_rag_tested": true,
+    "total_questions_tested": 50,
+    "processing_time": 89.8026168346405,
+    "performance_metrics": {},
+    "standard_yes_ratio": 0.0,
+    "boost_yes_ratio": 0.0,
+    "confidence_improvement": 0.0,
+    "speed_improvement": -0.012644786834716759,
+    "answer_change_ratio": 0.0
+  }
+}

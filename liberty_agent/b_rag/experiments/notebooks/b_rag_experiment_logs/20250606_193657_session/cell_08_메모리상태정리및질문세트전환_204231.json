@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "cell_number": 8,
+    "cell_name": "메모리 상태 정리 및 질문 세트 전환",
+    "execution_timestamp": "2025-06-06T20:42:31.321430",
+    "execution_time_from_session_start": 3933.478635072708,
+    "success": false,
+    "error_info": "ModuleNotFoundError: No module named 'liberty_agent.b_rag.core.question_generation.schemas'\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_87975/1318577511.py\", line 67, in <module>\n    from liberty_agent.b_rag.core.question_generation.schemas import QuestionSet, Question, AnswerType\nModuleNotFoundError: No module named 'liberty_agent.b_rag.core.question_generation.schemas'\n"
+  },
+  "summary": "실행 실패: No module named 'liberty_agent.b_rag.core.question_generation.schemas'",
+  "results": {
+    "error": "No module named 'liberty_agent.b_rag.core.question_generation.schemas'"
+  }
+}

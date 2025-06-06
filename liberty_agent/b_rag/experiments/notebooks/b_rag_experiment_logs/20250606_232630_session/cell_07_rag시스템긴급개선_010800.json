@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "cell_number": 7,
+    "cell_name": "RAG 시스템 긴급 개선",
+    "execution_timestamp": "2025-06-07T01:08:00.305873",
+    "execution_time_from_session_start": 6090.2401123046875,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "",
+  "results": {
+    "error": "name 'ChatOpenAI' is not defined"
+  }
+}

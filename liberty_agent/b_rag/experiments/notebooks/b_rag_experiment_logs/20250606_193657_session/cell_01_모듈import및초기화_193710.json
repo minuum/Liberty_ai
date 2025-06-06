@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "cell_number": 1,
+    "cell_name": "모듈 import 및 초기화",
+    "execution_timestamp": "2025-06-06T19:37:10.423489",
+    "execution_time_from_session_start": 12.580701112747192,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "모듈 import 및 초기화 완료\n- 들여쓰기 수정: 실패\n- 프롬프트 생성: 성공\n- 성공한 import: 4개\n- 실패한 import: 0개\n- 사용 가능한 모듈: 12개",
+  "results": {
+    "imports": {
+      "question_generator": "success",
+      "rag_system": "success",
+      "schemas": "success",
+      "libraries": "success"
+    },
+    "modules_available": [
+      "UnifiedYesNoQuestionGenerator",
+      "YesNoRAGSystem",
+      "YesNoRAGConfig",
+      "YesNoAnswer",
+      "TenLevelYesNoQuestions",
+      "LevelQuestion",
+      "FAISS",
+      "UpstageEmbeddings",
+      "pandas",
+      "matplotlib",
+      "seaborn",
+      "numpy"
+    ],
+    "import_errors": [],
+    "prompt_files_created": true,
+    "indentation_fixed": false,
+    "global_variables_initialized": true,
+    "total_successful_imports": 4,
+    "total_failed_imports": 0
+  }
+}

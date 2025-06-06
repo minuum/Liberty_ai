@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "cell_number": 16,
+    "cell_name": "실제 다중 문서 RAG 비교 테스트",
+    "execution_timestamp": "2025-06-06T21:46:43.197513",
+    "execution_time_from_session_start": 7785.354732990265,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "실제 다중 문서 RAG 비교 테스트 완료\n- Standard RAG 테스트: 성공\n- Boost RAG 테스트: 성공\n- 테스트 질문 수: 15개\n- 처리 시간: 143.86초\n- 확신도 개선: +0.000",
+  "results": {
+    "test_type": "real_multi_document_rag_comparison",
+    "standard_rag_tested": true,
+    "boost_rag_tested": true,
+    "total_questions_tested": 15,
+    "processing_time": 143.86250591278076,
+    "standard_yes_ratio": 0.8666666666666667,
+    "boost_yes_ratio": 0.9333333333333333,
+    "confidence_improvement": 0.0
+  }
+}

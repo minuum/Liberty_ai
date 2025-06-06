@@ -1,0 +1,106 @@
+{
+  "metadata": {
+    "save_timestamp": "2025-06-06T20:32:56.619737",
+    "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+    "generation_mode": "의미론적 동일성",
+    "difficulty_range": "일반",
+    "question_type": "semantic_equivalence_questions",
+    "total_questions": 10,
+    "yes_count": 0,
+    "no_count": 10,
+    "consistency_rate": 1.0,
+    "api_execution_time": 0
+  },
+  "questions": [
+    {
+      "id": 1,
+      "level": 1,
+      "question": "시간이 지나면 땅을 가질 수 있나요?",
+      "target_audience": "초등학생 (5-7세)",
+      "reasoning": "어린이들이 이해할 수 있도록 시효의 개념을 단순화하여 질문을 구성했습니다.",
+      "expected_answer": "No",
+      "confidence": 0.9
+    },
+    {
+      "id": 2,
+      "level": 2,
+      "question": "오래 지나면 땅이 내 것이 될 수 있나요?",
+      "target_audience": "초등학생 (8-10세)",
+      "reasoning": "조금 더 나이가 많은 어린이들이 이해할 수 있도록 시효의 개념을 설명했습니다.",
+      "expected_answer": "No",
+      "confidence": 0.9
+    },
+    {
+      "id": 3,
+      "level": 3,
+      "question": "시간이 지나면 땅의 주인이 될 수 있나요?",
+      "target_audience": "중학생 (11-13세)",
+      "reasoning": "중학생들이 이해할 수 있도록 시효의 개념을 설명했습니다.",
+      "expected_answer": "No",
+      "confidence": 0.9
+    },
+    {
+      "id": 4,
+      "level": 4,
+      "question": "오랜 시간이 지나면 땅을 소유할 수 있나요?",
+      "target_audience": "고등학생 (14-18세)",
+      "reasoning": "고등학생들이 이해할 수 있도록 시효의 개념을 설명했습니다.",
+      "expected_answer": "No",
+      "confidence": 0.9
+    },
+    {
+      "id": 5,
+      "level": 5,
+      "question": "시간이 지나면 소유권을 얻을 수 있나요?",
+      "target_audience": "일반 성인 (19-30세)",
+      "reasoning": "일반 성인들이 이해할 수 있도록 시효의 개념을 설명했습니다.",
+      "expected_answer": "No",
+      "confidence": 0.9
+    },
+    {
+      "id": 6,
+      "level": 6,
+      "question": "오랜 시간이 지나면 소유권을 취득할 수 있나요?",
+      "target_audience": "일반 성인 (31-50세)",
+      "reasoning": "성인들이 이해할 수 있도록 시효의 개념을 설명했습니다.",
+      "expected_answer": "No",
+      "confidence": 0.9
+    },
+    {
+      "id": 7,
+      "level": 7,
+      "question": "등기부취득시효가 완성되었다고 볼 수 있는가?",
+      "target_audience": "법학 전공자 (로스쿨 학생)",
+      "reasoning": "법학 전공자들이 이해할 수 있도록 등기부취득시효의 개념을 사용했습니다.",
+      "expected_answer": "No",
+      "confidence": 0.95
+    },
+    {
+      "id": 8,
+      "level": 8,
+      "question": "등기부취득시효가 성립되었다고 할 수 있는가?",
+      "target_audience": "법학 전공자 (로스쿨 학생)",
+      "reasoning": "법학 전공자들이 이해할 수 있도록 등기부취득시효의 개념을 사용했습니다.",
+      "expected_answer": "No",
+      "confidence": 0.95
+    },
+    {
+      "id": 9,
+      "level": 9,
+      "question": "등기부취득시효의 요건이 충족되었다고 볼 수 있는가?",
+      "target_audience": "법조인 (변호사, 판사)",
+      "reasoning": "법조인들이 이해할 수 있도록 등기부취득시효의 요건을 강조했습니다.",
+      "expected_answer": "No",
+      "confidence": 0.95
+    },
+    {
+      "id": 10,
+      "level": 10,
+      "question": "등기부취득시효의 법적 요건이 모두 충족되어 시효가 완성되었다고 해석할 수 있는가?",
+      "target_audience": "법학자 (교수, 연구자)",
+      "reasoning": "법학자들이 이해할 수 있도록 등기부취득시효의 법적 요건을 강조했습니다.",
+      "expected_answer": "No",
+      "confidence": 0.95
+    }
+  ]
+}

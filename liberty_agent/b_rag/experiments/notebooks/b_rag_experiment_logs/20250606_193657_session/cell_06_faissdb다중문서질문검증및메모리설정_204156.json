@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "cell_number": 6,
+    "cell_name": "FAISS DB 다중 문서 질문 검증 및 메모리 설정",
+    "execution_timestamp": "2025-06-06T20:41:56.406687",
+    "execution_time_from_session_start": 3898.5637340545654,
+    "success": false,
+    "error_info": "ModuleNotFoundError: No module named 'liberty_agent.b_rag.core.question_generation.schemas'\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_87975/3810201677.py\", line 78, in <module>\n    from liberty_agent.b_rag.core.question_generation.schemas import QuestionSet, Question, AnswerType\nModuleNotFoundError: No module named 'liberty_agent.b_rag.core.question_generation.schemas'\n"
+  },
+  "summary": "실행 실패: No module named 'liberty_agent.b_rag.core.question_generation.schemas'",
+  "results": {
+    "error": "No module named 'liberty_agent.b_rag.core.question_generation.schemas'"
+  }
+}

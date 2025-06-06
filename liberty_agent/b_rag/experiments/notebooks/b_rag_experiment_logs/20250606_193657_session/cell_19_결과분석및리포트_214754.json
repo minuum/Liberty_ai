@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "cell_number": 19,
+    "cell_name": "결과 분석 및 리포트",
+    "execution_timestamp": "2025-06-06T21:47:54.159040",
+    "execution_time_from_session_start": 7856.316236972809,
+    "success": false,
+    "error_info": "AttributeError: 'list' object has no attribute 'confidence'\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_87975/17330463.py\", line 24, in <module>\n    standard_confidences = [r.confidence for r in standard_results]\n                            ^^^^^^^^^^^^\nAttributeError: 'list' object has no attribute 'confidence'\n"
+  },
+  "summary": "실행 실패: 'list' object has no attribute 'confidence'",
+  "results": {
+    "error": "'list' object has no attribute 'confidence'"
+  }
+}

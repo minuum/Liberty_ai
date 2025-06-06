@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "cell_number": 5,
+    "cell_name": "최적화된 실제 RAG 비교 테스트",
+    "execution_timestamp": "2025-06-06T23:34:02.842755",
+    "execution_time_from_session_start": 452.77712416648865,
+    "success": false,
+    "error_info": "NameError: name 'OptimizedRAGConfig' is not defined\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_96978/3065563691.py\", line 63, in <module>\n    standard_config = OptimizedRAGConfig(\n                      ^^^^^^^^^^^^^^^^^^\nNameError: name 'OptimizedRAGConfig' is not defined\n"
+  },
+  "summary": "실행 실패: name 'OptimizedRAGConfig' is not defined",
+  "results": {
+    "error": "name 'OptimizedRAGConfig' is not defined"
+  }
+}

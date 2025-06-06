@@ -1,0 +1,1024 @@
+{
+  "timestamp": "20250606_190802",
+  "queries_processed": 5,
+  "total_questions": 50,
+  "total_clued_questions": 50,
+  "faiss_db_path": "/Users/minu/dev/Liberty/Liberty_ai/liberty_agent/cached_vectors/balanced_json",
+  "document_results": [
+    {
+      "document_id": "doc001",
+      "document_title": "제목 없음",
+      "gt_question": "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+      "questions_count": 10,
+      "yes_count": 10,
+      "no_count": 0,
+      "execution_time": 29.623883962631226,
+      "questions": [
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 1,
+          "question": "같이 일하는 사람이 돈 받을 수 있는 사람이 아니야?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 2,
+          "question": "함께 일하는 사람이 돈 받을 권리가 없다고 할 수 있어?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 3,
+          "question": "동업하는 사람이 돈 받을 수 있는 사람이 아니라고 할 수 있을까?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 4,
+          "question": "동업자가 돈 받을 권리가 없다고 할 수 있을까?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 5,
+          "question": "동업자가 채권의 준점유자가 아니라고 할 수 있는가?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 6,
+          "question": "동업자가 채권의 준점유자에 해당하지 않는다고 할 수 있는가?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 7,
+          "question": "동업자가 민법 제470조에 따른 채권의 준점유자에 해당하지 않는다고 볼 수 있는가?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 8,
+          "question": "민법 제470조의 해석에 따라 동업자가 채권의 준점유자에 해당하지 않는다고 해석할 수 있는가?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 9,
+          "question": "채권의 준점유자 개념에 비추어 동업자가 민법 제470조상 준점유자에 해당하지 않는다고 해석함이 타당한가?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 10,
+          "question": "채권준점유제도의 입법취지와 민법 제470조의 해석론상 동업관계 성립만으로는 준점유자 요건을 충족하지 못한다고 보는바, 동업자는 채권의 준점유자에 해당하지 아니한다고 보는 것이 법리상 타당한가?",
+          "expected_answer": "Yes"
+        }
+      ],
+      "clued_questions": [
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 1,
+          "original_question": "같이 일하는 사람이 돈 받을 수 있는 사람이 아니야?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 같이 일하는 사람이 돈 받을 수 있는 사람이 아니야?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 2,
+          "original_question": "함께 일하는 사람이 돈 받을 권리가 없다고 할 수 있어?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 함께 일하는 사람이 돈 받을 권리가 없다고 할 수 있어?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 3,
+          "original_question": "동업하는 사람이 돈 받을 수 있는 사람이 아니라고 할 수 있을까?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 동업하는 사람이 돈 받을 수 있는 사람이 아니라고 할 수 있을까?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 4,
+          "original_question": "동업자가 돈 받을 권리가 없다고 할 수 있을까?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 동업자가 돈 받을 권리가 없다고 할 수 있을까?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 5,
+          "original_question": "동업자가 채권의 준점유자가 아니라고 할 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 동업자가 채권의 준점유자가 아니라고 할 수 있는가?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 6,
+          "original_question": "동업자가 채권의 준점유자에 해당하지 않는다고 할 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 동업자가 채권의 준점유자에 해당하지 않는다고 할 수 있는가?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 7,
+          "original_question": "동업자가 민법 제470조에 따른 채권의 준점유자에 해당하지 않는다고 볼 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 동업자가 민법 제470조에 따른 채권의 준점유자에 해당하지 않는다고 볼 수 있는가?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 8,
+          "original_question": "민법 제470조의 해석에 따라 동업자가 채권의 준점유자에 해당하지 않는다고 해석할 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 민법 제470조의 해석에 따라 동업자가 채권의 준점유자에 해당하지 않는다고 해석할 수 있는가?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 9,
+          "original_question": "채권의 준점유자 개념에 비추어 동업자가 민법 제470조상 준점유자에 해당하지 않는다고 해석함이 타당한가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 채권의 준점유자 개념에 비추어 동업자가 민법 제470조상 준점유자에 해당하지 않는다고 해석함이 타당한가?",
+          "expected_answer": "Yes"
+        },
+        {
+          "document_id": "doc001",
+          "document_title": "제목 없음",
+          "level": 10,
+          "original_question": "채권준점유제도의 입법취지와 민법 제470조의 해석론상 동업관계 성립만으로는 준점유자 요건을 충족하지 못한다고 보는바, 동업자는 채권의 준점유자에 해당하지 아니한다고 보는 것이 법리상 타당한가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 채권준점유제도의 입법취지와 민법 제470조의 해석론상 동업관계 성립만으로는 준점유자 요건을 충족하지 못한다고 보는바, 동업자는 채권의 준점유자에 해당하지 아니한다고 보는 것이 법리상 타당한가?",
+          "expected_answer": "Yes"
+        }
+      ]
+    },
+    {
+      "document_id": "doc002",
+      "document_title": "제목 없음",
+      "gt_question": "계약의 해제권이 발생하는가?",
+      "questions_count": 10,
+      "yes_count": 0,
+      "no_count": 10,
+      "execution_time": 37.485530853271484,
+      "questions": [
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 1,
+          "question": "국가가 계약을 못 지키게 됐을 때, 그 계약을 꼭 해야 한다고 말할 수 있어?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 2,
+          "question": "법이 바뀌어서 계약을 못 하게 됐을 때, 그 계약을 꼭 해야 한다고 할 수 있어?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 3,
+          "question": "법이 바뀌어서 계약을 못 하게 됐을 때, 그 계약을 해야 한다고 주장할 수 있을까?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 4,
+          "question": "법이 바뀌어 계약을 할 수 없게 되었을 때, 그 계약을 해야 한다고 법적으로 주장할 수 있을까?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 5,
+          "question": "법령 개정으로 수의계약이 금지된 경우, 국가에 수의계약체결의무가 있다고 주장할 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 6,
+          "question": "법령이 개정되어 수의계약이 금지된 상황에서, 국가에 수의계약체결의무의 확인을 구할 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 7,
+          "question": "법령 개정으로 수의계약이 금지된 경우, 국가를 상대로 수의계약체결의무의 확인을 구할 법적 이익이 존재하는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 8,
+          "question": "법령 개정으로 수의계약이 금지된 상황에서, 국가에 대한 수의계약체결의무의 확인을 구할 법적 이익이 인정되는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 9,
+          "question": "법령 개정으로 수의계약이 금지된 경우, 국가를 상대로 수의계약체결의무의 확인을 구하는 것이 법리적으로 타당한가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 10,
+          "question": "법령 개정으로 수의계약이 금지된 상황에서, 국가에 대한 수의계약체결의무의 확인을 구하는 것이 법리적으로 유효한가?",
+          "expected_answer": "No"
+        }
+      ],
+      "clued_questions": [
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 1,
+          "original_question": "국가가 계약을 못 지키게 됐을 때, 그 계약을 꼭 해야 한다고 말할 수 있어?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 국가가 계약을 못 지키게 됐을 때, 그 계약을 꼭 해야 한다고 말할 수 있어?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 2,
+          "original_question": "법이 바뀌어서 계약을 못 하게 됐을 때, 그 계약을 꼭 해야 한다고 할 수 있어?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 법이 바뀌어서 계약을 못 하게 됐을 때, 그 계약을 꼭 해야 한다고 할 수 있어?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 3,
+          "original_question": "법이 바뀌어서 계약을 못 하게 됐을 때, 그 계약을 해야 한다고 주장할 수 있을까?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 법이 바뀌어서 계약을 못 하게 됐을 때, 그 계약을 해야 한다고 주장할 수 있을까?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 4,
+          "original_question": "법이 바뀌어 계약을 할 수 없게 되었을 때, 그 계약을 해야 한다고 법적으로 주장할 수 있을까?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 법이 바뀌어 계약을 할 수 없게 되었을 때, 그 계약을 해야 한다고 법적으로 주장할 수 있을까?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 5,
+          "original_question": "법령 개정으로 수의계약이 금지된 경우, 국가에 수의계약체결의무가 있다고 주장할 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 법령 개정으로 수의계약이 금지된 경우, 국가에 수의계약체결의무가 있다고 주장할 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 6,
+          "original_question": "법령이 개정되어 수의계약이 금지된 상황에서, 국가에 수의계약체결의무의 확인을 구할 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 법령이 개정되어 수의계약이 금지된 상황에서, 국가에 수의계약체결의무의 확인을 구할 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 7,
+          "original_question": "법령 개정으로 수의계약이 금지된 경우, 국가를 상대로 수의계약체결의무의 확인을 구할 법적 이익이 존재하는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 법령 개정으로 수의계약이 금지된 경우, 국가를 상대로 수의계약체결의무의 확인을 구할 법적 이익이 존재하는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 8,
+          "original_question": "법령 개정으로 수의계약이 금지된 상황에서, 국가에 대한 수의계약체결의무의 확인을 구할 법적 이익이 인정되는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 법령 개정으로 수의계약이 금지된 상황에서, 국가에 대한 수의계약체결의무의 확인을 구할 법적 이익이 인정되는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 9,
+          "original_question": "법령 개정으로 수의계약이 금지된 경우, 국가를 상대로 수의계약체결의무의 확인을 구하는 것이 법리적으로 타당한가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 법령 개정으로 수의계약이 금지된 경우, 국가를 상대로 수의계약체결의무의 확인을 구하는 것이 법리적으로 타당한가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc002",
+          "document_title": "제목 없음",
+          "level": 10,
+          "original_question": "법령 개정으로 수의계약이 금지된 상황에서, 국가에 대한 수의계약체결의무의 확인을 구하는 것이 법리적으로 유효한가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 법령 개정으로 수의계약이 금지된 상황에서, 국가에 대한 수의계약체결의무의 확인을 구하는 것이 법리적으로 유효한가?",
+          "expected_answer": "No"
+        }
+      ]
+    },
+    {
+      "document_id": "doc003",
+      "document_title": "제목 없음",
+      "gt_question": "소유권 이전의 효력이 인정되는가?",
+      "questions_count": 10,
+      "yes_count": 0,
+      "no_count": 10,
+      "execution_time": 40.71776580810547,
+      "questions": [
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 1,
+          "question": "땅을 바꾸기로 했는데, 그 땅을 다른 사람이 가져가면 바꾸는 게 안 되는 거야?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 2,
+          "question": "땅을 서로 주고받기로 했는데, 그 땅이 다른 사람 이름으로 바뀌면 주고받는 게 안 되는 거야?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 3,
+          "question": "땅을 교환하기로 했는데, 그 땅이 다른 사람에게 넘어가면 교환이 안 되는 건가요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 4,
+          "question": "토지를 교환하기로 했는데, 그 토지가 다른 사람 명의로 넘어가면 교환계약이 무효가 되나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 5,
+          "question": "토지 교환 계약 후, 교환 대상 토지가 제3자 명의로 이전되면 소유권 이전 의무가 이행불능이 되나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 6,
+          "question": "토지 교환 계약 후, 교환 대상 토지가 제3자에게 소유권 이전되면, 소유권 이전 의무가 이행불능 상태가 되는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 7,
+          "question": "토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자에게 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 8,
+          "question": "토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자 명의로 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되는지 여부는?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 9,
+          "question": "토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자에게 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되었다고 볼 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 10,
+          "question": "토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자에게 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되었다고 법리적으로 판단할 수 있는가?",
+          "expected_answer": "No"
+        }
+      ],
+      "clued_questions": [
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 1,
+          "original_question": "땅을 바꾸기로 했는데, 그 땅을 다른 사람이 가져가면 바꾸는 게 안 되는 거야?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 땅을 바꾸기로 했는데, 그 땅을 다른 사람이 가져가면 바꾸는 게 안 되는 거야?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 2,
+          "original_question": "땅을 서로 주고받기로 했는데, 그 땅이 다른 사람 이름으로 바뀌면 주고받는 게 안 되는 거야?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 땅을 서로 주고받기로 했는데, 그 땅이 다른 사람 이름으로 바뀌면 주고받는 게 안 되는 거야?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 3,
+          "original_question": "땅을 교환하기로 했는데, 그 땅이 다른 사람에게 넘어가면 교환이 안 되는 건가요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 땅을 교환하기로 했는데, 그 땅이 다른 사람에게 넘어가면 교환이 안 되는 건가요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 4,
+          "original_question": "토지를 교환하기로 했는데, 그 토지가 다른 사람 명의로 넘어가면 교환계약이 무효가 되나요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 토지를 교환하기로 했는데, 그 토지가 다른 사람 명의로 넘어가면 교환계약이 무효가 되나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 5,
+          "original_question": "토지 교환 계약 후, 교환 대상 토지가 제3자 명의로 이전되면 소유권 이전 의무가 이행불능이 되나요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 토지 교환 계약 후, 교환 대상 토지가 제3자 명의로 이전되면 소유권 이전 의무가 이행불능이 되나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 6,
+          "original_question": "토지 교환 계약 후, 교환 대상 토지가 제3자에게 소유권 이전되면, 소유권 이전 의무가 이행불능 상태가 되는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 토지 교환 계약 후, 교환 대상 토지가 제3자에게 소유권 이전되면, 소유권 이전 의무가 이행불능 상태가 되는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 7,
+          "original_question": "토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자에게 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자에게 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 8,
+          "original_question": "토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자 명의로 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되는지 여부는?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자 명의로 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되는지 여부는?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 9,
+          "original_question": "토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자에게 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되었다고 볼 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자에게 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되었다고 볼 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc003",
+          "document_title": "제목 없음",
+          "level": 10,
+          "original_question": "토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자에게 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되었다고 법리적으로 판단할 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 토지 교환 계약 후, 교환 대상 토지의 소유권이 제3자에게 이전된 경우, 소유권 이전 의무가 이행불능으로 확정되었다고 법리적으로 판단할 수 있는가?",
+          "expected_answer": "No"
+        }
+      ]
+    },
+    {
+      "document_id": "doc004",
+      "document_title": "제목 없음",
+      "gt_question": "손해배상의 범위가 제한되는가?",
+      "questions_count": 10,
+      "yes_count": 0,
+      "no_count": 10,
+      "execution_time": 21.26750898361206,
+      "questions": [
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 1,
+          "question": "물건을 만든 사람이 아닌 사람이 물건에 문제가 있을 때 책임을 덜 받을 수 있나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 2,
+          "question": "물건을 만든 사람이 아닌 사람이 물건에 문제가 있을 때 책임을 덜 받을 수 있을까요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 3,
+          "question": "물건을 만든 사람이 아닌 사람이 물건에 문제가 생겼을 때 책임을 덜 받을 수 있나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 4,
+          "question": "물건을 만든 사람이 아닌 사람이 물건에 문제가 생겼을 때 책임을 덜 받을 수 있을까요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 5,
+          "question": "제조업자가 아닌 판매자가 제품에 문제가 있을 때 책임을 덜 받을 수 있나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 6,
+          "question": "제조업자가 아닌 판매자가 제품에 문제가 있을 때 책임을 덜 받을 수 있을까요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 7,
+          "question": "제조업자가 아닌 판매자가 제품의 하자에 대해 책임을 덜 받을 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 8,
+          "question": "제조업자가 아닌 판매자가 제품의 하자에 대해 책임을 덜 받을 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 9,
+          "question": "제조업자가 아닌 판매자가 민법 제580조 제1항의 하자담보책임에서 제조물책임의 증명책임 완화 법리를 적용받을 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 10,
+          "question": "제조업자가 아닌 판매자가 민법 제580조 제1항의 하자담보책임에서 제조물책임의 증명책임 완화 법리를 유추적용받을 수 있는가?",
+          "expected_answer": "No"
+        }
+      ],
+      "clued_questions": [
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 1,
+          "original_question": "물건을 만든 사람이 아닌 사람이 물건에 문제가 있을 때 책임을 덜 받을 수 있나요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 물건을 만든 사람이 아닌 사람이 물건에 문제가 있을 때 책임을 덜 받을 수 있나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 2,
+          "original_question": "물건을 만든 사람이 아닌 사람이 물건에 문제가 있을 때 책임을 덜 받을 수 있을까요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 물건을 만든 사람이 아닌 사람이 물건에 문제가 있을 때 책임을 덜 받을 수 있을까요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 3,
+          "original_question": "물건을 만든 사람이 아닌 사람이 물건에 문제가 생겼을 때 책임을 덜 받을 수 있나요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 물건을 만든 사람이 아닌 사람이 물건에 문제가 생겼을 때 책임을 덜 받을 수 있나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 4,
+          "original_question": "물건을 만든 사람이 아닌 사람이 물건에 문제가 생겼을 때 책임을 덜 받을 수 있을까요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 물건을 만든 사람이 아닌 사람이 물건에 문제가 생겼을 때 책임을 덜 받을 수 있을까요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 5,
+          "original_question": "제조업자가 아닌 판매자가 제품에 문제가 있을 때 책임을 덜 받을 수 있나요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 제조업자가 아닌 판매자가 제품에 문제가 있을 때 책임을 덜 받을 수 있나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 6,
+          "original_question": "제조업자가 아닌 판매자가 제품에 문제가 있을 때 책임을 덜 받을 수 있을까요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 제조업자가 아닌 판매자가 제품에 문제가 있을 때 책임을 덜 받을 수 있을까요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 7,
+          "original_question": "제조업자가 아닌 판매자가 제품의 하자에 대해 책임을 덜 받을 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 제조업자가 아닌 판매자가 제품의 하자에 대해 책임을 덜 받을 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 8,
+          "original_question": "제조업자가 아닌 판매자가 제품의 하자에 대해 책임을 덜 받을 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 제조업자가 아닌 판매자가 제품의 하자에 대해 책임을 덜 받을 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 9,
+          "original_question": "제조업자가 아닌 판매자가 민법 제580조 제1항의 하자담보책임에서 제조물책임의 증명책임 완화 법리를 적용받을 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 제조업자가 아닌 판매자가 민법 제580조 제1항의 하자담보책임에서 제조물책임의 증명책임 완화 법리를 적용받을 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc004",
+          "document_title": "제목 없음",
+          "level": 10,
+          "original_question": "제조업자가 아닌 판매자가 민법 제580조 제1항의 하자담보책임에서 제조물책임의 증명책임 완화 법리를 유추적용받을 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 제조업자가 아닌 판매자가 민법 제580조 제1항의 하자담보책임에서 제조물책임의 증명책임 완화 법리를 유추적용받을 수 있는가?",
+          "expected_answer": "No"
+        }
+      ]
+    },
+    {
+      "document_id": "doc005",
+      "document_title": "제목 없음",
+      "gt_question": "시효가 완성되었다고 볼 수 있는가?",
+      "questions_count": 10,
+      "yes_count": 0,
+      "no_count": 10,
+      "execution_time": 28.58588981628418,
+      "questions": [
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 1,
+          "question": "시간이 지나면 땅을 가질 수 있는 거야?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 2,
+          "question": "오래 지나면 땅이 내 것이 될 수 있어?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 3,
+          "question": "시간이 많이 지나면 땅을 가질 수 있는 권리가 생기나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 4,
+          "question": "오랜 시간이 지나면 땅의 소유권을 가질 수 있나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 5,
+          "question": "오랜 시간 점유하면 소유권을 취득할 수 있나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 6,
+          "question": "장기간 점유 시 소유권 취득이 가능한가요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 7,
+          "question": "장기간 점유로 인한 등기부취득시효가 완성되었는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 8,
+          "question": "등기부취득시효의 요건을 충족하여 소유권을 취득할 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 9,
+          "question": "등기부취득시효가 완성되어 소유권을 취득할 수 있는 법적 근거가 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 10,
+          "question": "등기부취득시효의 법리적 요건을 충족하여 소유권을 취득할 수 있는가?",
+          "expected_answer": "No"
+        }
+      ],
+      "clued_questions": [
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 1,
+          "original_question": "시간이 지나면 땅을 가질 수 있는 거야?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 시간이 지나면 땅을 가질 수 있는 거야?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 2,
+          "original_question": "오래 지나면 땅이 내 것이 될 수 있어?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 오래 지나면 땅이 내 것이 될 수 있어?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 3,
+          "original_question": "시간이 많이 지나면 땅을 가질 수 있는 권리가 생기나요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 시간이 많이 지나면 땅을 가질 수 있는 권리가 생기나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 4,
+          "original_question": "오랜 시간이 지나면 땅의 소유권을 가질 수 있나요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 오랜 시간이 지나면 땅의 소유권을 가질 수 있나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 5,
+          "original_question": "오랜 시간 점유하면 소유권을 취득할 수 있나요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 오랜 시간 점유하면 소유권을 취득할 수 있나요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 6,
+          "original_question": "장기간 점유 시 소유권 취득이 가능한가요?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 장기간 점유 시 소유권 취득이 가능한가요?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 7,
+          "original_question": "장기간 점유로 인한 등기부취득시효가 완성되었는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 장기간 점유로 인한 등기부취득시효가 완성되었는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 8,
+          "original_question": "등기부취득시효의 요건을 충족하여 소유권을 취득할 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 등기부취득시효의 요건을 충족하여 소유권을 취득할 수 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 9,
+          "original_question": "등기부취득시효가 완성되어 소유권을 취득할 수 있는 법적 근거가 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 등기부취득시효가 완성되어 소유권을 취득할 수 있는 법적 근거가 있는가?",
+          "expected_answer": "No"
+        },
+        {
+          "document_id": "doc005",
+          "document_title": "제목 없음",
+          "level": 10,
+          "original_question": "등기부취득시효의 법리적 요건을 충족하여 소유권을 취득할 수 있는가?",
+          "clues": [
+            "초등학생",
+            "일반인"
+          ],
+          "clued_question": "(초등학생, 일반인 관점에서) 등기부취득시효의 법리적 요건을 충족하여 소유권을 취득할 수 있는가?",
+          "expected_answer": "No"
+        }
+      ]
+    }
+  ]
+}

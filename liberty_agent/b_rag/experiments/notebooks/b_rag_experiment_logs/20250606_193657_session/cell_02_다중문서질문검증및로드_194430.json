@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "cell_number": 2,
+    "cell_name": "다중 문서 질문 검증 및 로드",
+    "execution_timestamp": "2025-06-06T19:44:30.038608",
+    "execution_time_from_session_start": 452.19580698013306,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "다중 문서 질문 로드 완료\n- 질문 발견: No\n- 질문 세트 수: 0개\n- 총 질문 수: 0개\n- GT 질문: 0개 설정됨\n- 다음 셀 준비: 제한적",
+  "results": {
+    "test_type": "multi_document_questions_validation",
+    "questions_found": false,
+    "question_sets": 0,
+    "total_questions": 0,
+    "gt_questions_found": []
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "cell_number": 5,
+    "cell_name": "현재 생성된 질문 JSON 저장",
+    "execution_timestamp": "2025-06-06T20:36:41.773852",
+    "execution_time_from_session_start": 3583.9310200214386,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "현재 생성된 질문 JSON 저장 완료\n- 질문 발견: Yes\n- 저장된 질문 수: 10개\n- 파일 저장: 성공\n- 저장 경로: generated_questions_semantic_equivalence_questions_20250606_203641.json\n- 질문 타입: 의미론적 동일성",
+  "results": {
+    "test_type": "save_generated_questions_to_json",
+    "questions_found": true,
+    "questions_saved": 10,
+    "file_saved": true,
+    "save_path": "generated_questions_semantic_equivalence_questions_20250606_203641.json"
+  }
+}

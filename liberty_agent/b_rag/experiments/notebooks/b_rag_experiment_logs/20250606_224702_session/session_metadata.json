@@ -1,0 +1,21 @@
+{
+  "session_id": "20250606_224702",
+  "session_start_time": "2025-06-06T22:47:02.760251",
+  "total_cells": 2,
+  "completed_cells": [
+    {
+      "cell_number": 1,
+      "cell_name": "모듈 import 및 초기화",
+      "md_file": "cell_01_모듈import및초기화_224710.md",
+      "json_file": "cell_01_모듈import및초기화_224710.json"
+    },
+    {
+      "cell_number": 2,
+      "cell_name": "최적화된 실제 RAG 비교 테스트",
+      "md_file": "cell_02_최적화된실제rag비교테스트_230132.md",
+      "json_file": "cell_02_최적화된실제rag비교테스트_230132.json"
+    }
+  ],
+  "failed_cells": [],
+  "notebook_path": "/Users/minu/dev/Liberty/Liberty_ai/liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb"
+}

@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "cell_number": 22,
+    "cell_name": "메모리 상태 정리 및 질문 세트 전환",
+    "execution_timestamp": "2025-06-06T22:41:56.711629",
+    "execution_time_from_session_start": 11098.868834018707,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "메모리 상태 정리 및 질문 세트 전환 완료\n- FAISS 질문 발견: Yes\n- 사용 가능한 세트 수: 5개\n- 현재 활성 세트: 0번째\n- 메모리 정리: 완료\n- 세트 전환 함수: 등록됨",
+  "results": {
+    "test_type": "memory_cleanup_and_question_set_switch",
+    "faiss_questions_found": true,
+    "memory_cleaned": true,
+    "current_set_index": 0,
+    "available_sets": 5
+  }
+}

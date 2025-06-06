@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "cell_number": 11,
+    "cell_name": "FAISS DB 다중 문서 질문 검증 및 메모리 설정",
+    "execution_timestamp": "2025-06-06T21:08:07.146290",
+    "execution_time_from_session_start": 5469.303477048874,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "FAISS DB 다중 문서 질문 검증 및 메모리 설정 완료\n- 질문 발견: Yes\n- 질문 세트 수: 5개\n- 총 질문 수: 50개\n- 메모리 업데이트: 성공\n- GT 질문: 5개 설정됨",
+  "results": {
+    "test_type": "faiss_multi_document_questions_validation",
+    "questions_found": true,
+    "question_sets": 5,
+    "total_questions": 50,
+    "gt_questions_found": [
+      "동업자가 채권의 준점유자에 해당하지 아니 한다고 할 수 있는가?",
+      "계약의 해제권이 발생하는가?",
+      "소유권 이전의 효력이 인정되는가?",
+      "손해배상의 범위가 제한되는가?",
+      "시효가 완성되었다고 볼 수 있는가?"
+    ],
+    "memory_updated": true,
+    "yes_counts": [
+      10,
+      0,
+      0,
+      0,
+      0
+    ],
+    "no_counts": [
+      0,
+      10,
+      10,
+      10,
+      10
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "cell_number": 2,
+    "cell_name": "셀 3-7: 단서 추가 질문 생성",
+    "execution_timestamp": "2025-06-06T18:21:44.284192",
+    "execution_time_from_session_start": 18.9379141330719,
+    "success": false,
+    "error_info": "ValueError: 기존 생성된 질문 없음\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_52395/2411525516.py\", line 67, in <module>\n    raise ValueError(\"기존 생성된 질문 없음\")\nValueError: 기존 생성된 질문 없음\n"
+  },
+  "summary": "실행 실패: 기존 생성된 질문 없음",
+  "results": {
+    "error": "기존 생성된 질문 없음"
+  }
+}

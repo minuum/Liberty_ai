@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "cell_number": 7,
+    "cell_name": "FAISS DB 질문 결과 JSON 저장",
+    "execution_timestamp": "2025-06-06T20:42:20.676023",
+    "execution_time_from_session_start": 3922.8332421779633,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "FAISS DB 질문 결과 JSON 저장 완료\n- 질문 발견: Yes\n- 저장된 질문 세트 수: 5개\n- 저장된 총 질문 수: 50개\n- 파일 저장: 성공\n- 저장 경로: faiss_multi_document_questions_20250606_204220.json",
+  "results": {
+    "test_type": "save_faiss_questions_to_json",
+    "questions_found": true,
+    "questions_saved": 50,
+    "question_sets_saved": 5,
+    "file_saved": true,
+    "save_path": "faiss_multi_document_questions_20250606_204220.json"
+  }
+}

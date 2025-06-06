@@ -1,0 +1,138 @@
+{
+  "session_id": "20250606_193657",
+  "session_start_time": "2025-06-06T19:36:57.842867",
+  "total_cells": 22,
+  "completed_cells": [
+    {
+      "cell_number": 1,
+      "cell_name": "모듈 import 및 초기화",
+      "md_file": "cell_01_모듈import및초기화_193710.md",
+      "json_file": "cell_01_모듈import및초기화_193710.json"
+    },
+    {
+      "cell_number": 2,
+      "cell_name": "다중 문서 질문 검증 및 로드",
+      "md_file": "cell_02_다중문서질문검증및로드_194430.md",
+      "json_file": "cell_02_다중문서질문검증및로드_194430.json"
+    },
+    {
+      "cell_number": 3,
+      "cell_name": "현재 생성된 질문 JSON 저장",
+      "md_file": "cell_03_현재생성된질문json저장_203256.md",
+      "json_file": "cell_03_현재생성된질문json저장_203256.json"
+    },
+    {
+      "cell_number": 4,
+      "cell_name": "다중 문서 질문 검증 및 로드",
+      "md_file": "cell_04_다중문서질문검증및로드_203308.md",
+      "json_file": "cell_04_다중문서질문검증및로드_203308.json"
+    },
+    {
+      "cell_number": 5,
+      "cell_name": "현재 생성된 질문 JSON 저장",
+      "md_file": "cell_05_현재생성된질문json저장_203641.md",
+      "json_file": "cell_05_현재생성된질문json저장_203641.json"
+    },
+    {
+      "cell_number": 7,
+      "cell_name": "FAISS DB 질문 결과 JSON 저장",
+      "md_file": "cell_07_faissdb질문결과json저장_204220.md",
+      "json_file": "cell_07_faissdb질문결과json저장_204220.json"
+    },
+    {
+      "cell_number": 9,
+      "cell_name": "FAISS DB 다중 문서 질문 검증 및 메모리 설정",
+      "md_file": "cell_09_faissdb다중문서질문검증및메모리설정_204905.md",
+      "json_file": "cell_09_faissdb다중문서질문검증및메모리설정_204905.json"
+    },
+    {
+      "cell_number": 10,
+      "cell_name": "메모리 상태 정리 및 질문 세트 전환",
+      "md_file": "cell_10_메모리상태정리및질문세트전환_204916.md",
+      "json_file": "cell_10_메모리상태정리및질문세트전환_204916.json"
+    },
+    {
+      "cell_number": 11,
+      "cell_name": "FAISS DB 다중 문서 질문 검증 및 메모리 설정",
+      "md_file": "cell_11_faissdb다중문서질문검증및메모리설정_210807.md",
+      "json_file": "cell_11_faissdb다중문서질문검증및메모리설정_210807.json"
+    },
+    {
+      "cell_number": 12,
+      "cell_name": "FAISS DB 다중 문서 질문 검증 및 메모리 설정",
+      "md_file": "cell_12_faissdb다중문서질문검증및메모리설정_213759.md",
+      "json_file": "cell_12_faissdb다중문서질문검증및메모리설정_213759.json"
+    },
+    {
+      "cell_number": 13,
+      "cell_name": "FAISS DB 질문 결과 JSON 저장",
+      "md_file": "cell_13_faissdb질문결과json저장_213807.md",
+      "json_file": "cell_13_faissdb질문결과json저장_213807.json"
+    },
+    {
+      "cell_number": 14,
+      "cell_name": "메모리 상태 정리 및 질문 세트 전환",
+      "md_file": "cell_14_메모리상태정리및질문세트전환_213852.md",
+      "json_file": "cell_14_메모리상태정리및질문세트전환_213852.json"
+    },
+    {
+      "cell_number": 15,
+      "cell_name": "다중 문서 RAG 비교 테스트",
+      "md_file": "cell_15_다중문서rag비교테스트_213859.md",
+      "json_file": "cell_15_다중문서rag비교테스트_213859.json"
+    },
+    {
+      "cell_number": 16,
+      "cell_name": "실제 다중 문서 RAG 비교 테스트",
+      "md_file": "cell_16_실제다중문서rag비교테스트_214643.md",
+      "json_file": "cell_16_실제다중문서rag비교테스트_214643.json"
+    },
+    {
+      "cell_number": 17,
+      "cell_name": "다중 문서 결과 분석 및 시각화",
+      "md_file": "cell_17_다중문서결과분석및시각화_214723.md",
+      "json_file": "cell_17_다중문서결과분석및시각화_214723.json"
+    },
+    {
+      "cell_number": 20,
+      "cell_name": "FAISS DB 다중 문서 질문 검증 및 메모리 설정",
+      "md_file": "cell_20_faissdb다중문서질문검증및메모리설정_224144.md",
+      "json_file": "cell_20_faissdb다중문서질문검증및메모리설정_224144.json"
+    },
+    {
+      "cell_number": 21,
+      "cell_name": "FAISS DB 질문 결과 JSON 저장",
+      "md_file": "cell_21_faissdb질문결과json저장_224148.md",
+      "json_file": "cell_21_faissdb질문결과json저장_224148.json"
+    },
+    {
+      "cell_number": 22,
+      "cell_name": "메모리 상태 정리 및 질문 세트 전환",
+      "md_file": "cell_22_메모리상태정리및질문세트전환_224156.md",
+      "json_file": "cell_22_메모리상태정리및질문세트전환_224156.json"
+    }
+  ],
+  "failed_cells": [
+    {
+      "cell_number": 6,
+      "cell_name": "FAISS DB 다중 문서 질문 검증 및 메모리 설정",
+      "error": "ModuleNotFoundError: No module named 'liberty_agent.b_rag.core.question_generation.schemas'\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_87975/3810201677.py\", line 78, in <module>\n    from liberty_agent.b_rag.core.question_generation.schemas import QuestionSet, Question, AnswerType\nModuleNotFoundError: No module named 'liberty_agent.b_rag.core.question_generation.schemas'\n"
+    },
+    {
+      "cell_number": 8,
+      "cell_name": "메모리 상태 정리 및 질문 세트 전환",
+      "error": "ModuleNotFoundError: No module named 'liberty_agent.b_rag.core.question_generation.schemas'\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_87975/1318577511.py\", line 67, in <module>\n    from liberty_agent.b_rag.core.question_generation.schemas import QuestionSet, Question, AnswerType\nModuleNotFoundError: No module named 'liberty_agent.b_rag.core.question_generation.schemas'\n"
+    },
+    {
+      "cell_number": 18,
+      "cell_name": "결과 시각화",
+      "error": "AttributeError: 'list' object has no attribute 'confidence'\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_87975/2026602600.py\", line 29, in <module>\n    standard_confidences = [r.confidence for r in standard_results]\n                            ^^^^^^^^^^^^\nAttributeError: 'list' object has no attribute 'confidence'\n"
+    },
+    {
+      "cell_number": 19,
+      "cell_name": "결과 분석 및 리포트",
+      "error": "AttributeError: 'list' object has no attribute 'confidence'\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_87975/17330463.py\", line 24, in <module>\n    standard_confidences = [r.confidence for r in standard_results]\n                            ^^^^^^^^^^^^\nAttributeError: 'list' object has no attribute 'confidence'\n"
+    }
+  ],
+  "notebook_path": "/Users/minu/dev/Liberty/Liberty_ai/liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb"
+}

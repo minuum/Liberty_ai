@@ -1,0 +1,251 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 🇰🇷 Korean B-RAG 프로젝트 전용 커서룰
+
+## 언어 및 응답 설정
+- **항상 한국어로 응답**
+- 기술적 용어는 영어와 한국어 병기 (예: "FAISS DB", "질문 생성")
+- 이모지 적극 활용으로 시각적 가독성 향상
+
+## 핵심 개발 원칙
+
+### 1. 코드 작성 원칙
+```python
+# ✅ 셀 단위 완전한 코드 블록 제공
+# ✅ 복붙 즉시 실행 가능
+# ✅ 모든 imports 포함
+# ✅ JSON 직렬화 안전성 보장
+```
+
+#### 필수 체크리스트
+- [ ] 모든 필요한 imports 포함
+- [ ] numpy 타입을 Python 기본 타입으로 변환
+- [ ] try-catch 블록과 상세한 오류 메시지
+- [ ] 진행상황 이모지와 상태 메시지
+- [ ] 결과 검증 및 분포 확인 로직
+
+### 2. JSON 직렬화 안전성 (핵심!)
+```python
+# 🚨 자주 발생하는 오류 방지
+selected_score = float(docs_with_scores[0][1])  # float32 → float
+total_documents = int(vectorstore.index.ntotal)  # int64 → int
+confidence = float(getattr(q, 'confidence', 0.0))  # 모든 숫자 타입 변환
+```
+
+### 3. B-RAG 특수 요구사항
+
+#### 균형 답변 분포
+- **목표**: 7:3 ~ 9:1 범위의 유연한 Yes/No 비율
+- **금지**: 10:0 완전 편향 절대 방지
+- **허용**: 8:2, 9:1 등 자연스러운 분포
+
+#### Level 10 반대 관점 (중요!)
+```python
+# Level 10에서 확실한 반대 관점 적용
+if q.level == 10:
+    # 강력한 의미 전환 로직
+    if "할 수 있는가" in original_question:
+        new_question.question = original_question.replace("할 수 있는가", "할 수 없는가")
+```
+
+#### Enum 수정 불가 문제
+```python
+# ❌ 직접 수정 불가
+q.expected_answer.value = "Yes"
+
+# ✅ 새 객체 생성으로 우회
+new_question = LevelQuestion(
+    level=q.level,
+    question=q.question,
+    expected_answer=YesNoAnswer.YES,  # 새 값 할당
+    # ... 기타 필드
+)
+```
+
+## 파일 구조 인식
+
+### 핵심 디렉토리
+```
+liberty_agent/
+├── b_rag/
+│   ├── core/
+│   │   ├── question_generation/
+│   │   │   ├── unified_yesno_question_generator.py
+│   │   │   └── prompts/minu/
+│   │   ├── schemas/yesno_question_schemas.py
+│   │   └── clue_generation/
+│   ├── experiments/notebooks/
+│   └── cached_vectors/balanced_json/
+```
+
+### 자주 사용되는 스키마
+```python
+from liberty_agent.b_rag.core.schemas.yesno_question_schemas import (
+    YesNoAnswer, LevelQuestion, TenLevelYesNoQuestions
+)
+```
+
+## 자주 요청되는 기능 패턴
+
+### 1. 질문 생성 후 9:1 균형 조정
+```python
+def apply_flexible_balanced_distribution(questions, gt_question: str):
+    # 7:3, 8:2, 9:1 중 랜덤 선택
+    balance_options = [(7, 3), (8, 2), (9, 1)]
+    majority_count, minority_count = random.choice(balance_options)
+    
+    # Level 10을 반대 관점으로 설정
+    minority_levels = [10]
+    # ... 구현
+```
+
+### 2. FAISS DB 메타데이터 개선
+```python
+# 제목 추출 개선
+if title == '제목 없음' and doc.page_content.startswith('제목:'):
+    extracted_title = doc.page_content.split('\n')[0].replace('제목:', '').strip()
+    title = extracted_title[:50] + "..." if len(extracted_title) > 50 else extracted_title
+```
+
+### 3. 진행상황 표시 패턴
+```python
+print("🔄 FAISS DB 로드 중...")
+print("✅ 질문 생성 성공: {len}개")
+print("🎯 완벽한 9:1 답변 분포 달성!")
+print("⚠️ 균형이 약간 벗어남")
+print("❌ 질문 생성 중 오류")
+```
+
+## 응답 포맷 가이드
+
+### 코드 제공 시
+```python
+# ===== 🔬 셀 X-X: 기능명 (설명) =====
+# 완전한 셀 단위 코드 제공
+# 모든 imports, 함수 정의, 실행 로직 포함
+```
+
+### 결과 분석 시
+```
+📊 전체 결과 요약:
+처리된 쿼리: 5/5
+생성된 총 질문 수: 50개
+
+📊 세트별 답변 분포:
+세트 1 - '질문...': Yes 9개, No 1개 (9:1 🎯)
+세트 2 - '질문...': Yes 8개, No 2개 (8:2 ✅)
+```
+
+### 오류 설명 시
+```
+🚨 주요 오류: TypeError: Object of type float32 is not JSON serializable
+
+🔧 해결 방법:
+1. float32 → float() 변환
+2. int64 → int() 변환  
+3. numpy 배열 → Python 리스트 변환
+```
+
+## 코드 품질 체크리스트
+
+### 실행 전 확인사항
+- [ ] 필요한 모든 imports 포함됨
+- [ ] JSON 직렬화 안전한 타입 사용
+- [ ] try-catch 블록으로 오류 처리
+- [ ] 진행상황 로깅 포함
+- [ ] 결과 검증 로직 포함
+
+### B-RAG 특수 검증
+- [ ] Level 10 반대 관점 적용됨
+- [ ] 10:0 완전 편향 방지됨
+- [ ] Enum 새 객체 생성 방식 사용
+- [ ] FAISS DB 메타데이터 추출됨
+- [ ] 균형 분포 달성 확인됨
+
+### 결과 저장 검증
+- [ ] JSON 파일 정상 생성됨
+- [ ] 타임스탬프 포함됨
+- [ ] 실험 메타데이터 기록됨
+- [ ] 전역 변수 저장됨
+- [ ] 파일 경로 출력됨
+
+## 문제 해결 패턴
+
+### JSON 직렬화 오류
+```python
+# 🔧 모든 숫자 타입 변환
+"similarity_score": float(selected_score),
+"total_documents": int(vectorstore.index.ntotal),
+"confidence": float(getattr(q, 'confidence', 0.0))
+```
+
+### Enum 수정 불가 오류
+```python
+# ✅ 새 객체 생성 방식
+new_question = LevelQuestion(
+    level=q.level,
+    question=modified_question,
+    expected_answer=new_answer,  # Enum 값 직접 할당
+    # ... 기타 필드 복사
+)
+```
+
+### FAISS DB 메타데이터 누락
+```python
+# 🔧 내용에서 제목 추출
+if title == '제목 없음' and doc.page_content.startswith('제목:'):
+    extracted_title = doc.page_content.split('\n')[0].replace('제목:', '').strip()
+```
+
+## 실험 결과 평가 기준
+
+### 분포 품질 (5단계)
+- 9:1 = 5점 🎯 (완벽한 자연분포)
+- 8:2 = 4점 ✅ (우수한 자연분포)  
+- 7:3 = 3점 📊 (적절한 분포)
+- 6:4 = 2점 ⚖️ (균형 분포)
+- 10:0 = 0점 ❌ (실패)
+
+### 성공 메시지 패턴
+```python
+if yes_count == 9 and no_count == 1:
+    print("🎯 완벽한 9:1 (Yes:No) 답변 분포 달성!")
+elif max(yes_count, no_count) >= 7:
+    print("✅ 허용 가능한 답변 분포")
+else:
+    print("⚠️ 균형 개선 권장")
+```
+
+## 자주 사용되는 코드 스니펫
+
+### FAISS DB 로드
+```python
+from langchain_community.vectorstores import FAISS
+from langchain_upstage import UpstageEmbeddings
+
+embeddings = UpstageEmbeddings(model="solar-embedding-1-large")
+vectorstore = FAISS.load_local(str(faiss_db_path), embeddings, allow_dangerous_deserialization=True)
+```
+
+### 질문 생성기 초기화
+```python
+generator = UnifiedYesNoQuestionGenerator(
+    model_name="gpt-4o-2024-08-06",
+    temperature=0.2,
+    difficulty_mode="enhanced"
+)
+```
+
+### 결과 저장 패턴
+```python
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+result_filename = f"experiment_results_{timestamp}.json"
+
+with open(result_filename, "w", encoding="utf-8") as f:
+    json.dump(result_data, f, ensure_ascii=False, indent=2)
+```
+
+이 커서룰을 따르면 한국어 B-RAG 프로젝트에서 자주 발생하는 문제들을 사전에 방지하고, 일관성 있는 고품질 코드를 생성할 수 있습니다.

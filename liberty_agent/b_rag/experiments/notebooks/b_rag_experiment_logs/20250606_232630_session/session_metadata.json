@@ -1,0 +1,57 @@
+{
+  "session_id": "20250606_232630",
+  "session_start_time": "2025-06-06T23:26:30.065625",
+  "total_cells": 8,
+  "completed_cells": [
+    {
+      "cell_number": 1,
+      "cell_name": "모듈 import 및 초기화",
+      "md_file": "cell_01_모듈import및초기화_232637.md",
+      "json_file": "cell_01_모듈import및초기화_232637.json"
+    },
+    {
+      "cell_number": 2,
+      "cell_name": "FAISS DB 다중 문서 질문 검증 및 메모리 설정",
+      "md_file": "cell_02_faissdb다중문서질문검증및메모리설정_233340.md",
+      "json_file": "cell_02_faissdb다중문서질문검증및메모리설정_233340.json"
+    },
+    {
+      "cell_number": 3,
+      "cell_name": "FAISS DB 질문 결과 JSON 저장",
+      "md_file": "cell_03_faissdb질문결과json저장_233346.md",
+      "json_file": "cell_03_faissdb질문결과json저장_233346.json"
+    },
+    {
+      "cell_number": 4,
+      "cell_name": "메모리 상태 정리 및 질문 세트 전환",
+      "md_file": "cell_04_메모리상태정리및질문세트전환_233351.md",
+      "json_file": "cell_04_메모리상태정리및질문세트전환_233351.json"
+    },
+    {
+      "cell_number": 6,
+      "cell_name": "최적화된 실제 RAG 비교 테스트",
+      "md_file": "cell_06_최적화된실제rag비교테스트_235821.md",
+      "json_file": "cell_06_최적화된실제rag비교테스트_235821.json"
+    },
+    {
+      "cell_number": 7,
+      "cell_name": "RAG 시스템 긴급 개선",
+      "md_file": "cell_07_rag시스템긴급개선_010800.md",
+      "json_file": "cell_07_rag시스템긴급개선_010800.json"
+    },
+    {
+      "cell_number": 8,
+      "cell_name": "RAG 시스템 긴급 개선",
+      "md_file": "cell_08_rag시스템긴급개선_011058.md",
+      "json_file": "cell_08_rag시스템긴급개선_011058.json"
+    }
+  ],
+  "failed_cells": [
+    {
+      "cell_number": 5,
+      "cell_name": "최적화된 실제 RAG 비교 테스트",
+      "error": "NameError: name 'OptimizedRAGConfig' is not defined\n\nTraceback (most recent call last):\n  File \"/var/folders/ng/3fkn67lx65g3fmz9qjw7gdp80000gn/T/ipykernel_96978/3065563691.py\", line 63, in <module>\n    standard_config = OptimizedRAGConfig(\n                      ^^^^^^^^^^^^^^^^^^\nNameError: name 'OptimizedRAGConfig' is not defined\n"
+    }
+  ],
+  "notebook_path": "/Users/minu/dev/Liberty/Liberty_ai/liberty_agent/b_rag/experiments/notebooks/b_rag_test_notebook.ipynb"
+}

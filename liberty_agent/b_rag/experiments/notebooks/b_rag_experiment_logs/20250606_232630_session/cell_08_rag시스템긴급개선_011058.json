@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "cell_number": 8,
+    "cell_name": "RAG 시스템 긴급 개선",
+    "execution_timestamp": "2025-06-07T01:10:58.439136",
+    "execution_time_from_session_start": 6268.373444080353,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "",
+  "results": {
+    "test_type": "rag_system_emergency_fix",
+    "improved_temperature": 0.3,
+    "improved_threshold": 0.6,
+    "improved_top_k": 5,
+    "quick_test_completed": true,
+    "yes_rate_achieved": 20.0,
+    "avg_confidence_achieved": 0.7,
+    "improvement_success": true
+  }
+}

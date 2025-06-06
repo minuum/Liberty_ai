@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "cell_number": 17,
+    "cell_name": "다중 문서 결과 분석 및 시각화",
+    "execution_timestamp": "2025-06-06T21:47:23.561326",
+    "execution_time_from_session_start": 7825.718538045883,
+    "success": true,
+    "error_info": null
+  },
+  "summary": "다중 문서 결과 분석 및 시각화 완료\n- 시각화 생성: 성공\n- 저장된 차트: 4개\n- 평균 확신도 개선: +0.069\n- 답변 변경 비율: 56.0%",
+  "results": {
+    "test_type": "multi_document_result_analysis",
+    "visualization_created": true,
+    "charts_saved": [
+      "multi_doc_confidence_by_set_214722.png",
+      "multi_doc_yes_ratio_by_set_214723.png",
+      "multi_doc_confidence_improvement_214723.png",
+      "multi_doc_answer_change_214723.png"
+    ],
+    "analysis_summary": {
+      "total_sets": 5,
+      "total_questions": 25,
+      "standard_yes_ratio": 0.32,
+      "boost_yes_ratio": 0.4,
+      "answer_change_ratio": 0.56,
+      "avg_confidence_improvement": 0.06901249141549311
+    }
+  }
+}
